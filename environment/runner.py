@@ -7,8 +7,16 @@ from typing import List, Optional
 
 # TODO:
 # - Implement generators
-# - Update environment based on feedback
-# - Test the environment to make sure it's working properly
+#   - Team aware (stag) - seems better in small grids - DONE
+#   - Greedy planner (stag) - seems better in medium/large grids - DONE
+#   - Greedy (hare) - seems better in small grids - DONE
+#   - Greedy planner (hare) - seems better in medium/large grids - DONE
+# - Implement other agents for testing
+#   - Generators (no need to do anything once they're done in the previous step) - DONE
+#   - Greedy (stag) - DONE
+#   - Modeller (stag) - DONE
+#   - Greedy prob (hare) - DONE
+#   - Prob dest (hare) - DONE
 # - Implement checkers
 # - Implement and train algorithms
 # - Run simulations, get results
@@ -16,7 +24,12 @@ from typing import List, Optional
 
 def run(hunters: List[Agent], height: int = 5, width: int = 5, log: bool = False, results_file: Optional[str] = None,
         generator_file: Optional[str] = None, vector_file: Optional[str] = None) -> None:
-    stag_hare = StagHare(height, width, hunters)
+    # Sometimes the environment can be randomly initialized so that hunters are immediately placed in a surrounding
+    # position
+    while True:
+        stag_hare = StagHare(height, width, hunters)
+        if not stag_hare.is_over():
+            break
     rewards = [0] * len(hunters)
 
     # Run the environment

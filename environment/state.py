@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Dict, List, Tuple
-from utils.utils import AVAILABLE, HARE_NAME, HARE_REWARD, MAX_MOVEMENT_UNITS, POSSIBLE_DELTA_VALS, \
-    POSSIBLE_MOVEMENTS, STAG_NAME, STAG_REWARD, VERTICAL
+from utils.utils import AVAILABLE, HARE_NAME, HARE_REWARD, MAX_MOVEMENT_UNITS, N_REQUIRED_TO_CAPTURE_HARE, \
+    N_REQUIRED_TO_CAPTURE_STAG, POSSIBLE_DELTA_VALS, POSSIBLE_MOVEMENTS, STAG_NAME, STAG_REWARD, VERTICAL
 
 
 class State:
@@ -68,20 +68,16 @@ class State:
         row, col = row_val, col_val
 
         if row_val < 0:
-            # row = self.height - 1
-            row = 0
-
-        elif row_val >= self.height:
-            # row = 0
             row = self.height - 1
 
+        elif row_val >= self.height:
+            row = 0
+
         if col_val < 0:
-            # col = self.width - 1
-            col = 0
+            col = self.width - 1
 
         elif col_val >= self.width:
-            # col = 0
-            col = self.width - 1
+            col = 0
 
         return row, col
 
@@ -120,20 +116,18 @@ class State:
         return positions
 
     def delta_row(self, curr_row: int, new_row: int) -> int:
-        # move_down = (self.height - curr_row) + new_row
-        # move_up = curr_row + (self.height - new_row)
-        # move_regular = abs(curr_row - new_row)
-        #
-        # return min([move_down, move_up, move_regular])
-        return abs(curr_row - new_row)
+        move_down = (self.height - curr_row) + new_row
+        move_up = curr_row + (self.height - new_row)
+        move_regular = abs(curr_row - new_row)
+
+        return min([move_down, move_up, move_regular])
 
     def delta_col(self, curr_col: int, new_col: int) -> int:
-        # move_left = (self.width - curr_col) + new_col
-        # move_right = curr_col + (self.width - new_col)
-        # move_regular = abs(curr_col - new_col)
-        #
-        # return min([move_left, move_right, move_regular])
-        return abs(curr_col - new_col)
+        move_left = (self.width - curr_col) + new_col
+        move_right = curr_col + (self.width - new_col)
+        move_regular = abs(curr_col - new_col)
+
+        return min([move_left, move_right, move_regular])
 
     def n_movements(self, curr_row: int, curr_col: int, new_row: int, new_col: int) -> int:
         n_steps = self.delta_row(curr_row, new_row) + self.delta_col(curr_col, new_col)
@@ -146,8 +140,6 @@ class State:
         return n_movements <= MAX_MOVEMENT_UNITS
 
     def process_actions(self, action_map: Dict[str, Tuple[int, int]]) -> List[float]:
-        # prey_row, prey_col = self.agent_positions[Utils.PREY_NAME]
-
         for agent_name, tup in action_map.items():
             new_row, new_col = tup
             curr_row, curr_col = self.agent_positions[agent_name]
@@ -164,10 +156,6 @@ class State:
                 raise Exception(f'Cannot move from {(curr_row, curr_col)} to {(new_row, new_col)} because there are '
                                 f'{n_movements} > {MAX_MOVEMENT_UNITS} movements')
 
-            # # Update the number of steps the agent has taken if it is not neighboring the prey
-            # if (new_row, new_col) not in self.neighboring_positions(prey_row, prey_col, filter_availability=False):
-            #     self.agent_n_steps[agent_name] = self.agent_n_steps.get(agent_name, 0) + 1
-
             # Only move the agent if its desired new position is available
             if self.is_available(new_row, new_col):
                 # The old position should now be available since the agent is moving
@@ -181,7 +169,7 @@ class State:
         self.round_num += 1
 
         # Calculate agent rewards for this round
-        rewards, hare_captured, stag_captured = [0] * len(self.agent_names), self.hare_captured(), self.stag_captured()
+        rewards, hare_captured, stag_captured = [0] * (len(self.agent_names) - 2), self.hare_captured(), self.stag_captured()
 
         if hare_captured or stag_captured:
             hare_row, hare_col = self.agent_positions[HARE_NAME]
@@ -189,7 +177,7 @@ class State:
             hare_hunters, stag_hunters = set(), set()
 
             # Find all the hunters that have surrounded the hare and/or stag
-            for i, agent_name in enumerate(self.agent_names):
+            for i, agent_name in enumerate(self.agent_names[2:]):
                 row, col = self.agent_positions[agent_name]
 
                 if self.neighbors(row, col, hare_row, hare_col):
@@ -199,7 +187,7 @@ class State:
                     stag_hunters.add(agent_name)
 
             # Distribute the rewards to the hunters
-            for i, agent_name in enumerate(self.agent_names):
+            for i, agent_name in enumerate(self.agent_names[2:]):
                 if hare_captured and agent_name in hare_hunters:
                     rewards[i] = HARE_REWARD / len(hare_hunters)
 
@@ -211,7 +199,7 @@ class State:
     def hare_captured(self) -> bool:
         curr_row, curr_col = self.agent_positions[HARE_NAME]
 
-        # Try all possible movements for the hare; if it is surrounded on at least 1 side, it is captured
+        # Try all possible movements for the hare; if it is surrounded on the required number of sides, it is captured
         n_hunter_neighbors = 0
 
         for movement in POSSIBLE_MOVEMENTS:
@@ -224,12 +212,12 @@ class State:
 
                 n_hunter_neighbors += 1 if self.hunter_in_position(new_row, new_col) else 0
 
-        return n_hunter_neighbors >= 1
+        return n_hunter_neighbors >= N_REQUIRED_TO_CAPTURE_HARE
 
     def stag_captured(self) -> bool:
         curr_row, curr_col = self.agent_positions[STAG_NAME]
 
-        # Try all possible movements for the stag; if it is surrounded on at least 2 sides, it is captured
+        # Try all possible movements for the stag; if it is surrounded on the required number of sides, it is captured
         n_hunter_neighbors = 0
 
         for movement in POSSIBLE_MOVEMENTS:
@@ -242,7 +230,7 @@ class State:
 
                 n_hunter_neighbors += 1 if self.hunter_in_position(new_row, new_col) else 0
 
-        return n_hunter_neighbors >= 2
+        return n_hunter_neighbors >= N_REQUIRED_TO_CAPTURE_STAG
 
     # def collective_distance(self) -> float:
     #     collective_distance, (prey_row, prey_col) = 0, self.agent_positions[Utils.PREY_NAME]
