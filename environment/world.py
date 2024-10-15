@@ -3,7 +3,7 @@ from agents.prey import Prey
 from environment.state import State
 import numpy as np
 from typing import List
-from utils.utils import HARE_NAME, N_MIN_HUNTERS, STAG_NAME
+from utils.utils import HARE_NAME, N_HUNTERS, STAG_NAME
 
 
 class StagHare:
@@ -11,8 +11,8 @@ class StagHare:
         # Make sure we can set the grid up properly
         n_hunters = len(hunters)
 
-        if n_hunters < N_MIN_HUNTERS:
-            raise Exception(f'There have to be at least {N_MIN_HUNTERS} hunters')
+        if n_hunters != N_HUNTERS:
+            raise Exception(f'There have to be {N_HUNTERS} hunters')
 
         if height * width < n_hunters + 2:
             raise Exception(f'Not enough cells in the grid for the hare, stag, and {n_hunters} hunters')
