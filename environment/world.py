@@ -20,22 +20,28 @@ class StagHare:
         # Generate a list of agents (the hunters, hare, and stage)
         self.agents = [Prey(HARE_NAME), Prey(STAG_NAME)] + hunters
 
-        # Initialize the state
-        agent_names = [agent.name for agent in self.agents]
-        self.state = State(height, width, agent_names)
+        # Initialize the state and rewards
+        self.agent_names = [agent.name for agent in self.agents]
+        self.state = State(height, width, self.agent_names)
+        self.rewards = [0] * len(self.agent_names)
 
     def transition(self) -> List[float]:
         # Randomize the order in which the agents will act
         indices = list(range(len(self.agents)))
         np.random.shuffle(indices)
         action_map = {}
+        round_num = self.state.round_num
 
         for i in indices:
             agent = self.agents[i]
-            new_row, new_col = agent.act(self.state)
+            reward = 0 if (i == 0 or i == 1) else self.rewards[i]
+            new_row, new_col = agent.act(self.state, reward, round_num)
+            print(self.agent_names[i], reward)
             action_map[agent.name] = (new_row, new_col)
 
-        return self.state.process_actions(action_map)
+        self.rewards = self.state.process_actions(action_map)
+
+        return self.rewards
 
     def is_over(self) -> bool:
         # As soon as one of the prey agents is captured, we're done

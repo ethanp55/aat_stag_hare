@@ -8,7 +8,7 @@ class Agent:
     def __init__(self, name: str) -> None:
         self.name = name
 
-    def act(self, state: State) -> Tuple[int, int]:
+    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         pass
 
     def random_action(self, state: State) -> Tuple[int, int]:

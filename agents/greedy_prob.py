@@ -12,7 +12,7 @@ class GreedyProbabilistic(Agent):
         self.dimension_temp, self.direction_temp, self.occupied_penalty = \
             dimension_temp, direction_temp, occupied_penalty
 
-    def act(self, state: State) -> Tuple[int, int]:
+    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         prey_row, prey_col = state.agent_positions[HARE_NAME]
         curr_row, curr_col = state.agent_positions[self.name]
         prey_neighboring_positions = state.neighboring_positions(prey_row, prey_col)

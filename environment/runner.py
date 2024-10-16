@@ -17,12 +17,9 @@ from typing import List, Optional
 #   - Modeller (stag) - DONE
 #   - Greedy prob (hare) - DONE
 #   - Prob dest (hare) - DONE
-# - Implement checkers
-# - Implement and train algorithms
-# - Run simulations, get results
 
 
-def run(hunters: List[Agent], height: int = 5, width: int = 5, log: bool = False, results_file: Optional[str] = None,
+def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = False, results_file: Optional[str] = None,
         generator_file: Optional[str] = None, vector_file: Optional[str] = None) -> None:
     # Sometimes the environment can be randomly initialized so that hunters are immediately placed in a surrounding
     # position
@@ -30,10 +27,11 @@ def run(hunters: List[Agent], height: int = 5, width: int = 5, log: bool = False
         stag_hare = StagHare(height, width, hunters)
         if not stag_hare.is_over():
             break
-    rewards = [0] * len(hunters)
+    rewards = [0] * (len(hunters) + 2)
 
     # Run the environment
     while not stag_hare.is_over():
+        round_num = stag_hare.state.round_num
         round_rewards = stag_hare.transition()
 
         # Update rewards
@@ -41,7 +39,6 @@ def run(hunters: List[Agent], height: int = 5, width: int = 5, log: bool = False
             rewards[i] += reward
 
         # Write any generator usage data and/or vectors
-        round_num = stag_hare.state.round_num - 1
         if generator_file is not None:
             with open(generator_file, 'a', newline='') as file:
                 writer = csv.writer(file)
@@ -55,6 +52,9 @@ def run(hunters: List[Agent], height: int = 5, width: int = 5, log: bool = False
         if log:
             print(f'State:\n{stag_hare.state}')
             print(f'Rewards: {round_rewards}\n')
+
+    # Some agents need to store the final results
+    stag_hare.transition()
 
     # Save data
     if results_file is not None:

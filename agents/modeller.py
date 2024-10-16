@@ -133,7 +133,7 @@ class Modeller(Agent):
 
         return action_map
 
-    def act(self, state: State) -> Tuple[int, int]:
+    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         self._update_teammate_models(state)
 
         # If already neighboring the prey, try to move onto it

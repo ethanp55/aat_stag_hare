@@ -7,5 +7,5 @@ class Random(Agent):
     def __init__(self, name: str) -> None:
         Agent.__init__(self, name)
 
-    def act(self, state: State) -> Tuple[int, int]:
+    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         return self.random_action(state)

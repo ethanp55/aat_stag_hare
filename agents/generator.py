@@ -17,8 +17,8 @@ class Generator(Agent):
         self.baseline = baseline
         self.checker = checker
 
-    def act(self, state: State) -> Tuple[int, int]:
-        return self.generator.act(state)
+    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
+        return self.generator.act(state, reward, round_num)
 
     def check_assumptions(self, state: State) -> None:
         assert self.checker is not None

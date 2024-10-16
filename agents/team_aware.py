@@ -9,7 +9,7 @@ class TeamAware(Agent):
     def __init__(self, name: str) -> None:
         Agent.__init__(self, name)
 
-    def act(self, state: State) -> Tuple[int, int]:
+    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         stag_row, stag_col = state.agent_positions[STAG_NAME]
         curr_row, curr_col = state.agent_positions[self.name]
         stag_neighboring_positions = state.neighboring_positions(stag_row, stag_col)

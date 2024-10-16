@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Dict, List, Tuple
-from utils.utils import AVAILABLE, HARE_NAME, HARE_REWARD, MAX_MOVEMENT_UNITS, N_REQUIRED_TO_CAPTURE_HARE, \
+from utils.utils import AVAILABLE, HARE_NAME, HARE_REWARD, MAX_MOVEMENT_UNITS, N_HUNTERS, N_REQUIRED_TO_CAPTURE_HARE, \
     N_REQUIRED_TO_CAPTURE_STAG, POSSIBLE_DELTA_VALS, POSSIBLE_MOVEMENTS, STAG_NAME, STAG_REWARD, VERTICAL
 
 
@@ -39,6 +39,47 @@ class State:
             grid_str += f'{row}\n'
 
         return grid_str[:-1]
+
+    # Same as prev two, but for the other hunters
+    def vector_representation(self, hunter_name: str) -> np.array:
+        # Grid dimensions
+        n_rows, n_cols = self.height, self.width
+
+        # The hunter's position
+        curr_row, curr_col = self.agent_positions[hunter_name]
+        my_x, my_y = curr_row / self.height, curr_col / self.width
+
+        # The positions of the hare and stag
+        hare_row, hare_col = self.agent_positions[HARE_NAME]
+        stag_row, stag_col = self.agent_positions[STAG_NAME]
+        hare_x, hare_y = hare_row / self.height, hare_col / self.width
+        stag_x, stag_y = stag_row / self.height, stag_col / self.width
+
+        # The hunter's distance to the hare and stag
+        n_possible_steps = self.height * self.width
+        dist_to_hare = self.n_movements(curr_row, curr_col, hare_row, hare_col)
+        dist_to_stag = self.n_movements(curr_row, curr_col, stag_row, stag_col)
+        my_dist_to_hare, my_dist_to_stag = dist_to_hare / n_possible_steps, dist_to_stag / n_possible_steps
+
+        # The other hunters' distance to the hare and stag
+        other_hunters_dists_to_hare, other_hunters_dist_to_stag = [], []
+        for agent_name, (row, col) in self.agent_positions.items():
+            if agent_name == HARE_NAME or agent_name == STAG_NAME or agent_name == hunter_name:
+                continue
+
+            dist_to_hare = self.n_movements(row, col, hare_row, hare_col)
+            dist_to_stag = self.n_movements(row, col, stag_row, stag_col)
+            their_dist_to_hare, their_dist_to_stag = dist_to_hare / n_possible_steps, dist_to_stag / n_possible_steps
+            other_hunters_dists_to_hare.append(their_dist_to_hare)
+            other_hunters_dist_to_stag.append(their_dist_to_stag)
+        assert len(other_hunters_dists_to_hare) == len(other_hunters_dist_to_stag) == N_HUNTERS - 1
+
+        # Combine everything
+        list_representation = [n_rows, n_cols, my_x, my_y, hare_x, hare_y, stag_x, stag_y, my_dist_to_hare,
+                               my_dist_to_stag] + other_hunters_dists_to_hare + other_hunters_dist_to_stag
+
+        # Convert to numpy array, return
+        return np.array(list_representation)
 
     def available_actions(self) -> Dict[str, List[Tuple[int, int]]]:
         possible_actions_map = {}
@@ -169,7 +210,7 @@ class State:
         self.round_num += 1
 
         # Calculate agent rewards for this round
-        rewards, hare_captured, stag_captured = [0] * (len(self.agent_names) - 2), self.hare_captured(), self.stag_captured()
+        rewards, hare_captured, stag_captured = [0] * len(self.agent_names), self.hare_captured(), self.stag_captured()
 
         if hare_captured or stag_captured:
             hare_row, hare_col = self.agent_positions[HARE_NAME]
@@ -177,7 +218,10 @@ class State:
             hare_hunters, stag_hunters = set(), set()
 
             # Find all the hunters that have surrounded the hare and/or stag
-            for i, agent_name in enumerate(self.agent_names[2:]):
+            for i, agent_name in enumerate(self.agent_names):
+                if agent_name == HARE_NAME or agent_name == STAG_NAME:
+                    continue
+
                 row, col = self.agent_positions[agent_name]
 
                 if self.neighbors(row, col, hare_row, hare_col):
@@ -187,7 +231,7 @@ class State:
                     stag_hunters.add(agent_name)
 
             # Distribute the rewards to the hunters
-            for i, agent_name in enumerate(self.agent_names[2:]):
+            for i, agent_name in enumerate(self.agent_names):
                 if hare_captured and agent_name in hare_hunters:
                     rewards[i] = HARE_REWARD / len(hare_hunters)
 

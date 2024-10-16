@@ -10,7 +10,7 @@ class ProbabilisticDestinations(Agent):
         Agent.__init__(self, name)
         self.temperature, self.max_dist, self.max_iterations = temperature, max_dist, max_iterations
 
-    def act(self, state: State) -> Tuple[int, int]:
+    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         prey_row, prey_col = state.agent_positions[HARE_NAME]
         curr_row, curr_col = state.agent_positions[self.name]
 
