@@ -2,6 +2,7 @@ from agents.agent import Agent
 from agents.alegaatr import AlegAATr
 from agents.generator_pool import GeneratorPool
 from agents.greedy import Greedy
+from agents.smalegaatr import SMAlegAATr
 from agents.team_aware import TeamAware
 from copy import deepcopy
 from environment.runner import run
@@ -93,7 +94,7 @@ class FavorMoreRecent(Agent):
 
 N_EPOCHS = 10
 GRID_SIZES = [(10, 10), (13, 13)]
-NO_BASELINE = False
+NO_BASELINE = True
 
 
 def run_training():
@@ -128,7 +129,8 @@ def run_training():
                 agents_to_train_on = []
                 # agents_to_train_on.append(UniformSelector(check_assumptions=True, no_baseline=NO_BASELINE))
                 # agents_to_train_on.append(FavorMoreRecent(check_assumptions=True, no_baseline=NO_BASELINE))
-                agents_to_train_on.append(AlegAATr(lmbda=0.0, ml_model_type='knn', train=True))
+                agents_to_train_on.append(SMAlegAATr(train=True))
+                # agents_to_train_on.append(AlegAATr(lmbda=0.0, ml_model_type='knn', train=True))
                 # agents_to_train_on.append(SMAlegAATr(game, player_idx, train=True))
                 # agents_to_train_on.append(QAlegAATr(game, player_idx, train=True))
                 # agents_to_train_on.append(RawO(game, player_idx, train=True))

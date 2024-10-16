@@ -23,13 +23,12 @@ for agent_name in agent_names:
         height = file.split('h=')[1].split('_')[0]
         width = file.split('w=')[1].split('.')[0]
         opp_type = file[len(agent_name) + 1:].split('_')[0]
-        data = np.genfromtxt(f'{folder}{file}', delimiter=',', skip_header=0)
+        data = np.genfromtxt(f'{folder}{file}', delimiter=',', skip_header=1)
         if len(data.shape) == 1:
             data = data.reshape(1, -1)
         curr_generator_counts = {}
 
         for row in data:
-            print(file)
             generator = row[-1]
             curr_generator_counts[generator] = curr_generator_counts.get(generator, 0) + 1
 

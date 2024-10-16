@@ -1,10 +1,17 @@
 from agents.alegaatr import AlegAATr
+from agents.aleqgaatr import AleqgAATr
 from agents.dqn import DQNAgent
 from agents.generator import GreedyHareGen, GreedyPlannerHareGen, GreedyPlannerStagGen, TeamAwareGen
 from agents.greedy import Greedy
-from agents.modeller import Modeller
 from agents.greedy_prob import GreedyProbabilistic
+from agents.madqn import MADQN
+from agents.modeller import Modeller
+from agents.ppo import PPO
 from agents.prob_dest import ProbabilisticDestinations
+from agents.ralegaatr import RAlegAATr
+from agents.rdqn import RDQN
+from agents.smalegaatr import SMAlegAATr
+from agents.soaleqgaatr import SOAleqgAATr
 from copy import deepcopy
 from environment.runner import run
 import os
@@ -20,7 +27,7 @@ print(n_training_iterations, progress_percentage_chunk)
 n_other_hunters = N_HUNTERS - 1
 
 # names = ['DQN', 'MADQN', 'RDQN', 'AleqgAATr', 'RAlegAATr', 'SOAleqgAATr', 'AlegAATr', 'SMAlegAATr', 'QAlegAATr', 'RawO', 'PPO']
-names = ['DQN']
+names = ['PPO']
 
 # Reset any existing simulation files (opening a file in write mode will truncate it)
 for file in os.listdir('../simulations/results/'):
@@ -52,12 +59,26 @@ for epoch in range(N_EPOCHS):
 
         for other_hunters, label in list_of_other_hunters:
             agents_to_test = []
-            agents_to_test.append(DQNAgent())
+            # agents_to_test.append(DQNAgent())
             # agents_to_test.append(AlegAATr(lmbda=0.0, ml_model_type='knn', enhanced=True))
+            # agents_to_test.append(AleqgAATr())
+            # agents_to_test.append(MADQN())
+            # agents_to_test.append(SOAleqgAATr())
+            # agents_to_test.append(SMAlegAATr(enhanced=False))
+            # agents_to_test.append(RAlegAATr())
+            # agents_to_test.append(RDQN())
+            agents_to_test.append(PPO())
 
             self_play_agents = []
-            self_play_agents.append([DQNAgent(f'DQN{i}') for i in range(n_other_hunters)])
+            # self_play_agents.append([DQNAgent(f'DQN{i}') for i in range(n_other_hunters)])
             # self_play_agents.append([AlegAATr(f'AlegAATr{i}', lmbda=0.0, ml_model_type='knn', enhanced=True) for i in range(n_other_hunters)])
+            # self_play_agents.append([AleqgAATr(f'AleqgAATr{i}') for i in range(n_other_hunters)])
+            # self_play_agents.append([MADQN(f'MADQN{i}') for i in range(n_other_hunters)])
+            # self_play_agents.append([SOAleqgAATr(f'SOAleqgAATr{i}') for i in range(n_other_hunters)])
+            # self_play_agents.append([SMAlegAATr(f'SMAlegAATr{i}', enhanced=False) for i in range(n_other_hunters)])
+            # self_play_agents.append([RAlegAATr(f'RAlegAATr{i}') for i in range(n_other_hunters)])
+            # self_play_agents.append([RDQN(f'RDQN{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([PPO(f'PPO{i}') for i in range(n_other_hunters)])
 
             for i, agent_to_test in enumerate(agents_to_test):
                 if label == 'selfplay':

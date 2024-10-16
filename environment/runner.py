@@ -7,6 +7,15 @@ from typing import List, Optional
 
 def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = False, results_file: Optional[str] = None,
         generator_file: Optional[str] = None, vector_file: Optional[str] = None) -> None:
+    # Reset any generator usage data and/or vector data
+    if generator_file is not None:
+        with open(generator_file, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['round', 'generator'])
+    if vector_file is not None:
+        with open(vector_file, 'w', newline='') as _:
+            pass
+
     # Sometimes the environment can be randomly initialized so that hunters are immediately placed in a surrounding
     # position
     while True:
