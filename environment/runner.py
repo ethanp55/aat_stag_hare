@@ -5,20 +5,6 @@ import numpy as np
 from typing import List, Optional
 
 
-# TODO:
-# - Implement generators
-#   - Team aware (stag) - seems better in small grids - DONE
-#   - Greedy planner (stag) - seems better in medium/large grids - DONE
-#   - Greedy (hare) - seems better in small grids - DONE
-#   - Greedy planner (hare) - seems better in medium/large grids - DONE
-# - Implement other agents for testing
-#   - Generators (no need to do anything once they're done in the previous step) - DONE
-#   - Greedy (stag) - DONE
-#   - Modeller (stag) - DONE
-#   - Greedy prob (hare) - DONE
-#   - Prob dest (hare) - DONE
-
-
 def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = False, results_file: Optional[str] = None,
         generator_file: Optional[str] = None, vector_file: Optional[str] = None) -> None:
     # Sometimes the environment can be randomly initialized so that hunters are immediately placed in a surrounding

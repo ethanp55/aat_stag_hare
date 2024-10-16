@@ -3,15 +3,12 @@ from agents.generator import GreedyHareGen, GreedyPlannerHareGen, GreedyPlannerS
 import csv
 from environment.state import State
 import fcntl
-import numpy as np
 from typing import List
 
 
 class GeneratorPool(Agent):
-    def __init__(self, name: str, player: int, check_assumptions: bool = False,
-                 no_baseline_labels: bool = False) -> None:
+    def __init__(self, name: str, check_assumptions: bool = False, no_baseline_labels: bool = False) -> None:
         Agent.__init__(self, name)
-        self.player = player
         self.generators = []
         self.generators.append(GreedyHareGen(name, check_assumptions=check_assumptions))
         self.generators.append(GreedyPlannerHareGen(name, check_assumptions=check_assumptions))

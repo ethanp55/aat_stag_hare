@@ -33,10 +33,10 @@ class AssumptionChecker:
     def _check_progress(self, state: State) -> None:
         # Check the grid sizes
         width, height = state.width, state.height
-        self.width_small = width / 15 if width < 15 else 0.0
-        self.width_large = 15 / width if width >= 15 else 0.0
-        self.height_small = height / 15 if height < 15 else 0.0
-        self.height_large = 15 / height if height >= 15 else 0.0
+        self.width_small = width / 10 if width <= 10 else 0.0
+        self.width_large = 10 / width if width > 10 else 0.0
+        self.height_small = height / 10 if height <= 10 else 0.0
+        self.height_large = 10 / height if height > 10 else 0.0
 
         # Check how close we are to the stag and hare, relative to the other hunters
         stag_row, stag_col = state.agent_positions[STAG_NAME]

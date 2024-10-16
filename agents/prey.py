@@ -1,4 +1,4 @@
-from agents.random import Random
+from agents.random_agent import Random
 from utils.utils import HARE_NAME, STAG_NAME
 
 

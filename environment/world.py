@@ -36,10 +36,10 @@ class StagHare:
             agent = self.agents[i]
             reward = 0 if (i == 0 or i == 1) else self.rewards[i]
             new_row, new_col = agent.act(self.state, reward, round_num)
-            print(self.agent_names[i], reward)
             action_map[agent.name] = (new_row, new_col)
 
-        self.rewards = self.state.process_actions(action_map)
+        if not self.is_over():
+            self.rewards = self.state.process_actions(action_map)
 
         return self.rewards
 
