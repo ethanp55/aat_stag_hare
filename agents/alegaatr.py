@@ -106,7 +106,7 @@ class AlegAATr(Agent):
         done = state.hare_captured() or state.stag_captured()
         if done and self.train:
             self.generator_pool.train_aat(enhanced=True)
-        if done:
-            print(f'Generators used: {self.generators_used}')
+        # if done:
+        #     print(f'Generators used: {self.generators_used}')
 
         return token_allocations

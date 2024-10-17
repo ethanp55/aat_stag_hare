@@ -70,3 +70,7 @@ print(pairwise_tukeyhsd(endog=df['agent_final_reward'], groups=df['algorithm'], 
 
 print('\nFINAL REWARD SUMS:')
 print(pairwise_tukeyhsd(endog=df['reward_sum'], groups=df['algorithm'], alpha=0.05))
+
+print('\nSELF-PLAY REWARDS:')
+df_self_play = df[df['opponent_type'] == 'selfplay']
+print(pairwise_tukeyhsd(endog=df_self_play['reward_sum'], groups=df_self_play['algorithm'], alpha=0.05))

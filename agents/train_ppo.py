@@ -7,7 +7,7 @@ from environment.runner import run
 from utils.utils import HARE_NAME, N_HUNTERS
 
 
-N_EPOCHS = 200
+N_EPOCHS = 500
 n_training_iterations = N_EPOCHS * len(GRID_SIZES)
 progress_percentage_chunk = int(0.05 * n_training_iterations)
 curr_iteration = 0
