@@ -18,8 +18,8 @@ from utils.utils import N_HUNTERS
 
 # Variables
 N_AGENTS = 11
-N_ITERATIONS = 100
-GRID_SIZE = (9, 9)
+N_ITERATIONS = 500
+GRID_SIZE = (11, 11)
 progress_percentage_chunk = int(0.05 * N_ITERATIONS)
 n_other_hunters = N_HUNTERS - 1
 
