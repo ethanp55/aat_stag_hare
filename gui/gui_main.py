@@ -3,15 +3,22 @@ from operator import truediv
 import pygame
 from pygame import K_ESCAPE
 import player
+
+
 from environment.runner import run
+from agents.random_agent import *
+from agents.human import *
 
-# i know for a fact that I need at least these 2.
-# i know for a fact that I need at least these 2.
-import environment
-import agents
+# number of rows and columns.
+height = 10
+width = 10
 
 
-# need to make a couple of agents IG lol
+
+hunters = [Random(name="R1"),Random(name="R2"),Random(name="H")]
+run(hunters, height=height, width=width) # how the mcfetch do I access the stag and the hare, I can't find them anywhere. probably need to set them up as values IG.
+
+
 
 
 SCREEN_WIDTH = 800 # fetch it we are making it a square.
@@ -46,6 +53,16 @@ while running:
         #2. udpates the state of the game objects
         #3. updates the display (and audio output)
         #4. maintains the speed of the game.
+
+        # so the way I understand it
+        # we need to import the size of the game from the actual environment and update them as we go
+        # blit the lines on the screen and make them black
+        # fill the backround with white (which we already did)
+        # what I don't understand is how to update the environment to contain those agents as specified.
+        # I don't know how to make the user input actually interact with anything, which is prolly the bigggest problem
+        # I also don't know if the output is dynamic or static - if moves are made once every couple of seconds or the second
+        # that new player input is available it executes everything. more questions for me to ask IG lol.
+        # I wish I could just run this and understand how it works, that would make this a lot easier.
 
         screen.fill((0,0,0))
         screen.blit(player.surf, player.rect)

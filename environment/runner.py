@@ -56,3 +56,4 @@ def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = Fal
         with open(results_file, 'a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(rewards)
+
