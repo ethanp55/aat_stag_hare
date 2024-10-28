@@ -39,10 +39,13 @@ class StagHare:
             action_map[agent.name] = (new_row, new_col)
 
         if not self.is_over():
-            self.rewards = self.state.process_actions(action_map)
+            self.rewards = self.state.process_actions(action_map) # this is where a lot of the magic happens.
 
         return self.rewards
 
     def is_over(self) -> bool:
         # As soon as one of the prey agents is captured, we're done
         return self.state.hare_captured() or self.state.stag_captured()
+
+    def return_state(self):
+        return self.state

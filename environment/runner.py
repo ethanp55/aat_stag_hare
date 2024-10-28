@@ -6,7 +6,7 @@ from typing import List, Optional
 
 
 def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = False, results_file: Optional[str] = None,
-        generator_file: Optional[str] = None, vector_file: Optional[str] = None) -> None:
+        generator_file: Optional[str] = None, vector_file: Optional[str] = None, gui_enabled: Optional[bool] = False) -> None:
     # Reset any generator usage data and/or vector data
     if generator_file is not None:
         with open(generator_file, 'w', newline='') as file:
@@ -15,6 +15,8 @@ def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = Fal
     if vector_file is not None:
         with open(vector_file, 'w', newline='') as _:
             pass
+
+
 
     # Sometimes the environment can be randomly initialized so that hunters are immediately placed in a surrounding
     # position
@@ -26,6 +28,7 @@ def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = Fal
 
     # Run the environment
     while not stag_hare.is_over():
+
         round_num = stag_hare.state.round_num
         round_rewards = stag_hare.transition()
 
