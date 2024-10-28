@@ -28,32 +28,40 @@ SCREEN_WIDTH = 800 # fetch it we are making it a square.
 SCREEN_HEIGHT = 800
 
 def main():
-    human_player = pygame.Surface((20, 20))  # creates a little player object
-    human_player.fill((0, 120, 120))
-    human_rect_text = human_player.get_rect()
+    #human_player = pygame.Surface((20, 20))  # creates a little player object
+    #human_player.fill((0, 120, 120))
+    #human_rect_text = human_player.get_rect()
 
     pygame.init()  # actually starts the game.
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # not sure what the preferred game size is but lets start there IG.
 
-    #player = player.Player()
+
 
     running = True
 
     #stag_hare = StagHare(height, width, hunters)
 
+    SCREEN.fill(BLACKCOLOR)
+
+    LR_lines = width + 1
+    UD_lines = height + 1
+
+    widthOffset = SCREEN_WIDTH / LR_lines
+    heightOffset = SCREEN_HEIGHT / UD_lines
+
+    for x in range(0, LR_lines):
+        for y in range(0, UD_lines):
+
+
+            rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
+            pygame.draw.rect(SCREEN, WHITECOLOR, rect)
+
+
     while running:
-
         #states = stag_hare.return_state()
-        # first we need to render the
-        LR_lines = WIDTH + 1
-        UD_lines = HEIGHT + 1
 
-        widthOffset = SCREEN_WIDTH / LR_lines
-        heightOffset = SCREEN_HEIGHT / UD_lines
 
-        current_pixel = 0
-        SCREEN.fill(WHITECOLOR)
-        drawGrid(SCREEN)
+
 
         for event in pygame.event.get():
 
@@ -88,19 +96,24 @@ def main():
             # that new player input is available it executes everything. more questions for me to ask IG lol.
             # I wish I could just run this and understand how it works, that would make this a lot easier.
 
-            SCREEN.blit(player.surf, player.rect)
-            player.update(pressed_keys)
-            pygame.display.flip()
+            #SCREEN.blit(player.surf, player.rect)
+            #player.update(pressed_keys)
+            pygame.display.update()
 
     pygame.quit()
 
 
-def drawGrid(SCREEN):
-    blockSize = 80
-    for x in range(0, SCREEN_WIDTH, blockSize):
-        for y in range(0, SCREEN_HEIGHT, blockSize):
-            rect = pygame.Rect(x,y,blockSize,blockSize)
-            pygame.draw.rect(SCREEN, BLACKCOLOR, rect)
+# def drawGrid(SCREEN):
+#     LR_lines = width + 1
+#     UD_lines = height + 1
+#
+#     widthOffset = SCREEN_WIDTH / LR_lines
+#     heightOffset = SCREEN_HEIGHT / UD_lines
+#
+#     for x in range(0, LR_lines):
+#         for y in range(0, UD_lines):
+#             rect = pygame.Rect(x,y,widthOffset,heightOffset)
+#             pygame.draw.rect(SCREEN, WHITECOLOR, rect)
 
 if __name__ == '__main__':
     main()
