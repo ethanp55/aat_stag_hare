@@ -11,9 +11,9 @@ from environment.world import StagHare
 
 # pre load in all of our sprites as well.
 HUNTER_SPRITE = pygame.image.load("hunter.png") # for the human player thingy.
-HARE_IMAGE = pygame.image.load("hare.jpg") # might need to make this smaller ig.
+HARE_IMAGE = pygame.image.load("hare.png") # might need to make this smaller ig.
 STAG_IMAGE = pygame.image.load("stag.png") # might also need to make this smaller.
-AGENT_IMAGE = pygame.image.load("Agent.png") # hehe funny joke.
+AGENT_IMAGE = pygame.image.load("agent.png") # hehe funny joke.
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)

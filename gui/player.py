@@ -19,10 +19,13 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surf = pygame.Surface((75, 25))
-        self.surf.fill((255, 255, 255))
-        self.rect = self.surf.get_rect()
-
+        #self.surf = pygame.Surface((75, 25))
+        #self.surf.fill((255, 255, 255))
+        #self.rect = self.surf.get_rect()
+        self.image = HUNTER_SPRITE
+        self.surf = HUNTER_SPRITE
+        self.rect = self.image.get_rect()
+        #self.surf = pygame.Surface((20,20))
 
     def update(self, pressed_keys):
         if pressed_keys[K_UP]:
