@@ -58,26 +58,32 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
+            if event.type == pygame.KEYDOWN:
+                pressed_keys = pygame.key.get_pressed()
+                stag_hare.agents[4].set_player_position(pressed_keys, state)
+
+                round_rewards = stag_hare.gui_transition()
+
+                # Update rewards
+                for i, reward in enumerate(round_rewards):
+                    rewards[i] += reward
+
+                stag_hare.gui_transition()  # this is where a lot of the magic happens.
 
 
-        pressed_keys = pygame.key.get_pressed()
-        stag_hare.agents[4].set_player_position(pressed_keys)
+            for agent in state.agent_positions:
+                if agent == 'hare':
+                    hare.update(SCREEN, state.agent_positions[agent])
+                if agent == "stag":
+                    stag.update(SCREEN, state.agent_positions[agent])
+                if agent == "R1":
+                    agent1.update(SCREEN, state.agent_positions[agent])
+                if agent == "R2":
+                    agent2.update(SCREEN, state.agent_positions[agent])
+                if agent == "H":
+                    this_player.update(SCREEN, state.agent_positions[agent])
 
 
-        for agent in state.agent_positions:
-            if agent == 'hare':
-                hare.update(SCREEN, state.agent_positions[agent])
-            if agent == "stag":
-                stag.update(SCREEN, state.agent_positions[agent])
-            if agent == "R1":
-                agent1.update(SCREEN, state.agent_positions[agent])
-            if agent == "R2":
-                agent2.update(SCREEN, state.agent_positions[agent])
-            if agent == "H":
-                this_player.update(SCREEN, state.agent_positions[agent])
-
-
-            #this_player.update(pressed_keys)
             pygame.display.update()
 
             if event.type == pygame.QUIT:
@@ -86,18 +92,6 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:  # gives us a way to stop execution.
                     running = False
-
-        round_num = stag_hare.state.round_num
-        round_rewards = stag_hare.gui_transition()
-
-        # Update rewards
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-        stag_hare.gui_transition() # this is where a lot of the magic happens.
-
-
-
 
     pygame.quit()
 

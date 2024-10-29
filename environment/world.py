@@ -52,12 +52,13 @@ class StagHare:
 
         for i in indices:
             agent = self.agents[i]
-            if agent == "H":
-                new_row, new_col = agent.get_player_position()
-
-            reward = 0 if (i == 0 or i == 1) else self.rewards[i]
-            new_row, new_col = agent.act(self.state, reward, round_num)
-            action_map[agent.name] = (new_row, new_col)
+            if agent.name == "H":
+                new_row, new_col = agent.get_player_position(self.state)
+                action_map[agent.name] = (new_row, new_col)
+            else:
+                reward = 0 if (i == 0 or i == 1) else self.rewards[i]
+                new_row, new_col = agent.act(self.state, reward, round_num)
+                action_map[agent.name] = (new_row, new_col)
 
         if not self.is_over():
             self.rewards = self.state.process_actions(action_map)  # this is where a lot of the magic happens.

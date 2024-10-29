@@ -2,8 +2,7 @@ from agents.agent import Agent
 from environment.state import State
 from typing import Tuple
 
-row = 0
-col = 0
+
 
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
     K_UP,
@@ -21,9 +20,19 @@ class humanAgent:
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         pass
 
-    def get_player_position(self):
+    def set_player_position(self, pressed_keys, state):
         curr_row, curr_col = state.agent_positions[self.name]
+        if pressed_keys[K_UP]:
+            curr_row += 1
+        if pressed_keys[K_DOWN]:
+            curr_row -= 1
+        if pressed_keys[K_LEFT]:
+            curr_col -= 1
+        if pressed_keys[K_RIGHT]:
+            curr_col += 1
+        state.agent_positions[self.name] = (curr_row, curr_col) # updates the actual position
 
-    def set_player_position(self, row, col):
-        self.row = row
-        self.col = col
+    def get_player_position(self, state):
+        curr_row, curr_col = state.agent_positions[self.name]
+        return curr_row, curr_col
+
