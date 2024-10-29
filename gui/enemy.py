@@ -1,24 +1,33 @@
+from array import array
+
 import pygame
-from pygame import K_ESCAPE
+
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 
 
-
-
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, sprite):
         super(Enemy, self).__init__()
-        self.surf = pygame.Surface((400, 400))
-        self.surf.fill((255, 255, 255))
-        self.rect = self.surf.get_rect()
+        self.image = sprite
+        self.surf = sprite
+        self.rect = self.image.get_rect()
 
-    def update(self):
-        pass
-        # so if we get a position 1,1, what does that actually correspond to?
-        # like in the grid?
+    def update(self, screen, array_position):
+        # here
+        new_position = calculate_position(array_position)
 
-        # update, instead of pressed keys, will take in the new position and upate it to the appropriate cell and center it.
-        # something something new state something something
+        screen.blit(self.surf, new_position) # so this one works.
 
 
+
+
+def calculate_position(array_position):
+    current_x = array_position[0]
+    current_y = array_position[1]
+    #current_y = 10 - current_y # need to flip
+
+    current_x = current_x * 80 + 18 # just an offset constant
+    current_y = current_y * 80 + 18
+    return current_x, current_y

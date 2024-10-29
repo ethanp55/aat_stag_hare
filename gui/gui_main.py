@@ -4,6 +4,7 @@ import pygame
 from pygame import K_ESCAPE
 from pygame.examples.moveit import WIDTH, HEIGHT
 from gui import player
+from gui import enemy
 from environment.runner import run
 from agents.random_agent import *
 from agents.human import *
@@ -29,6 +30,12 @@ SCREEN_HEIGHT = 800
 
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 
+# sets up and initializes all of our agents
+this_player = player.Player()
+stag = enemy.Enemy(STAG_IMAGE)
+hare = enemy.Enemy(HARE_IMAGE)
+agent1 = enemy.Enemy(AGENT_IMAGE)
+agent2 = enemy.Enemy(AGENT_IMAGE)
 
 def main():
     pygame.init()  # actually starts the game.
@@ -43,16 +50,31 @@ def main():
 
         states = stag_hare.return_state()
 
+
+
         for event in pygame.event.get():
+
+            for agent in states.agent_positions:
+                if agent == 'hare':
+                    pass
+                if agent == "stag":
+                    pass
+                if agent == "R1":
+                    pass
+                if agent == "R2":
+                    pass
+                if agent == "H":
+                    pass
 
             pressed_keys = pygame.key.get_pressed()
 
-            this_player = player.Player()
-            #new_player_position = calculate_position(0,0)
-            #this_player.rect.x = new_player_position[0]
-            #this_player.rect.y = new_player_position[1]
+
 
             SCREEN.blit(this_player.surf, this_player.rect)
+            current_tuple = 9,9
+            stag.update(SCREEN, current_tuple)
+
+
 
             this_player.update(pressed_keys)
             pygame.display.update()
