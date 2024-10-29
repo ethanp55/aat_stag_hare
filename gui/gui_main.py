@@ -31,31 +31,31 @@ SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish scr
 
 
 def main():
-    human_player = pygame.Surface((20, 20))  # creates a little player object
-    human_player.fill((0, 120, 120))
-    human_rect_text = human_player.get_rect()
-
     pygame.init()  # actually starts the game.
-    this_player = player.Player()
-
 
 
     running = True
 
-    #stag_hare = StagHare(height, width, hunters)
-
-
-
-
+    stag_hare = StagHare(height, width, hunters)
     while running:
 
         draw_grid()
 
-        #states = stag_hare.return_state()
+        states = stag_hare.return_state()
 
         for event in pygame.event.get():
 
             pressed_keys = pygame.key.get_pressed()
+
+            this_player = player.Player()
+            #new_player_position = calculate_position(0,0)
+            #this_player.rect.x = new_player_position[0]
+            #this_player.rect.y = new_player_position[1]
+
+            SCREEN.blit(this_player.surf, this_player.rect)
+
+            this_player.update(pressed_keys)
+            pygame.display.update()
 
             if event.type == pygame.QUIT:
                 running = False
@@ -63,32 +63,9 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:  # gives us a way to stop execution.
                     running = False
-                # now we need to pass off the movement.
-                #
 
-            # i need a rect for all of the players,
-            # then a separate one for the stag and the hare
-            # and maybe have a different class for the player vs the non players.
 
-            # need to handle 4 events
-            # 1. process user input
-            # 2. udpates the state of the game objects
-            # 3. updates the display (and audio output)
-            # 4. maintains the speed of the game.
 
-            # so the way I understand it
-            # we need to import the size of the game from the actual environment and update them as we go
-            # blit the lines on the screen and make them black
-            # fill the backround with white (which we already did)
-            # what I don't understand is how to update the environment to contain those agents as specified.
-            # I don't know how to make the user input actually interact with anything, which is prolly the bigggest problem
-            # I also don't know if the output is dynamic or static - if moves are made once every couple of seconds or the second
-            # that new player input is available it executes everything. more questions for me to ask IG lol.
-            # I wish I could just run this and understand how it works, that would make this a lot easier.
-
-            SCREEN.blit(this_player.surf, this_player.rect)
-            this_player.update(pressed_keys)
-            pygame.display.update()
 
     pygame.quit()
 
@@ -104,3 +81,10 @@ def draw_grid(): # draws the grid on every frame just so we have it.
 
 if __name__ == '__main__':
     main()
+
+
+def calculate_position(row, column):
+    new_x_coord = (row * width) + 10 # centering constant IG.
+    new_y_coord = (column * height) + 10
+    return new_x_coord, new_y_coord
+
