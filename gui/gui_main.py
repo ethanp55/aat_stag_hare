@@ -3,37 +3,40 @@ from operator import truediv
 import pygame
 from pygame import K_ESCAPE
 from pygame.examples.moveit import WIDTH, HEIGHT
-
-import player
-
-
+from gui import player
 from environment.runner import run
 from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
 
-# number of rows and columns.
-height = 10
-width = 10
-
-
-hunters = [Random(name="R1"),Random(name="R2"),Random(name="H")]
-# how the mcfetch do I access the stag and the hare, I can't find them anywhere. probably need to set them up as values IG.
-
+# pre load in all of our sprites as well.
+HUNTER_SPRITE = pygame.image.load("hunter.png") # for the human player thingy.
+HARE_IMAGE = pygame.image.load("hare.jpg") # might need to make this smaller ig.
+STAG_IMAGE = pygame.image.load("stag.png") # might also need to make this smaller.
+AGENT_IMAGE = pygame.image.load("Agent.png") # hehe funny joke.
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
-SCREEN_WIDTH = 800 # fetch it we are making it a square.
+# number of rows and columns.
+height = 10
+width = 10
+
+hunters = [Random(name="R1"),Random(name="R2"),Random(name="H")] # creates our agents for our environment
+
+SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
+
+
 def main():
-    #human_player = pygame.Surface((20, 20))  # creates a little player object
-    #human_player.fill((0, 120, 120))
-    #human_rect_text = human_player.get_rect()
+    human_player = pygame.Surface((20, 20))  # creates a little player object
+    human_player.fill((0, 120, 120))
+    human_rect_text = human_player.get_rect()
 
     pygame.init()  # actually starts the game.
-    SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # not sure what the preferred game size is but lets start there IG.
+    this_player = player.Player()
 
 
 
@@ -41,27 +44,14 @@ def main():
 
     #stag_hare = StagHare(height, width, hunters)
 
-    SCREEN.fill(BLACKCOLOR)
 
-    LR_lines = width + 1
-    UD_lines = height + 1
-
-    widthOffset = SCREEN_WIDTH / LR_lines
-    heightOffset = SCREEN_HEIGHT / UD_lines
-
-    for x in range(0, LR_lines):
-        for y in range(0, UD_lines):
-
-
-            rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
-            pygame.draw.rect(SCREEN, WHITECOLOR, rect)
 
 
     while running:
+
+        draw_grid()
+
         #states = stag_hare.return_state()
-
-
-
 
         for event in pygame.event.get():
 
@@ -96,24 +86,21 @@ def main():
             # that new player input is available it executes everything. more questions for me to ask IG lol.
             # I wish I could just run this and understand how it works, that would make this a lot easier.
 
-            #SCREEN.blit(player.surf, player.rect)
-            #player.update(pressed_keys)
+            SCREEN.blit(this_player.surf, this_player.rect)
+            this_player.update(pressed_keys)
             pygame.display.update()
 
     pygame.quit()
 
 
-# def drawGrid(SCREEN):
-#     LR_lines = width + 1
-#     UD_lines = height + 1
-#
-#     widthOffset = SCREEN_WIDTH / LR_lines
-#     heightOffset = SCREEN_HEIGHT / UD_lines
-#
-#     for x in range(0, LR_lines):
-#         for y in range(0, UD_lines):
-#             rect = pygame.Rect(x,y,widthOffset,heightOffset)
-#             pygame.draw.rect(SCREEN, WHITECOLOR, rect)
+def draw_grid(): # draws the grid on every frame just so we have it.
+    SCREEN.fill(WHITECOLOR)
+    widthOffset = (SCREEN_WIDTH / width)
+    heightOffset = (SCREEN_HEIGHT / height)
+    for x in range(0, width):
+        for y in range(0, height):
+            rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
+            pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
 
 if __name__ == '__main__':
     main()

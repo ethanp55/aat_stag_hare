@@ -3,6 +3,10 @@ from pygame import K_ESCAPE
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 
+HUNTER_SPRITE = pygame.image.load("hunter.png") # for the human player thingy.
+
+
+
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
     K_UP,
     K_DOWN,
@@ -18,6 +22,8 @@ class Player(pygame.sprite.Sprite):
         self.surf = pygame.Surface((75, 25))
         self.surf.fill((255, 255, 255))
         self.rect = self.surf.get_rect()
+
+
     def update(self, pressed_keys):
         if pressed_keys[K_UP]:
             self.rect.move_ip(0, -5)
