@@ -43,6 +43,27 @@ class StagHare:
 
         return self.rewards
 
+
+    def gui_transition(self) -> List[float]:
+        indices = list(range(len(self.agents)))
+        np.random.shuffle(indices)
+        action_map = {}
+        round_num = self.state.round_num
+
+        for i in indices:
+            agent = self.agents[i]
+            if agent == "H":
+                new_row, new_col = agent.get_player_position()
+
+            reward = 0 if (i == 0 or i == 1) else self.rewards[i]
+            new_row, new_col = agent.act(self.state, reward, round_num)
+            action_map[agent.name] = (new_row, new_col)
+
+        if not self.is_over():
+            self.rewards = self.state.process_actions(action_map)  # this is where a lot of the magic happens.
+
+        return self.rewards
+
     def is_over(self) -> bool:
         # As soon as one of the prey agents is captured, we're done
         return self.state.hare_captured() or self.state.stag_captured()

@@ -10,6 +10,9 @@ from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
 
+#the state contains the position methinks.
+
+
 # pre load in all of our sprites as well.
 HUNTER_SPRITE = pygame.image.load("hunter.png") # for the human player thingy.
 HARE_IMAGE = pygame.image.load("hare.png") # might need to make this smaller ig.
@@ -23,7 +26,7 @@ WHITECOLOR = (255, 255, 255)
 height = 10
 width = 10
 
-hunters = [Random(name="R1"),Random(name="R2"),Random(name="H")] # creates our agents for our environment
+hunters = [Random(name="R1"),Random(name="R2"),humanAgent(name="H")] # creates our agents for our environment
 
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
@@ -44,39 +47,37 @@ def main():
     running = True
 
     stag_hare = StagHare(height, width, hunters)
-    while running:
-
+    while running and not stag_hare.is_over(): # make sure that we aren't over
         draw_grid()
+        rewards = [0] * (len(hunters) + 2)
 
-        states = stag_hare.return_state()
-
-
+        state = stag_hare.return_state()
 
         for event in pygame.event.get():
 
-            for agent in states.agent_positions:
-                if agent == 'hare':
-                    pass
-                if agent == "stag":
-                    pass
-                if agent == "R1":
-                    pass
-                if agent == "R2":
-                    pass
-                if agent == "H":
-                    pass
-
-            pressed_keys = pygame.key.get_pressed()
+            if event.type == pygame.QUIT:
+                running = False
 
 
 
-            SCREEN.blit(this_player.surf, this_player.rect)
-            current_tuple = 9,9
-            stag.update(SCREEN, current_tuple)
+        pressed_keys = pygame.key.get_pressed()
+        stag_hare.agents[4].set_player_position(pressed_keys)
 
 
+        for agent in state.agent_positions:
+            if agent == 'hare':
+                hare.update(SCREEN, state.agent_positions[agent])
+            if agent == "stag":
+                stag.update(SCREEN, state.agent_positions[agent])
+            if agent == "R1":
+                agent1.update(SCREEN, state.agent_positions[agent])
+            if agent == "R2":
+                agent2.update(SCREEN, state.agent_positions[agent])
+            if agent == "H":
+                this_player.update(SCREEN, state.agent_positions[agent])
 
-            this_player.update(pressed_keys)
+
+            #this_player.update(pressed_keys)
             pygame.display.update()
 
             if event.type == pygame.QUIT:
@@ -85,6 +86,15 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:  # gives us a way to stop execution.
                     running = False
+
+        round_num = stag_hare.state.round_num
+        round_rewards = stag_hare.gui_transition()
+
+        # Update rewards
+        for i, reward in enumerate(round_rewards):
+            rewards[i] += reward
+
+        stag_hare.gui_transition() # this is where a lot of the magic happens.
 
 
 

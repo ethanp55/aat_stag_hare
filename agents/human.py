@@ -2,7 +2,15 @@ from agents.agent import Agent
 from environment.state import State
 from typing import Tuple
 
+row = 0
+col = 0
 
+from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
+    K_UP,
+    K_DOWN,
+    K_LEFT,
+    K_RIGHT,
+)
 
 
 class humanAgent:
@@ -11,7 +19,11 @@ class humanAgent:
 
 
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
+        pass
 
-        # so this is going to need to change, becuase we want the actions to be toggleable by the player
-        # this is going to need to take in input from the other dudes, which is unfortuante.
-        return 1,1 # this is NOT final. just need to make a gui first.
+    def get_player_position(self):
+        curr_row, curr_col = state.agent_positions[self.name]
+
+    def set_player_position(self, row, col):
+        self.row = row
+        self.col = col

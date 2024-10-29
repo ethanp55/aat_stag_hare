@@ -19,30 +19,22 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        #self.surf = pygame.Surface((75, 25))
-        #self.surf.fill((255, 255, 255))
-        #self.rect = self.surf.get_rect()
         self.image = HUNTER_SPRITE
         self.surf = HUNTER_SPRITE
         self.rect = self.image.get_rect()
-        #self.surf = pygame.Surface((20,20))
 
-    def update(self, pressed_keys):
-        if pressed_keys[K_UP]:
-            self.rect.move_ip(0, -5)
-        if pressed_keys[K_DOWN]:
-            self.rect.move_ip(0, 5)
-        if pressed_keys[K_LEFT]:
-            self.rect.move_ip(-5, 0)
-        if pressed_keys[K_RIGHT]:
-            self.rect.move_ip(5, 0)
 
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.right > SCREEN_WIDTH:
-            self.rect.right = SCREEN_WIDTH
-        if self.rect.top <= 0:
-            self.rect.top = 0
-        if self.rect.bottom >= SCREEN_HEIGHT:
-            self.rect.bottom = SCREEN_HEIGHT
+    def update(self, screen, array_position):
+        new_position = calculate_position(array_position)
+        screen.blit(self.surf, new_position)  # so this one works.
+
+
+def calculate_position(array_position):
+    current_x = array_position[0]
+    current_y = array_position[1]
+    # current_y = 10 - current_y # need to flip
+
+    current_x = current_x * 80 + 18  # just an offset constant
+    current_y = current_y * 80 + 18
+    return current_x, current_y
 
