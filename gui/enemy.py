@@ -26,8 +26,6 @@ class Enemy(pygame.sprite.Sprite):
 def calculate_position(array_position):
     current_x = array_position[0]
     current_y = array_position[1]
-    #current_y = 10 - current_y # need to flip
-
     current_x = current_x * 80 + 18 # just an offset constant
     current_y = current_y * 80 + 18
     return current_x, current_y

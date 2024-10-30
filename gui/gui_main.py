@@ -49,12 +49,13 @@ agent2 = enemy.Enemy(AGENT_IMAGE)
 def main():
     pygame.init()  # actually starts the game.
     running = True
+    rewards = [0] * (len(hunters) + 2)
 
     stag_hare = StagHare(height, width, hunters)
+
     while running and not stag_hare.is_over(): # make sure that we aren't over
 
         draw_grid()
-        rewards = [0] * (len(hunters) + 2)
 
         state = stag_hare.return_state()
 
@@ -109,21 +110,18 @@ def draw_grid(): # draws the grid on every frame just so we have it.
             pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
 
 
-def calculate_position(row, column):
-    new_x_coord = (row * width) + 10 # centering constant IG.
-    new_y_coord = (column * height) + 10
-    return new_y_coord, new_x_coord
 
 def set_player_position(pressed_keys, state):
     curr_row, curr_col = state.agent_positions["H"] # because thats the name of the human player
     if pressed_keys[K_UP]:
-        curr_row += 1 # move left
+        curr_col -= 1  # move up
     if pressed_keys[K_DOWN]:
-        curr_row -= 1 # move right
+        curr_col += 1  # move down
     if pressed_keys[K_LEFT]:
-        curr_col -= 1 # move up
+        curr_row -= 1  # move left
     if pressed_keys[K_RIGHT]:
-        curr_col += 1 # move down
+        curr_row += 1  # move right
+
     return curr_row, curr_col
 
 if __name__ == '__main__':

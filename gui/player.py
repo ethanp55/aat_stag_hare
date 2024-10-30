@@ -7,14 +7,6 @@ HUNTER_SPRITE = pygame.image.load("hunter.png") # for the human player thingy.
 
 
 
-from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
-    K_UP,
-    K_DOWN,
-    K_LEFT,
-    K_RIGHT,
-)
-
-
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
