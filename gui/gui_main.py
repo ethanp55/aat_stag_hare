@@ -45,6 +45,8 @@ stag = enemy.Enemy(STAG_IMAGE)
 hare = enemy.Enemy(HARE_IMAGE)
 agent1 = enemy.Enemy(AGENT_IMAGE)
 agent2 = enemy.Enemy(AGENT_IMAGE)
+play_test_player = player.Player()
+
 
 def main():
     pygame.init()  # actually starts the game.
@@ -67,8 +69,15 @@ def main():
             if event.type == pygame.KEYDOWN:
                 pressed_keys = pygame.key.get_pressed()
 
+                old_position = state.agent_positions["H"]
+                state.grid[old_position[0]][old_position[1]] = -1 # sets the grid state to empty where teh player was
+
                 state.agent_positions["H"] = set_player_position(pressed_keys, state)
-                round_rewards = stag_hare.gui_transition() # magic
+
+                new_position = state.agent_positions["H"]
+                state.grid[new_position[0]][new_position[1]] = 4 # and sets it to 4 where the player is.
+
+                round_rewards = stag_hare.transition() # magic
 
                 # Update rewards
                 for i, reward in enumerate(round_rewards):
@@ -85,6 +94,8 @@ def main():
                 if agent == "R2":
                     agent2.update(SCREEN, state.agent_positions[agent])
                 if agent == "H":
+                    #current_position = (3,2)
+                    #this_player.update(SCREEN, current_position)
                     this_player.update(SCREEN, state.agent_positions[agent])
 
 
@@ -112,15 +123,19 @@ def draw_grid(): # draws the grid on every frame just so we have it.
 
 
 def set_player_position(pressed_keys, state):
+
+    # so left and up are mixed, as are down and right. I couldn't tell you why. \
+    # also you can currently escape by either going left or up but I think that might be intended. 
+
     curr_row, curr_col = state.agent_positions["H"] # because thats the name of the human player
     if pressed_keys[K_UP]:
-        curr_col -= 1  # move up
+        curr_row -= 1
     if pressed_keys[K_DOWN]:
-        curr_col += 1  # move down
+        curr_row += 1  # move down
     if pressed_keys[K_LEFT]:
-        curr_row -= 1  # move left
+        curr_col -= 1  # move left
     if pressed_keys[K_RIGHT]:
-        curr_row += 1  # move right
+        curr_col += 1  # move right
 
     return curr_row, curr_col
 

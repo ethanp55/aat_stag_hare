@@ -28,4 +28,4 @@ def calculate_position(array_position):
     current_y = array_position[1]
     current_x = current_x * 80 + 18 # just an offset constant
     current_y = current_y * 80 + 18
-    return current_x, current_y
+    return current_y, current_x
