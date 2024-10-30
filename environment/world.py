@@ -53,7 +53,7 @@ class StagHare:
         for i in indices:
             agent = self.agents[i]
             if agent.name == "H":
-                new_row, new_col = agent.get_player_position(self.state)
+                new_row, new_col = self.state.agent_positions["H"]
                 action_map[agent.name] = (new_row, new_col)
             else:
                 reward = 0 if (i == 0 or i == 1) else self.rewards[i]

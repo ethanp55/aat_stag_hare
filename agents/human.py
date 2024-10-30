@@ -30,7 +30,9 @@ class humanAgent:
             curr_col -= 1
         if pressed_keys[K_RIGHT]:
             curr_col += 1
-        state.agent_positions[self.name] = (curr_row, curr_col) # updates the actual position
+
+        return curr_row, curr_col
+    #state.agent_positions[self.name] = (curr_row, curr_col) # updates the actual position
 
     def get_player_position(self, state):
         curr_row, curr_col = state.agent_positions[self.name]

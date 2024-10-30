@@ -2,16 +2,13 @@ from operator import truediv
 
 import pygame
 from pygame import K_ESCAPE
-from pygame.examples.moveit import WIDTH, HEIGHT
 from gui import player
 from gui import enemy
-from environment.runner import run
 from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
 
 #the state contains the position methinks.
-
 
 # pre load in all of our sprites as well.
 HUNTER_SPRITE = pygame.image.load("hunter.png") # for the human player thingy.
@@ -33,6 +30,15 @@ SCREEN_HEIGHT = 800
 
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 
+
+from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
+    K_UP,
+    K_DOWN,
+    K_LEFT,
+    K_RIGHT,
+)
+
+
 # sets up and initializes all of our agents
 this_player = player.Player()
 stag = enemy.Enemy(STAG_IMAGE)
@@ -42,12 +48,11 @@ agent2 = enemy.Enemy(AGENT_IMAGE)
 
 def main():
     pygame.init()  # actually starts the game.
-
-
     running = True
 
     stag_hare = StagHare(height, width, hunters)
     while running and not stag_hare.is_over(): # make sure that we aren't over
+
         draw_grid()
         rewards = [0] * (len(hunters) + 2)
 
@@ -60,9 +65,9 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 pressed_keys = pygame.key.get_pressed()
-                stag_hare.agents[4].set_player_position(pressed_keys, state)
 
-                round_rewards = stag_hare.gui_transition()
+                state.agent_positions["H"] = set_player_position(pressed_keys, state)
+                round_rewards = stag_hare.gui_transition() # magic
 
                 # Update rewards
                 for i, reward in enumerate(round_rewards):
@@ -105,12 +110,26 @@ def draw_grid(): # draws the grid on every frame just so we have it.
             rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
             pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
 
-if __name__ == '__main__':
-    main()
-
 
 def calculate_position(row, column):
     new_x_coord = (row * width) + 10 # centering constant IG.
     new_y_coord = (column * height) + 10
-    return new_x_coord, new_y_coord
+    return new_y_coord, new_x_coord
+
+def set_player_position(pressed_keys, state):
+    curr_row, curr_col = state.agent_positions["H"] # because thats the name of the human player
+    if pressed_keys[K_UP]:
+        curr_row += 1 # move left
+    if pressed_keys[K_DOWN]:
+        curr_row -= 1 # move right
+    if pressed_keys[K_LEFT]:
+        curr_col -= 1 # move up
+    if pressed_keys[K_RIGHT]:
+        curr_col += 1 # move down
+    return curr_row, curr_col
+
+if __name__ == '__main__':
+    main()
+
+
 
