@@ -73,8 +73,6 @@ def main():
                 for i, reward in enumerate(round_rewards):
                     rewards[i] += reward
 
-                stag_hare.gui_transition()  # this is where a lot of the magic happens.
-
 
             for agent in state.agent_positions:
                 if agent == 'hare':
