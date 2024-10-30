@@ -22,8 +22,7 @@ BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
 # number of rows and columns.
-height = 10
-width = 10
+
 
 hunters = [Random(name='R1'), Random(name='R2'), humanAgent(name='H')]
 # hunters = [AlegAATr(name='R1', lmbda=0.0, ml_model_type='knn', enhanced=True),
@@ -48,15 +47,18 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
 
 
 # sets up and initializes all of our agents
-this_player = player.Player()
-stag = enemy.Enemy(STAG_IMAGE)
-hare = enemy.Enemy(HARE_IMAGE)
-agent1 = enemy.Enemy(AGENT_IMAGE)
-agent2 = enemy.Enemy(AGENT_IMAGE)
-play_test_player = player.Player()
 
 
-def main():
+
+def main(height=12, width=12):
+
+    this_player = player.Player(height, height)
+    stag = enemy.Enemy(height, height)
+    hare = enemy.Enemy(height, height)
+    agent1 = enemy.Enemy(height, height)
+    agent2 = enemy.Enemy(height, height)
+
+
     pygame.init()  # actually starts the game.
     running = True
     rewards = [0] * (len(hunters) + 2)
@@ -68,7 +70,7 @@ def main():
 
     while running and not stag_hare.is_over(): # make sure that we aren't over
 
-        draw_grid()
+        draw_grid(height, width)
 
         state = stag_hare.return_state()
 
@@ -117,7 +119,7 @@ def main():
     pygame.quit()
 
 
-def draw_grid(): # draws the grid on every frame just so we have it.
+def draw_grid(height, width): # draws the grid on every frame just so we have it.
     SCREEN.fill(WHITECOLOR)
     widthOffset = (SCREEN_WIDTH / width)
     heightOffset = (SCREEN_HEIGHT / height)
