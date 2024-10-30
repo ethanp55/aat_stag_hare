@@ -74,3 +74,7 @@ print(pairwise_tukeyhsd(endog=df['reward_sum'], groups=df['algorithm'], alpha=0.
 print('\nSELF-PLAY REWARDS:')
 df_self_play = df[df['opponent_type'] == 'selfplay']
 print(pairwise_tukeyhsd(endog=df_self_play['reward_sum'], groups=df_self_play['algorithm'], alpha=0.05))
+
+print('\nAVERAGE REWARDS:')
+average_rewards_by_alg = df.groupby('algorithm')['agent_final_reward'].agg(['mean']).reset_index()
+print(average_rewards_by_alg)
