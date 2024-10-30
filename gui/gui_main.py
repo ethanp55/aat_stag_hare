@@ -7,6 +7,8 @@ from gui import enemy
 from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
+from agents.alegaatr import AlegAATr
+from agents.dqn import DQNAgent
 
 #the state contains the position methinks.
 
@@ -23,7 +25,13 @@ WHITECOLOR = (255, 255, 255)
 height = 10
 width = 10
 
-hunters = [Random(name="R1"),Random(name="R2"),humanAgent(name="H")] # creates our agents for our environment
+hunters = [Random(name='R1'), Random(name='R2'), humanAgent(name='H')]
+# hunters = [AlegAATr(name='R1', lmbda=0.0, ml_model_type='knn', enhanced=True),
+#            AlegAATr(name='R2', lmbda=0.0, ml_model_type='knn', enhanced=True),
+#            humanAgent(name='H')]
+# hunters = [DQNAgent(name='R1'),
+#            DQNAgent(name='R2'),
+#            humanAgent(name='H')]
 
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
@@ -53,7 +61,10 @@ def main():
     running = True
     rewards = [0] * (len(hunters) + 2)
 
-    stag_hare = StagHare(height, width, hunters)
+    while True:
+        stag_hare = StagHare(height, width, hunters)
+        if not stag_hare.is_over():
+            break
 
     while running and not stag_hare.is_over(): # make sure that we aren't over
 
@@ -69,15 +80,10 @@ def main():
             if event.type == pygame.KEYDOWN:
                 pressed_keys = pygame.key.get_pressed()
 
-                old_position = state.agent_positions["H"]
-                state.grid[old_position[0]][old_position[1]] = -1 # sets the grid state to empty where teh player was
+                new_row, new_col = set_player_position(pressed_keys, state)
+                hunters[-1].set_next_action(new_row, new_col)
 
-                state.agent_positions["H"] = set_player_position(pressed_keys, state)
-
-                new_position = state.agent_positions["H"]
-                state.grid[new_position[0]][new_position[1]] = 4 # and sets it to 4 where the player is.
-
-                round_rewards = stag_hare.transition() # magic
+                round_rewards = stag_hare.transition()
 
                 # Update rewards
                 for i, reward in enumerate(round_rewards):
