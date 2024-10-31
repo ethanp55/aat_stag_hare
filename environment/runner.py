@@ -16,6 +16,8 @@ def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = Fal
         with open(vector_file, 'w', newline='') as _:
             pass
 
+
+
     # Sometimes the environment can be randomly initialized so that hunters are immediately placed in a surrounding
     # position
     while True:
@@ -26,6 +28,7 @@ def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = Fal
 
     # Run the environment
     while not stag_hare.is_over():
+
         round_num = stag_hare.state.round_num
         round_rewards = stag_hare.transition()
 
