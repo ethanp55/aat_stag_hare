@@ -35,7 +35,7 @@ def _plot_embeddings(labels: List[str], embeddings: np.array, agent_name: str, t
 
 folder = '../simulations/vectors/'
 gen_vectors = {}
-agents_to_ignore = []  # Agents that converged to output the same vector, regardless of state
+agents_to_ignore = ['AleqgAATr', 'RDQN', 'MADQN', 'RAlegAATr', 'SOAleqgAATr', 'DQN']  # Agents that converged to output the same vector, regardless of state
 
 for file in os.listdir(folder):
     agent_name = file.split('_')[0]

@@ -121,8 +121,8 @@ class PPO(Agent):
 
         token_allocations = generator_to_token_allocs[self.generator_to_use_idx]
 
-        if state.hare_captured() or state.stag_captured():
-            print(f'Generators used: {self.generators_used}')
+        # if state.hare_captured() or state.stag_captured():
+        #     print(f'Generators used: {self.generators_used}')
 
         return token_allocations
 

@@ -6,7 +6,7 @@ from typing import List, Optional
 
 
 def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = False, results_file: Optional[str] = None,
-        generator_file: Optional[str] = None, vector_file: Optional[str] = None, gui_enabled: Optional[bool] = False) -> None:
+        generator_file: Optional[str] = None, vector_file: Optional[str] = None) -> List[float]:
     # Reset any generator usage data and/or vector data
     if generator_file is not None:
         with open(generator_file, 'w', newline='') as file:
@@ -60,3 +60,4 @@ def run(hunters: List[Agent], height: int = 10, width: int = 10, log: bool = Fal
             writer = csv.writer(f)
             writer.writerow(rewards)
 
+    return rewards
