@@ -21,11 +21,13 @@ class Player(pygame.sprite.Sprite):
         self.width = width
         self.surf.fill(player_color)
         self.rect = self.surf.get_rect()
+        self.square_height = self.height
+        self.square_width = self.width
 
 
-    def update(self, screen, array_position):
+    def update(self, screen, array_position, dead=False):
         new_position = calculate_position(self, array_position)
-        screen.blit(self.surf, new_position)  # so this one works.
+        screen.blit(self.surf, new_position)  # so this on
 
 
 def calculate_position(self, array_position):

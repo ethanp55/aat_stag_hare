@@ -15,13 +15,13 @@ agent_2_color = (135, 135, 245)
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, height, width):
         super(Enemy, self).__init__()
-
         square_height = SCREEN_HEIGHT / height
         square_width = SCREEN_WIDTH / width
-
         self.name = name
         self.surf = pygame.surface.Surface((square_height, square_width))
         self.height, self.width = height, width
+        self.square_height = self.height
+        self.square_width = self.width
 
         if name == "stag":
             self.surf.fill(stag_color)
@@ -34,13 +34,15 @@ class Enemy(pygame.sprite.Sprite):
 
         self.rect = self.surf.get_rect()
 
-    def update(self, screen, array_position):
+
+    def update(self, screen, array_position, dead=False):
         # here
         new_position = calculate_position(self, array_position)
-
-        screen.blit(self.surf, new_position) # so this one works.
-
-
+        if dead:
+            self.surf.fill((200, 60, 20))
+            screen.blit(self.surf, new_position)
+        else:
+            screen.blit(self.surf, new_position) # so this one works.
 
 
 def calculate_position(self, array_position):

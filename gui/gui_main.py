@@ -1,6 +1,8 @@
 from operator import truediv
 
 import pygame
+import sys
+import time
 from pygame import K_ESCAPE
 from gui import player
 from gui import enemy
@@ -10,21 +12,8 @@ from environment.world import StagHare
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
 
-import sys
-
-#the state contains the position methinks.
-
-# pre load in all of our sprites as well.
-HUNTER_SPRITE = pygame.image.load("hunter.png") # for the human player thingy.
-HARE_IMAGE = pygame.image.load("hare.png") # might need to make this smaller ig.
-STAG_IMAGE = pygame.image.load("stag.png") # might also need to make this smaller.
-AGENT_IMAGE = pygame.image.load("agent.png") # hehe funny joke.
-
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
-
-# number of rows and columns.
-
 
 hunters = [Random(name='R1'), Random(name='R2'), humanAgent(name='H')]
 # hunters = [AlegAATr(name='R1', lmbda=0.0, ml_model_type='knn', enhanced=True),
@@ -34,12 +23,11 @@ hunters = [Random(name='R1'), Random(name='R2'), humanAgent(name='H')]
 #            DQNAgent(name='R2'),
 #            humanAgent(name='H')]
 
+
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
-
-
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
     K_UP,
     K_DOWN,
@@ -48,20 +36,12 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
 )
 
 
-# sets up and initializes all of our agents
-
-
-
 def main(height=12, width=12):
-
-
-
     this_player = player.Player("player", height, width)
     stag = enemy.Enemy("stag", height, width)
     hare = enemy.Enemy("hare", height, width)
     agent1 = enemy.Enemy("agent1", height, width)
     agent2 = enemy.Enemy("agent2", height, width)
-
 
     pygame.init()  # actually starts the game.
     running = True
@@ -72,7 +52,7 @@ def main(height=12, width=12):
         if not stag_hare.is_over():
             break
 
-    while running and not stag_hare.is_over(): # make sure that we aren't over
+    while running:  #and not stag_hare.is_over(): # make sure that we aren't over
 
         draw_grid(height, width)
 
@@ -113,14 +93,18 @@ def main(height=12, width=12):
 
             pygame.display.update()
 
-            if event.type == pygame.QUIT:
-                running = False
-
             if event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:  # gives us a way to stop execution.
                     running = False
 
-    pygame.quit()
+        if stag_hare.is_over():
+            if stag_hare.state.hare_captured():
+                hare.update(SCREEN, state.agent_positions["hare"], True)
+            else:
+                stag.update(SCREEN, state.agent_positions["stag"], True)
+            pygame.display.update()
+            time.sleep(3)
+            running = False
 
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.
@@ -136,9 +120,6 @@ def draw_grid(height, width): # draws the grid on every frame just so we have it
 
 def set_player_position(pressed_keys, state):
 
-    # so left and up are mixed, as are down and right. I couldn't tell you why. \
-    # also you can currently escape by either going left or up but I think that might be intended. 
-
     curr_row, curr_col = state.agent_positions["H"] # because thats the name of the human player
     if pressed_keys[K_UP]:
         curr_row -= 1
@@ -153,6 +134,3 @@ def set_player_position(pressed_keys, state):
 
 if __name__ == '__main__':
     main(int(sys.argv[1]), int(sys.argv[2]))
-
-
-
