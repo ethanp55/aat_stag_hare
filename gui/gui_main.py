@@ -7,8 +7,10 @@ from gui import enemy
 from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
-from agents.alegaatr import AlegAATr
-from agents.dqn import DQNAgent
+#from agents.alegaatr import AlegAATr
+#from agents.dqn import DQNAgent
+
+import sys
 
 #the state contains the position methinks.
 
@@ -52,11 +54,13 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
 
 def main(height=12, width=12):
 
-    this_player = player.Player(height, height)
-    stag = enemy.Enemy(height, height)
-    hare = enemy.Enemy(height, height)
-    agent1 = enemy.Enemy(height, height)
-    agent2 = enemy.Enemy(height, height)
+
+
+    this_player = player.Player("player", height, width)
+    stag = enemy.Enemy("stag", height, width)
+    hare = enemy.Enemy("hare", height, width)
+    agent1 = enemy.Enemy("agent1", height, width)
+    agent2 = enemy.Enemy("agent2", height, width)
 
 
     pygame.init()  # actually starts the game.
@@ -148,7 +152,7 @@ def set_player_position(pressed_keys, state):
     return curr_row, curr_col
 
 if __name__ == '__main__':
-    main()
+    main(int(sys.argv[1]), int(sys.argv[2]))
 
 
 

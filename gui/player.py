@@ -3,19 +3,24 @@ from pygame import K_ESCAPE
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 
-HUNTER_SPRITE = pygame.image.load("hunter.png") # for the human player thingy.
+player_color = (45, 135, 35)
 
 
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, height, width):
+    def __init__(self, name, height, width):
         super(Player, self).__init__()
-        self.image = HUNTER_SPRITE
-        self.surf = HUNTER_SPRITE
-        self.rect = self.image.get_rect()
+
+        square_height = SCREEN_HEIGHT / height
+        square_width = SCREEN_WIDTH / width
+
+        self.name = name
+        self.surf = pygame.surface.Surface((square_height, square_width))
         self.height = height
         self.width = width
+        self.surf.fill(player_color)
+        self.rect = self.surf.get_rect()
 
 
     def update(self, screen, array_position):
