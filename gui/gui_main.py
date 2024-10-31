@@ -12,6 +12,11 @@ from environment.world import StagHare
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
 
+PAUSE_TIME = 3
+HEIGHT = 10
+WIDTH = 10
+
+
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
@@ -36,25 +41,25 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
 )
 
 
-def main(height=12, width=12):
-    this_player = player.Player("player", height, width)
-    stag = enemy.Enemy("stag", height, width)
-    hare = enemy.Enemy("hare", height, width)
-    agent1 = enemy.Enemy("agent1", height, width)
-    agent2 = enemy.Enemy("agent2", height, width)
+def main():
+    this_player = player.Player("player", HEIGHT, WIDTH)
+    stag = enemy.Enemy("stag", HEIGHT, WIDTH)
+    hare = enemy.Enemy("hare", HEIGHT, WIDTH)
+    agent1 = enemy.Enemy("agent1", HEIGHT, WIDTH)
+    agent2 = enemy.Enemy("agent2", HEIGHT, WIDTH)
 
     pygame.init()  # actually starts the game.
     running = True
     rewards = [0] * (len(hunters) + 2)
 
     while True:
-        stag_hare = StagHare(height, width, hunters)
+        stag_hare = StagHare(HEIGHT, WIDTH, hunters)
         if not stag_hare.is_over():
             break
 
     while running:  #and not stag_hare.is_over(): # make sure that we aren't over
 
-        draw_grid(height, width)
+        draw_grid(HEIGHT, WIDTH)
 
         state = stag_hare.return_state()
 
@@ -103,7 +108,7 @@ def main(height=12, width=12):
             else:
                 stag.update(SCREEN, state.agent_positions["stag"], True)
             pygame.display.update()
-            time.sleep(3)
+            time.sleep(PAUSE_TIME)
             running = False
 
 
@@ -133,4 +138,4 @@ def set_player_position(pressed_keys, state):
     return curr_row, curr_col
 
 if __name__ == '__main__':
-    main(int(sys.argv[1]), int(sys.argv[2]))
+    main()
