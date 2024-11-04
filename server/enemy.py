@@ -27,9 +27,9 @@ class Enemy(pygame.sprite.Sprite):
             self.surf.fill(stag_color)
         elif name == "hare":
             self.surf.fill(hare_color)
-        elif name == "agent1":
+        elif name == "R1":
             self.surf.fill(agent_1_color)
-        elif name == "agent2":
+        elif name == "R2":
             self.surf.fill(agent_2_color)
 
         self.rect = self.surf.get_rect()

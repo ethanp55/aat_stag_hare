@@ -51,6 +51,17 @@ async def handler(websocket, path):
         await websocket.send("Game state update")
 
 
+
+def draw_grid(height, width): # draws the grid on every frame just so we have it.
+    SCREEN.fill(WHITECOLOR)
+    widthOffset = (SCREEN_WIDTH / width)
+    heightOffset = (SCREEN_HEIGHT / height)
+    for x in range(0, width):
+        for y in range(0, height):
+            rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
+            pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
+
+
 if __name__ == '__main__':
     hunters = [] # creates our function and our staghunt game
 
@@ -67,11 +78,3 @@ if __name__ == '__main__':
 
 
 
-def draw_grid(height, width): # draws the grid on every frame just so we have it.
-    SCREEN.fill(WHITECOLOR)
-    widthOffset = (SCREEN_WIDTH / width)
-    heightOffset = (SCREEN_HEIGHT / height)
-    for x in range(0, width):
-        for y in range(0, height):
-            rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
-            pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
