@@ -35,7 +35,6 @@ hunters = []
 our_agents = []
 
 
-
 # Creating WebSocket server
 async def ws_server(websocket):
     # we are hard coding the number of players in bc I honestly can't be bothered.
@@ -45,6 +44,7 @@ async def ws_server(websocket):
     print("WebSocket: Server Started.")
     stag = enemy.Enemy("stag", HEIGHT, WIDTH)  # initalizes my enemies for me (the sprites anyway
     hare = enemy.Enemy("hare", HEIGHT, WIDTH)
+
     for i in range(HUMAN_PLAYERS):
         enemy_name = "H" + str(i)
         new_player = enemy.Enemy(enemy_name, HEIGHT, WIDTH)
@@ -57,34 +57,45 @@ async def ws_server(websocket):
         hunters.append(Random(name=enemy_name))
         our_agents.append(new_enemy)
 
-    while True: # gets us out of a weird edge case.
-        stag_hare = StagHare(HEIGHT, WIDTH, hunters)
-        if not stag_hare.is_over():
-            break
-
     try:
         while True:
-            state = stag_hare.return_state()
+            stag_hare = StagHare(HEIGHT, WIDTH, hunters)
+            if not stag_hare.is_over():
+                break
+
+            msg = {}
+            msg["HEIGHT"] = HEIGHT
+            msg["WIDTH"] = WIDTH
+
+
+            state = stag_hare.state
+
+            for agent in state.agent_positions:
+                msg[agent.name] = state.agent_positions[agent]
+
 
             client_id = id(websocket)
             connected_clients[client_id] = websocket
             # Receiving values from client
-            age = await websocket.recv()
+
+            msg["CLIENT_ID"] = client_id
+
+            input = await websocket.recv()
 
             # Prompt message when any of the field is missing
 
             # Printing details received by client
-            print(f"Details Received from Client: {client_id} : {age}")
+            print(f"Details Received from Client: {client_id} : {input}")
 
-            print(f"Age: {age}")
+            print(f"Age: {input}")
 
-            for agent in state.agent_positions:
+            # for agent in state.agent_positions:
+            #     pass
 
-
-            new_dict_to_send = (f"height: {HEIGHT}, width: {WIDTH}, "
+            # new_dict_to_send = (f"height: {HEIGHT}, width: {WIDTH}, "
 
             # Sending a response back to the client
-            if int(age) < 18:
+            if int(input) < 18:
                 await websocket.send(f"Sorry!, You can't join the club.")
             else:
                 await websocket.send(f"Welcome aboard.")
