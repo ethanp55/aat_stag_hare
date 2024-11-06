@@ -2,6 +2,29 @@ import json
 
 import websockets
 import asyncio
+import pygame
+
+
+import pygame
+import sys
+import time
+from pygame import K_ESCAPE
+from gui import player
+from gui import enemy
+from agents.random_agent import *
+from agents.human import *
+from environment.world import StagHare
+HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
+AGENTS = 2 # how many agents we are going to add
+
+
+#from agents.alegaatr import AlegAATr
+#from agents.dqn import DQNAgent
+
+PAUSE_TIME = 3
+HEIGHT = 10
+WIDTH = 10
+
 
 connected_clients = {}
 HEIGHT = 10
@@ -12,6 +35,7 @@ async def ws_server(websocket, path):
     client_id = id(websocket)
     connected_clients[client_id] = websocket
 
+
     try:
         # Handle first message
         input_data = await websocket.recv()
@@ -20,12 +44,15 @@ async def ws_server(websocket, path):
         client_id = id(websocket)
         connected_clients[client_id] = websocket
         response = {}
-        response["HEIGHT"] = HEIGHT
-        response["WIDTH"] = WIDTH
         await websocket.send(json.dumps(response))
 
         # Keep connection open
         while True:
+            response["HEIGHT"] = HEIGHT
+            response["WIDTH"] = WIDTH
+            #for agent in state.agent_positions:
+
+            await websocket.send(json.dumps(response))
             # Wait for future messages
             input_data = await websocket.recv()
             print(f"Received another message: {input_data}")
@@ -36,6 +63,22 @@ async def ws_server(websocket, path):
 
 
 async def main():
+    hunters = [] # first things first initalize the hunters and get them ready
+    for i in range(HUMAN_PLAYERS):
+        new_name = "H" + str(i)
+        hunters.append(humanAgent(name=new_name))
+    for i in range(AGENTS):
+        new_name = "R" + str(i)
+        hunters.append(Random(name=new_name))
+
+
+
+    while True: # set up stag hunt and avoid weird edgecase
+        stag_hare = StagHare(HEIGHT, WIDTH, hunters)
+        if not stag_hare.is_over():
+            break
+
+    # start the actual server and go from there
     async with websockets.serve(ws_server, "localhost", 7890):
         await asyncio.Future()  # run forever
 

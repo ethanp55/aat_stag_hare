@@ -1,20 +1,6 @@
 from operator import truediv
 
-import pygame
-import sys
-import time
-from pygame import K_ESCAPE
-from gui import player
-from gui import enemy
-from agents.random_agent import *
-from agents.human import *
-from environment.world import StagHare
-#from agents.alegaatr import AlegAATr
-#from agents.dqn import DQNAgent
 
-PAUSE_TIME = 3
-HEIGHT = 10
-WIDTH = 10
 
 
 BLACKCOLOR = (0, 0, 0)
@@ -51,6 +37,8 @@ def main():
     pygame.init()  # actually starts the game.
     running = True
     rewards = [0] * (len(hunters) + 2)
+
+
 
     while True:
         stag_hare = StagHare(HEIGHT, WIDTH, hunters)
