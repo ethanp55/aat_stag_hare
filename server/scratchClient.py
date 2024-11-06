@@ -2,7 +2,8 @@ import json
 
 import websockets
 import asyncio
-
+HEIGHT = None
+WIDTH = None
 
 # The main function that will handle connection and communication
 # with the server
@@ -22,7 +23,7 @@ async def ws_client():
         # Stay alive forever, listen to incoming msgs
         while True:
             msg = await ws.recv()
-            print_board(msg)
+
 
 
 def print_board(msg):
