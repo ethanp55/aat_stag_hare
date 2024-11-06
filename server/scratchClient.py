@@ -1,3 +1,5 @@
+import json
+
 import websockets
 import asyncio
 
@@ -11,8 +13,11 @@ async def ws_client():
     async with websockets.connect(url) as ws:
         print("WebSocket: Client Connected.")
 
-        # Send values to the server
-        await ws.send(f"22")
+        # Create a dictionary to send to the server
+        user_data = {"age": 22}
+
+        # Serialize the dictionary to a JSON string
+        await ws.send(json.dumps(user_data))
 
         # Stay alive forever, listen to incoming msgs
         while True:

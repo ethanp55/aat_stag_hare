@@ -1,8 +1,11 @@
+import json
+
 import websockets
 import asyncio
 
 connected_clients = {}
-
+HEIGHT = 10
+WIDTH = 10
 
 # Creating WebSocket server
 async def ws_server(websocket, path):
@@ -16,11 +19,10 @@ async def ws_server(websocket, path):
         print(f"Age: {input_data}")
         client_id = id(websocket)
         connected_clients[client_id] = websocket
-
-        if int(input_data) < 18:
-            await websocket.send(f"Sorry!, You can't join the club.")
-        else:
-            await websocket.send(f"Welcome aboard.")
+        response = {}
+        response["HEIGHT"] = HEIGHT
+        response["WIDTH"] = WIDTH
+        await websocket.send(json.dumps(response))
 
         # Keep connection open
         while True:
