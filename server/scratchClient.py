@@ -11,9 +11,8 @@ async def ws_client():
     async with websockets.connect(url) as ws:
         print("WebSocket: Client Connected.")
 
-        age = input("Your Age: ")
         # Send values to the server
-        await ws.send(f"{age}")
+        await ws.send(f"22")
 
         # Stay alive forever, listen to incoming msgs
         while True:
