@@ -27,8 +27,11 @@ WIDTH = 10
 
 
 connected_clients = {}
+client_input = {}
 HEIGHT = 10
 WIDTH = 10
+
+global stag_hare
 
 # Creating WebSocket server
 async def ws_server(websocket, path):
@@ -41,7 +44,8 @@ async def ws_server(websocket, path):
         input_data = await websocket.recv()
         print(f"Details Received from Client: {client_id} : {input_data}")
         print(f"Age: {input_data}")
-        client_id = id(websocket)
+        long_client_id = id(websocket)
+        client_id = connected_clients.__sizeof__() + 1
         connected_clients[client_id] = websocket
         response = {}
         await websocket.send(json.dumps(response))
@@ -50,12 +54,17 @@ async def ws_server(websocket, path):
         while True:
             response["HEIGHT"] = HEIGHT
             response["WIDTH"] = WIDTH
-            #for agent in state.agent_positions:
+            response["SELF_ID"] = client_id
+
+
+           # for agent in stag_hare.state.agent_positions:
+             #   response[str(agent.name)] = stag_hare.state.agent_positions[agent]
 
             await websocket.send(json.dumps(response))
             # Wait for future messages
             input_data = await websocket.recv()
             print(f"Received another message: {input_data}")
+            client_input[client_id] = input_data
             # Optionally, process additional messages here
 
     except websockets.ConnectionClosed as e:
@@ -70,8 +79,6 @@ async def main():
     for i in range(AGENTS):
         new_name = "R" + str(i)
         hunters.append(Random(name=new_name))
-
-
 
     while True: # set up stag hunt and avoid weird edgecase
         stag_hare = StagHare(HEIGHT, WIDTH, hunters)

@@ -63,6 +63,39 @@ async def ws_client():
 
 
 
+            for event in pygame.event.get():
+
+                if event.type == pygame.QUIT:
+                    running = False
+
+                if event.type == pygame.KEYDOWN:
+                    pressed_keys = pygame.key.get_pressed()
+
+                    #new_row, new_col = set_player_position(pressed_keys, state)
+
+
+                # for agent in msg["agents"]:
+                #     if agent == 'hare':
+                #         hare.update(SCREEN, state.agent_positions[agent])
+                #     if agent == "stag":
+                #         stag.update(SCREEN, state.agent_positions[agent])
+                #     if agent == "R1":
+                #         agent1.update(SCREEN, state.agent_positions[agent])
+                #     if agent == "R2":
+                #         agent2.update(SCREEN, state.agent_positions[agent])
+                #     if agent == "H":
+                #         # current_position = (3,2)
+                #         # this_player.update(SCREEN, current_position)
+                #         this_player.update(SCREEN, state.agent_positions[agent])
+
+
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == K_ESCAPE:  # gives us a way to stop execution.
+                        running = False
+
+
+
 def print_board(msg):
     height = None
     width = None
