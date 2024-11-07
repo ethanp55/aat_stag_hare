@@ -59,17 +59,21 @@ async def ws_client():
             msg = await ws.recv()
             real_msg = json.loads(msg)
             print_board(real_msg)
+            if "SElF_ID" in real_msg:
+                self_id = real_msg["SELF_ID"]
             pygame.display.update()
 
 
 
-            for event in pygame.event.get():
 
-                if event.type == pygame.QUIT:
-                    running = False
+            pressed_keys = pygame.key.get_pressed()
+            if len(pressed_keys) == 1:
 
-                if event.type == pygame.KEYDOWN:
-                    pressed_keys = pygame.key.get_pressed()
+                position_update = set_player_position(pressed_keys)
+                print("this is the position update ", position_update)
+                #await ws.send(json.dumps(position_update))
+
+
 
                     #new_row, new_col = set_player_position(pressed_keys, state)
 
@@ -90,19 +94,22 @@ async def ws_client():
 
 
 
-                if event.type == pygame.KEYDOWN:
-                    if event.key == K_ESCAPE:  # gives us a way to stop execution.
-                        running = False
+                # if event.type == pygame.KEYDOWN:
+                #     if event.key == K_ESCAPE:  # gives us a way to stop execution.
+                #         running = False
 
 
 
 def print_board(msg):
     height = None
     width = None
+    self_id = None
     if "HEIGHT" in msg:
         height = msg["HEIGHT"]
     if "WIDTH" in msg:
         width = msg["WIDTH"]
+    if "SELF_ID" in msg:
+        self_id = msg["SELF_ID"]
     if height is not None or width is not None:
         draw_grid(height, width)
 
@@ -119,6 +126,21 @@ def draw_grid(height, width): # draws the grid on every frame just so we have it
             pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
 
 
+
+def set_player_position(pressed_keys):
+
+    curr_row, curr_col = 0,0# because thats the name of the human player
+    if pressed_keys[K_UP]:
+        curr_row -= 1
+    if pressed_keys[K_DOWN]:
+        curr_row += 1  # move down
+    if pressed_keys[K_LEFT]:
+        curr_col -= 1  # move left
+    if pressed_keys[K_RIGHT]:
+        curr_col += 1  # move right
+
+    print("we have updated the player position")
+    return curr_row, curr_col
 
 
 if __name__ == "__main__":

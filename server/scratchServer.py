@@ -18,6 +18,9 @@ HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
 AGENTS = 2 # how many agents we are going to add
 
 
+BLACKCOLOR = (0, 0, 0)
+WHITECOLOR = (255, 255, 255)
+
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
 
@@ -45,7 +48,7 @@ async def ws_server(websocket, path):
         print(f"Details Received from Client: {client_id} : {input_data}")
         print(f"Age: {input_data}")
         long_client_id = id(websocket)
-        client_id = connected_clients.__sizeof__() + 1
+        client_id = len(connected_clients)
         connected_clients[client_id] = websocket
         response = {}
         await websocket.send(json.dumps(response))
