@@ -57,8 +57,10 @@ def start_client():
     client_socket.connect((host, port))
 
     # Send data to the server
-    message = "Hello from the client!"
-    client_socket.send(message.encode())
+    message = {
+        "message" : "Hello from the client!"
+    }
+    client_socket.send(json.dumps(message).encode())
 
     # Receive a response from the server
     while True:
@@ -74,11 +76,10 @@ def start_client():
 
         if server_response != None:
 
-            data = data.decode()
             Height = 0
             Width = 0
             self_ID = None
-            print_board(data)
+            print_board(server_response)
 
 
     # Close the connection
@@ -96,8 +97,8 @@ def print_board(msg):
         width = msg["WIDTH"]
     if "SELF_ID" in msg:
         self_id = msg["SELF_ID"]
-    if height is not None or width is not None:
-        draw_grid(height, width)
+    # if height is not None or width is not None:
+    #     draw_grid(height, width)
 
 
 if __name__ == "__main__":

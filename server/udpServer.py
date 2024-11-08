@@ -3,7 +3,7 @@ import socket
 import websockets
 import asyncio
 import pygame
-
+from websockets.sync.client import connect
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
@@ -55,6 +55,7 @@ def start_server():
 
     # Accept a client connection
     client_socket, client_address = server_socket.accept()
+    connected_clients[len(connected_clients)] = client_socket
 
     # Receive data from the client
     data = client_socket.recv(1024)
@@ -79,24 +80,20 @@ def start_server():
 
 
 
-
-    # Send a response to the client
-    message = "Hello from the server!"
-    client_socket.send(message.encode())
-    stag_hunt_game_loop()
+    stag_hunt_game_loop(connected_clients)
     # Close the connection
     client_socket.close()
 
 
 
-def stag_hunt_game_loop():
+def stag_hunt_game_loop(connected_clients):
 
     hunters = []  # first things first initalize the hunters and get them ready
     for i in range(HUMAN_PLAYERS):
-        new_name = "H" + str(i)
+        new_name = "H" + str(i+1)
         hunters.append(humanAgent(name=new_name))
     for i in range(AGENTS):
-        new_name = "R" + str(i)
+        new_name = "R" + str(i+1)
         hunters.append(Random(name=new_name))
 
     while True:  # set up stag hunt and avoid weird edgecase
@@ -122,64 +119,80 @@ def stag_hunt_game_loop():
         if not stag_hare.is_over():
             break
 
-    while running:  #and not stag_hare.is_over(): # make sure that we aren't over
-        response = {}
-        response["HEIGHT"] = HEIGHT
-        response["WIDTH"] = WIDTH
-        #response["SELF_ID"] = client_id
 
 
-        draw_grid(HEIGHT, WIDTH)
+    while True:
 
-        state = stag_hare.return_state()
-
-        for event in pygame.event.get():
-
-            if event.type == pygame.QUIT:
-                running = False
-
-            if event.type == ALL_READY:
-                pressed_keys = pygame.key.get_pressed()
-
-                #new_row, new_col = set_player_position(pressed_keys, state)
-                #hunters[-1].set_next_action(new_row, new_col)
-
-                round_rewards = stag_hare.transition()
-
-                # Update rewards
-                for i, reward in enumerate(round_rewards):
-                    rewards[i] += reward
+        for client in connected_clients:
 
 
-            for agent in state.agent_positions:
-                if agent == 'hare':
-                    hare.update(SCREEN, state.agent_positions[agent])
-                if agent == "stag":
-                    stag.update(SCREEN, state.agent_positions[agent])
-                if agent == "R1":
-                    agent1.update(SCREEN, state.agent_positions[agent])
-                if agent == "R2":
-                    agent2.update(SCREEN, state.agent_positions[agent])
-                if agent == "H":
-                    #current_position = (3,2)
-                    #this_player.update(SCREEN, current_position)
-                    this_player.update(SCREEN, state.agent_positions[agent])
+
+            while running:  #and not stag_hare.is_over(): # make sure that we aren't over
+                response = {
+                    "HEIGHT" : HEIGHT,
+                    "WIDTH" : WIDTH,
+                    "CLIENT_ID" : client
+                }
+                connected_clients[client].send(json.dumps(response).encode())
 
 
-            pygame.display.update()
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == K_ESCAPE:  # gives us a way to stop execution.
+
+                draw_grid(HEIGHT, WIDTH)
+
+                state = stag_hare.return_state()
+
+                for agent in stag_hare.state.agent_positions: # go ahead and print this out every rfame
+                    if agent == 'hare':
+                        hare.update(SCREEN, stag_hare.state.agent_positions[agent])
+                    if agent == "stag":
+                        stag.update(SCREEN, stag_hare.state.agent_positions[agent])
+                    if agent == "R1":
+                        agent1.update(SCREEN, stag_hare.state.agent_positions[agent])
+                    if agent == "R2":
+                        agent2.update(SCREEN, stag_hare.state.agent_positions[agent])
+                    if agent == "H":
+                        # current_position = (3,2)
+                        # this_player.update(SCREEN, current_position)
+                        this_player.update(SCREEN, stag_hare.state.agent_positions[agent])
+
+
+
+                # for event in pygame.event.get():
+                #
+                #     if event.type == pygame.QUIT:
+                #         running = False
+                #
+                #     if event.type == ALL_READY:
+                #         pressed_keys = pygame.key.get_pressed()
+                #
+                #         #new_row, new_col = set_player_position(pressed_keys, state)
+                #         #hunters[-1].set_next_action(new_row, new_col)
+                #
+                #         round_rewards = stag_hare.transition()
+                #
+                #         # Update rewards
+                #         for i, reward in enumerate(round_rewards):
+                #             rewards[i] += reward
+
+
+
+
+
+                pygame.display.update()
+
+                    # if event.type == pygame.KEYDOWN:
+                    #     if event.key == K_ESCAPE:  # gives us a way to stop execution.
+                    #         running = False
+
+                if stag_hare.is_over():
+                    if stag_hare.state.hare_captured():
+                        hare.update(SCREEN, state.agent_positions["hare"], True)
+                    else:
+                        stag.update(SCREEN, state.agent_positions["stag"], True)
+                    pygame.display.update()
+                    time.sleep(PAUSE_TIME)
                     running = False
-
-        if stag_hare.is_over():
-            if stag_hare.state.hare_captured():
-                hare.update(SCREEN, state.agent_positions["hare"], True)
-            else:
-                stag.update(SCREEN, state.agent_positions["stag"], True)
-            pygame.display.update()
-            time.sleep(PAUSE_TIME)
-            running = False
 
 
 
