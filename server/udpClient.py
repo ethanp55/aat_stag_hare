@@ -1,32 +1,12 @@
 import socket
 
 import json
-
-import websockets
-import asyncio
+from server import enemy
 import pygame
-
-from operator import truediv
-
-import pygame
-import sys
-import time
-from pygame import K_ESCAPE
-from gui import player
-from gui import enemy
-from agents.random_agent import *
-from agents.human import *
-from environment.world import StagHare
-#from agents.alegaatr import AlegAATr
-#from agents.dqn import DQNAgent
 
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
-
-
-
-
 
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
     K_UP,
@@ -35,20 +15,17 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
     K_RIGHT,
 )
 
-
-
-SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
-SCREEN_HEIGHT = 800
-
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
-HEIGHT = 0
-WIDTH = 0
+agents = [] # holds all of the sprites for the various agents.
 
 def start_client():
     host = '127.0.0.1'  # The server's IP address
     port = 12345         # The port number to connect to
+
+
+    pygame.init()  # actually starts the game.
 
     # Create a TCP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -70,35 +47,104 @@ def start_client():
             # Deserialize the JSON response from the server
             server_response = json.loads(data.decode())
             print(f"Received JSON from server: {server_response}")
+
         except json.JSONDecodeError:
             pass
 
-
         if server_response != None:
 
-            Height = 0
-            Width = 0
-            self_ID = None
+            if "HUMAN_AGENTS" in server_response:
+                initalize(server_response)
             print_board(server_response)
 
+        # now we need to get player input
+        # for event in pygame.event.get():
+        #     if event.type == pygame.KEYDOWN:
+        #
+        #     break
+
+        pressed_keys = pygame.key.get_pressed()
+        if len(pressed_keys) >= 1:  # we have an input!
+            position_update = adjust_position(pressed_keys)
+            message = {
+                "NEW_INPUT": position_update
+            }
+        client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
+
+        packet_to_send = {}
+
+
+        pygame.display.update()  # try to get things to draw to the screen IG>
 
     # Close the connection
     client_socket.close()
 
 
+def initalize(server_response):
+    global HUMAN_AGENTS, AI_AGENTS, HEIGHT, WIDTH
+    HUMAN_AGENTS = server_response["HUMAN_AGENTS"]
+    AI_AGENTS = server_response["AI_AGENTS"]
+    HEIGHT = server_response["HEIGHT"]
+    WIDTH = server_response["WIDTH"]
+
+    for i in range(HUMAN_AGENTS):
+        new_name = "H" + str(i+1)
+        new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
+        agents.append(new_agent)
+
+    for i in range(AI_AGENTS):
+        new_name = "R" + str(i+1)
+        new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
+        agents.append(new_agent)
+
+    # these ones will remain constant
+    stag = enemy.Enemy("stag", HEIGHT, WIDTH)
+    hare = enemy.Enemy("hare", HEIGHT, WIDTH)
+    agents.append(stag)
+    agents.append(hare)
+
+
+def adjust_position(pressed_keys):
+    curr_row = 0
+    curr_col = 0
+    if pressed_keys[K_UP]:
+        curr_row -= 1
+    if pressed_keys[K_DOWN]:
+        curr_row += 1  # move down
+    if pressed_keys[K_LEFT]:
+        curr_col -= 1  # move left
+    if pressed_keys[K_RIGHT]:
+        curr_col += 1  # move right
+    return curr_row, curr_col
 
 def print_board(msg):
-    height = None
-    width = None
+
+    if HEIGHT is not None or WIDTH is not None:
+        draw_grid(HEIGHT, WIDTH) # draw the board first
+
     self_id = None
-    if "HEIGHT" in msg:
-        height = msg["HEIGHT"]
-    if "WIDTH" in msg:
-        width = msg["WIDTH"]
     if "SELF_ID" in msg:
         self_id = msg["SELF_ID"]
-    # if height is not None or width is not None:
-    #     draw_grid(height, width)
+    if "AGENT_POSITIONS" in msg:
+        agents_positions = msg["AGENT_POSITIONS"]
+        for agent in agents:
+            row = agents_positions[agent.name]["Y_COORD"]
+            col = agents_positions[agent.name]["X_COORD"]
+            new_tuple = row, col
+            agent.update(SCREEN, new_tuple)
+
+
+
+
+
+def draw_grid(height, width): # draws the grid on every frame just so we have it.
+    SCREEN.fill(WHITECOLOR)
+    widthOffset = (SCREEN_WIDTH / width)
+    heightOffset = (SCREEN_HEIGHT / height)
+    for x in range(0, width):
+        for y in range(0, height):
+            rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
+            pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
 
 
 if __name__ == "__main__":
