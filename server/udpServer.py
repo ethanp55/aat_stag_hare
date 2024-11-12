@@ -13,8 +13,8 @@ from agents.human import *
 from environment.world import StagHare
 from server import enemy
 
-HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
-AI_AGENTS = 2 # how many agents we are going to add
+HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
+AI_AGENTS = 1 # how many agents we are going to add
 
 ALL_READY = pygame.USEREVENT + 1
 ALL_READY_EVENT = pygame.event.Event(ALL_READY)
@@ -84,11 +84,25 @@ def start_server():
         print("Received data is not valid JSON.")
         client_socket.send(json.dumps({"error": "Invalid JSON format"}).encode())
 
+    try:
+        # Example game event loop - blocked until enough players
+        while True:
+            if len(connected_clients) == HUMAN_PLAYERS:
+                print(f"Enough players connected, starting game with {len(connected_clients)} players.")
+                # Here you could start the game or trigger some event
+                stag_hunt_game_loop(connected_clients)
+                break
+            else:
+                # Inform the player they're waiting for more players
+                client_socket.sendall(b"Waiting for more players...\n")
+                time.sleep(1)  # Simulate a small delay to avoid busy-waiting
 
-    if len(connected_clients) == HUMAN_PLAYERS: # only starts the staghunt loop when we have all the players we need.
-        stag_hunt_game_loop(connected_clients)
-        # Close the connection
+    except Exception as e:
+        print("Error")
+    finally:
         client_socket.close()
+
+
 
 
 
