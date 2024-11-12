@@ -1,5 +1,6 @@
 import json
 import socket
+import threading
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
@@ -38,6 +39,10 @@ client_id_dict = {}
 
 hunters = []
 
+# these ones always stay the same
+stag = enemy.Enemy("stag", HEIGHT, WIDTH)
+hare = enemy.Enemy("hare", HEIGHT, WIDTH)
+
 agents = [] # holds the actual agents that we want to update
 
 
@@ -45,78 +50,18 @@ global stag_hare
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 
 # Set up the server to listen on a specific host and port
-def start_server():
-    host = '127.0.0.1'  # Localhost
-    port = 12345  # Port to bind the server
+def start_server(host='127.0.0.1', port=12345):
 
-    # Create a TCP socket
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((host, port))
-    server_socket.listen(2)  # Allow only one connection
-
-    print(f"Server listening on {host}:{port}...")
-
-    # Accept a client connection
-    client_socket, client_address = server_socket.accept()
-    connected_clients[len(connected_clients)] = client_socket
-    client_id_dict[client_socket] = len(connected_clients)
-
-    # Receive data from the client
-    data = client_socket.recv(1024)
-
-    try:
-        # Deserialize the JSON data
-        received_json = json.loads(data.decode())
-        print(f"Received JSON from client: {received_json}")
-
-        # Create a response
-        response = {
-            "message": "Hello from the server!",
-            "HUMAN_AGENTS" : HUMAN_PLAYERS,
-            "AI_AGENTS" : AI_AGENTS,
-            "HEIGHT" : HEIGHT,
-            "WIDTH" : WIDTH,
-        }
-
-        # Serialize and send the response as JSON
-        client_socket.send(json.dumps(response).encode())
-    except json.JSONDecodeError:
-        print("Received data is not valid JSON.")
-        client_socket.send(json.dumps({"error": "Invalid JSON format"}).encode())
-
-    try:
-        # Example game event loop - blocked until enough players
-        while True:
-            if len(connected_clients) == HUMAN_PLAYERS:
-                print(f"Enough players connected, starting game with {len(connected_clients)} players.")
-                # Here you could start the game or trigger some event
-                stag_hunt_game_loop(connected_clients)
-                break
-            else:
-                # Inform the player they're waiting for more players
-                client_socket.sendall(b"Waiting for more players...\n")
-                time.sleep(1)  # Simulate a small delay to avoid busy-waiting
-
-    except Exception as e:
-        print("Error")
-    finally:
-        client_socket.close()
-
-
-
-
-
-def stag_hunt_game_loop(connected_clients):
     global hunters
     hunters = []  # first things first initalize the hunters and get them ready
     for i in range(HUMAN_PLAYERS):
-        new_name = "H" + str(i+1)
+        new_name = "H" + str(i + 1)
         hunters.append(humanAgent(name=new_name))
         new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
         agents.append(new_agent)
 
     for i in range(AI_AGENTS):
-        new_name = "R" + str(i+1)
+        new_name = "R" + str(i + 1)
         hunters.append(Random(name=new_name))
         new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
         agents.append(new_agent)
@@ -127,11 +72,77 @@ def stag_hunt_game_loop(connected_clients):
             break
 
     # these ones will remain constant
-    stag = enemy.Enemy("stag", HEIGHT, WIDTH)
-    hare = enemy.Enemy("hare", HEIGHT, WIDTH)
+
 
     agents.append(stag)
     agents.append(hare)
+
+
+    # Create a TCP socket
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((host, port))
+    server_socket.listen(2)  # Allow only one connection
+
+    print(f"Server listening on {host}:{port}...")
+
+    while True:
+        client_socket, client_address = server_socket.accept()
+        connected_clients[len(connected_clients)] = client_socket
+        client_id_dict[client_socket] = len(connected_clients)
+
+        data = client_socket.recv(1024) # beleive its bricking becuase it wants to receive the packet
+
+        try:
+            # Deserialize the JSON data
+            received_json = json.loads(data.decode())
+            print(f"Received JSON from client: {received_json}")
+
+            # Create a response
+            response = {
+                "message": "Hello from the server!",
+                "HUMAN_AGENTS": HUMAN_PLAYERS,
+                "AI_AGENTS": AI_AGENTS,
+                "HEIGHT": HEIGHT,
+                "WIDTH": WIDTH,
+            }
+
+            # Serialize and send the response as JSON
+            client_socket.send(json.dumps(response).encode())
+        except json.JSONDecodeError:
+            print("Received data is not valid JSON.")
+            client_socket.send(json.dumps({"error": "Invalid JSON format"}).encode())
+
+
+
+        threading.Thread(target=handle_client, args=(client_socket,)).start()
+
+
+
+def handle_client(client_socket):
+    global connected_clients
+
+    try:
+        while True:
+            if len(connected_clients) == HUMAN_PLAYERS:
+                stag_hunt_game_loop()
+                break
+            else:
+                response = {
+                    "message": "Hello from the server!",
+                    "HUMAN_AGENTS": HUMAN_PLAYERS,
+                    "AI_AGENTS": AI_AGENTS,
+                    "HEIGHT": HEIGHT,
+                    "WIDTH": WIDTH,
+                }
+                client_socket.send(json.dumps(response).encode())
+
+    except Exception as e:
+        print("Error with something")
+    finally:
+        client_socket.close()
+
+def stag_hunt_game_loop():
+
 
     # we need to be smarter about these ones
 
