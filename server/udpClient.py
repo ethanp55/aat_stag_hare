@@ -95,8 +95,6 @@ def start_client():
 
         client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
 
-        packet_to_send = {}
-
 
         pygame.display.update()  # try to get things to draw to the screen IG>
 
