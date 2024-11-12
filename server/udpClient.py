@@ -18,9 +18,15 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
+client_ID = 0
+
+
 agents = [] # holds all of the sprites for the various agents.
 
 def start_client():
+
+    global client_ID
+
     host = '127.0.0.1'  # The server's IP address
     port = 12345         # The port number to connect to
 
@@ -43,19 +49,43 @@ def start_client():
     while True:
         server_response = None
         data = client_socket.recv(1024)
-        try:
+
+        try: # get the stuff first
             # Deserialize the JSON response from the server
             server_response = json.loads(data.decode())
-            print(f"Received JSON from server: {server_response}")
 
         except json.JSONDecodeError:
             pass
 
         if server_response != None:
-
             if "HUMAN_AGENTS" in server_response:
                 initalize(server_response)
+            if "CLIENT_ID" in server_response:
+                client_ID = server_response["CLIENT_ID"]
             print_board(server_response)
+
+
+        message = {
+            "NEW_INPUT" : None,
+
+        }
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                pressed_keys = pygame.key.get_pressed()
+                print("We TRYING to send a new position")
+                message = {
+                    "NEW_INPUT" : adjust_position(pressed_keys),
+                    "CLIENT_ID": client_ID,
+                }
+
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            break
+
+
+
 
         # now we need to get player input
         # for event in pygame.event.get():
@@ -63,12 +93,6 @@ def start_client():
         #
         #     break
 
-        pressed_keys = pygame.key.get_pressed()
-        if len(pressed_keys) >= 1:  # we have an input!
-            position_update = adjust_position(pressed_keys)
-            message = {
-                "NEW_INPUT": position_update
-            }
         client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
 
         packet_to_send = {}

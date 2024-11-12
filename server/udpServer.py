@@ -34,6 +34,10 @@ client_input = {}
 HEIGHT = 10
 WIDTH = 10
 
+client_id_dict = {}
+
+hunters = []
+
 agents = [] # holds the actual agents that we want to update
 
 
@@ -55,6 +59,7 @@ def start_server():
     # Accept a client connection
     client_socket, client_address = server_socket.accept()
     connected_clients[len(connected_clients)] = client_socket
+    client_id_dict[client_socket] = len(connected_clients)
 
     # Receive data from the client
     data = client_socket.recv(1024)
@@ -88,7 +93,7 @@ def start_server():
 
 
 def stag_hunt_game_loop(connected_clients):
-
+    global hunters
     hunters = []  # first things first initalize the hunters and get them ready
     for i in range(HUMAN_PLAYERS):
         new_name = "H" + str(i+1)
@@ -134,9 +139,11 @@ def stag_hunt_game_loop(connected_clients):
 
         for client in connected_clients:
             data = connected_clients[client].recv(1024)
+            pass
             if data != None:
                 received_json = json.loads(data.decode())
-                if "NEW_INPUT" in received_json:
+                if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] is not None:
+                    print(f"{client} has tried to move!")
                     client_input[client] = received_json["NEW_INPUT"]
 
                 if len(client_input) == len(connected_clients): # everyone has an answer
@@ -144,8 +151,8 @@ def stag_hunt_game_loop(connected_clients):
                         for agent in agents:
                             check_name = "H" + str(i+1)
                             if agent.name == check_name:
-                                hunters
-                                pass
+                                 next_round(stag_hare, rewards, client_input)
+                                 client_input.clear()
 
             current_state = {}
 
@@ -183,26 +190,10 @@ def stag_hunt_game_loop(connected_clients):
 
 
 
-            # for event in pygame.event.get():
-            #
-            #     if event.type == pygame.QUIT:
-            #         running = False
-            #
-            #     if event.type == ALL_READY:
-            #         pressed_keys = pygame.key.get_pressed()
-            #
-            #         #new_row, new_col = set_player_position(pressed_keys, state)
-            #         #hunters[-1].set_next_action(new_row, new_col)
-            #
-            #         round_rewards = stag_hare.transition()
-            #
-            #         # Update rewards
-            #         for i, reward in enumerate(round_rewards):
-            #             rewards[i] += reward
+            for event in pygame.event.get():
 
-
-
-
+                if event.type == pygame.QUIT:
+                    running = False
 
             #pygame.display.update()
 
@@ -216,6 +207,7 @@ def stag_hunt_game_loop(connected_clients):
                 else:
                     stag.update(SCREEN, state.agent_positions["stag"], True)
                 #pygame.display.update()
+                print("GAME OVER")
                 time.sleep(PAUSE_TIME)
                 running = False
 
@@ -230,6 +222,26 @@ def draw_grid(height, width): # draws the grid on every frame just so we have it
             rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
             pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
 
+
+def next_round(stag_hare, rewards, new_positions):
+
+    for client_id in new_positions:
+        client_agent = "H" + str(client_id + 1)
+        current_position = stag_hare.state.agent_positions[client_agent]
+        new_tuple_row = new_positions[client_id][0] + current_position[0]
+        new_tuple_col = new_positions[client_id][1] + current_position[1]
+        hunters[client_id].set_next_action(new_tuple_row, new_tuple_col)
+
+                 # no clue if this will work lol.
+
+        print(f"this is the client_ID, {client_id}")
+
+
+    round_rewards = stag_hare.transition()
+    #
+    # Update rewards
+    for i, reward in enumerate(round_rewards):
+        rewards[i] += reward
 
 
 if __name__ == "__main__":

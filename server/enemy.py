@@ -17,6 +17,7 @@ player_2_color = (130, 130, 130)
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, height, width):
         super(Enemy, self).__init__()
+        self.row_to_return, self.col_to_return = None, None # for ethans code
         square_height = SCREEN_HEIGHT / height
         square_width = SCREEN_WIDTH / width
         self.name = name
@@ -57,3 +58,7 @@ def calculate_position(self, array_position):
     current_x = current_x * (SCREEN_WIDTH / self.width)
     current_y = current_y * (SCREEN_HEIGHT / self.height)
     return current_y, current_x
+
+
+def set_next_action(self, new_row, new_col) -> None:
+    self.row_to_return, self.col_to_return = new_row, new_col
