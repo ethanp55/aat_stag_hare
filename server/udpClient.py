@@ -46,7 +46,6 @@ def start_client():
         try:
             # Deserialize the JSON response from the server
             server_response = json.loads(data.decode())
-            print(f"Received JSON from server: {server_response}")
 
         except json.JSONDecodeError:
             pass
@@ -63,15 +62,14 @@ def start_client():
         #
         #     break
 
-        pressed_keys = pygame.key.get_pressed()
-        if len(pressed_keys) >= 1:  # we have an input!
-            position_update = adjust_position(pressed_keys)
-            message = {
-                "NEW_INPUT": position_update
-            }
+        # pressed_keys = pygame.key.get_pressed()
+        # if len(pressed_keys) >= 1:  # we have an input!
+        #     position_update = adjust_position(pressed_keys)
+        #     message = {
+        #         "NEW_INPUT": position_update
+        #     }
         client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
 
-        packet_to_send = {}
 
 
         pygame.display.update()  # try to get things to draw to the screen IG>
@@ -132,10 +130,6 @@ def print_board(msg):
             col = agents_positions[agent.name]["X_COORD"]
             new_tuple = row, col
             agent.update(SCREEN, new_tuple)
-
-
-
-
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.
     SCREEN.fill(WHITECOLOR)
