@@ -11,7 +11,7 @@ hare_color = (222, 222, 222)
 agent_1_color = (40, 30, 245)
 agent_2_color = (135, 135, 245)
 player_color = (45, 135, 35)
-player_2_color = (130, 130, 130)
+player_2_color = (39, 194, 21)
 
 
 class Enemy(pygame.sprite.Sprite):

@@ -115,7 +115,7 @@ def handle_client(client_socket):
     try:
         while True:
             if len(connected_clients) == HUMAN_PLAYERS:
-                stag_hunt_game_loop(client_socket)
+                stag_hunt_game_loop()
                 break
 
             response = {
@@ -134,67 +134,73 @@ def handle_client(client_socket):
     finally:
         client_socket.close()
 
-def stag_hunt_game_loop(client_socket):
+
+def stag_hunt_game_loop():
     global connected_clients
     global stag_hare
     client_input = {}
-    pygame.init()  # actually starts the game.
+    pygame.init()  # Initialize pygame
     running = True
     rewards = [0] * (len(hunters) + 2)
 
     while running:
+        # Receive data from clients
         for client in connected_clients:
             data = connected_clients[client].recv(1024)
-            if data != None:
-                received_json = json.loads(data.decode())
-                if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] is not None:
-                    print(f"{client} has tried to move!")
-                    client_input[client] = received_json["NEW_INPUT"]
+            if data:
+                try:
+                    received_json = json.loads(data.decode())
+                    if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] is not None:
+                        client_input[client] = received_json["NEW_INPUT"]
 
-                if len(client_input) == len(connected_clients): # everyone has an answer
-                    for i in range(HUMAN_PLAYERS):
-                        for agent in agents:
-                            check_name = "H" + str(i+1)
-                            if agent.name == check_name:
-                                 next_round(stag_hare, rewards, client_input)
-                                 client_input.clear()
+                    if len(client_input) == len(connected_clients):  # Everyone has an answer
+                        for i in range(HUMAN_PLAYERS):
+                            for agent in agents:
+                                check_name = "H" + str(i + 1)
+                                if agent.name == check_name:
+                                    next_round(stag_hare, rewards, client_input)
+                                    client_input.clear()
 
-            current_state = {}
+                except json.JSONDecodeError:
+                    print(f"Error decoding data from {client}")
 
-            for agent in stag_hare.state.agent_positions:
-                hidden_second_dict = {}
-                hidden_second_dict["X_COORD"] = int(stag_hare.state.agent_positions[agent][1])
-                hidden_second_dict["Y_COORD"] = int(stag_hare.state.agent_positions[agent][0])
-                current_state[agent] = hidden_second_dict
+        current_state = {}
 
-            response = {
-                "CLIENT_ID": client,
-                "AGENT_POSITIONS": current_state,
-            }
+        # Prepare current state to send to clients
+        for agent in stag_hare.state.agent_positions:
+            hidden_second_dict = {}
+            hidden_second_dict["X_COORD"] = int(stag_hare.state.agent_positions[agent][1])
+            hidden_second_dict["Y_COORD"] = int(stag_hare.state.agent_positions[agent][0])
+            current_state[agent] = hidden_second_dict
 
+        response = {
+            "CLIENT_ID": client,
+            "AGENT_POSITIONS": current_state,
+        }
+
+        # Send updated state to all clients
+        for client in connected_clients:
             new_message = json.dumps(response).encode()
             connected_clients[client].send(new_message)
 
-            draw_grid(HEIGHT, WIDTH)
-            state = stag_hare.return_state()
+        draw_grid(HEIGHT, WIDTH)
+        state = stag_hare.return_state()
 
-            for agent in agents: # that should be all we need to do actually, throw them in an array and let it do everything else.
-                agent.update(SCREEN, stag_hare.state.agent_positions[agent.name])
+        for agent in agents:
+            agent.update(SCREEN, stag_hare.state.agent_positions[agent.name])
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-            if stag_hare.is_over():
-                if stag_hare.state.hare_captured():
-                    hare.update(SCREEN, state.agent_positions["hare"], True)
-                else:
-                    stag.update(SCREEN, state.agent_positions["stag"], True)
-                #pygame.display.update()
-                print("GAME OVER")
-                time.sleep(PAUSE_TIME)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
                 running = False
 
+        if stag_hare.is_over():
+            if stag_hare.state.hare_captured():
+                hare.update(SCREEN, state.agent_positions["hare"], True)
+            else:
+                stag.update(SCREEN, state.agent_positions["stag"], True)
+            print("GAME OVER")
+            time.sleep(PAUSE_TIME)
+            running = False
 
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.

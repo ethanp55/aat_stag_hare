@@ -14,42 +14,30 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
     K_LEFT,
     K_RIGHT,
 )
-
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
-
 client_ID = 0
-
-
 agents = [] # holds all of the sprites for the various agents.
 
 def start_client():
 
     global client_ID
-
     host = '127.0.0.1'  # The server's IP address
     port = 12345         # The port number to connect to
-
-
     pygame.init()  # actually starts the game.
-
     # Create a TCP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     # Connect to the server
     client_socket.connect((host, port))
-
     # Send data to the server
     message = {
         "message" : "Hello from the client!"
     }
     client_socket.send(json.dumps(message).encode())
-
     # Receive a response from the server
     while True:
         server_response = None
         data = client_socket.recv(1024)
-
         try: # get the stuff first
             # Deserialize the JSON response from the server
             server_response = json.loads(data.decode())
@@ -63,14 +51,9 @@ def start_client():
             if "CLIENT_ID" in server_response:
                 client_ID = server_response["CLIENT_ID"]
             print_board(server_response)
-
-
         message = {
             "NEW_INPUT" : None,
-
         }
-
-
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 pressed_keys = pygame.key.get_pressed()
@@ -84,18 +67,7 @@ def start_client():
                 pygame.quit()
             break
 
-
-
-
-        # now we need to get player input
-        # for event in pygame.event.get():
-        #     if event.type == pygame.KEYDOWN:
-        #
-        #     break
-
         client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
-
-
         pygame.display.update()  # try to get things to draw to the screen IG>
 
     # Close the connection
@@ -156,9 +128,6 @@ def print_board(msg):
             agent.update(SCREEN, new_tuple)
 
 
-
-
-
 def draw_grid(height, width): # draws the grid on every frame just so we have it.
     SCREEN.fill(WHITECOLOR)
     widthOffset = (SCREEN_WIDTH / width)
@@ -167,7 +136,6 @@ def draw_grid(height, width): # draws the grid on every frame just so we have it
         for y in range(0, height):
             rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
             pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
-
 
 if __name__ == "__main__":
     start_client()
