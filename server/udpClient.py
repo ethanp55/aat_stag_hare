@@ -46,10 +46,11 @@ def start_client():
             pass
 
         if server_response != None:
-            if "HUMAN_AGENTS" in server_response:
-                initalize(server_response)
+
             if "CLIENT_ID" in server_response:
                 client_ID = server_response["CLIENT_ID"]
+            if "HUMAN_AGENTS" in server_response:
+                initalize(server_response)
             print_board(server_response)
         message = {
             "NEW_INPUT" : None,
@@ -75,7 +76,7 @@ def start_client():
 
 
 def initalize(server_response):
-    global HUMAN_AGENTS, AI_AGENTS, HEIGHT, WIDTH
+    global HUMAN_AGENTS, AI_AGENTS, HEIGHT, WIDTH, client_ID
     HUMAN_AGENTS = server_response["HUMAN_AGENTS"]
     AI_AGENTS = server_response["AI_AGENTS"]
     HEIGHT = server_response["HEIGHT"]
@@ -83,7 +84,10 @@ def initalize(server_response):
 
     for i in range(HUMAN_AGENTS):
         new_name = "H" + str(i+1)
-        new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
+        my_player = False
+        if str(i+1) == str(client_ID):
+            my_player = True
+        new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH, my_player)
         agents.append(new_agent)
 
     for i in range(AI_AGENTS):

@@ -15,7 +15,7 @@ player_2_color = (39, 194, 21)
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, name, height, width):
+    def __init__(self, name, height, width, my_player=False):
         super(Enemy, self).__init__()
         self.row_to_return, self.col_to_return = None, None # for ethans code
         square_height = SCREEN_HEIGHT / height
@@ -34,10 +34,13 @@ class Enemy(pygame.sprite.Sprite):
             self.surf.fill(agent_1_color)
         elif name == "R2":
             self.surf.fill(agent_2_color)
-        elif name == "H1":
-            self.surf.fill(player_color)
-        elif name == "H2":
-            self.surf.fill(player_2_color)
+
+        if name[0] == "H":
+            if my_player:
+                self.surf.fill(player_color)
+            else:
+                self.surf.fill(player_2_color)
+
 
         self.rect = self.surf.get_rect()
 

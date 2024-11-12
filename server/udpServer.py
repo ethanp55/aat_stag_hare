@@ -3,7 +3,7 @@ import socket
 import threading
 import select
 
-
+from server.udpClient import client_ID
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
@@ -97,6 +97,7 @@ def start_server(host='127.0.0.1', port=12345):
                 "AI_AGENTS": AI_AGENTS,
                 "HEIGHT": HEIGHT,
                 "WIDTH": WIDTH,
+                "CLIENT_ID" : client_id_dict[client_socket],
             }
 
             # Serialize and send the response as JSON
@@ -174,7 +175,7 @@ def stag_hunt_game_loop():
             current_state[agent] = hidden_second_dict
 
         response = {
-            "CLIENT_ID": client,
+            "CLIENT_ID": client_ID,
             "AGENT_POSITIONS": current_state,
         }
 
