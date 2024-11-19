@@ -17,6 +17,9 @@ from agents.human import *
 from environment.world import StagHare
 from server import enemy
 
+
+
+
 HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
 AI_AGENTS = 1 # how many agents we are going to add
 
@@ -41,6 +44,11 @@ hunters = []
 stag = enemy.Enemy("stag", HEIGHT, WIDTH)
 hare = enemy.Enemy("hare", HEIGHT, WIDTH)
 
+MAX_ROUNDS = 2
+round = 0
+player_points = []
+HARE_POINTS = 1
+STAG_POINTS = 3
 
 agents = [] # holds the actual agents that we want to update
 stag_hare = None
@@ -116,6 +124,10 @@ def handle_client(client_socket):
     try:
         while True:
             if len(connected_clients) == HUMAN_PLAYERS:
+
+                for client in connected_clients: # sets points dict to 0
+                    player_points[client] = 0
+
                 stag_hunt_game_loop()
                 break
 
@@ -137,7 +149,7 @@ def handle_client(client_socket):
 
 
 def stag_hunt_game_loop():
-    global connected_clients
+    global connected_clients, round, hunters
     global stag_hare
     client_input = {}
     pygame.init()  # Initialize pygame
@@ -195,13 +207,70 @@ def stag_hunt_game_loop():
                 running = False
 
         if stag_hare.is_over():
+
             if stag_hare.state.hare_captured():
+                find_hunter_hare()
                 hare.update(SCREEN, state.agent_positions["hare"], True)
+
             else:
+
+
                 stag.update(SCREEN, state.agent_positions["stag"], True)
+
+            pygame.display.update()
             print("GAME OVER")
             time.sleep(PAUSE_TIME)
-            running = False
+            if round == MAX_ROUNDS:
+                running = False
+            else:
+                reset_stag_hare()
+                round += 1
+
+def find_hunter_hare():
+    global stag_hare, HARE_POINTS, player_points
+    hare_position = stag_hare.state.agent_positions["hare"]
+    huntersToReturn = []
+    for hunter in hunters:
+        positionX = hunter.col_to_return
+        positionY = hunter.row_to_return
+        if positionX + 1 == hare_position[1] or positionX -1 == hare_position[0] or positionY + 1 == hare_position[0] or positionY - 1 == hare_position[0]:
+            current_index = int(hunter.name[1])
+            current_index += 1
+            current_points = player_points[current_index]
+            current_points += HARE_POINTS
+
+
+def find_hunter_stag():
+    global hunters, STAG_POINTS, player_points
+    for hunter in hunters:  # update every player points
+        current_index = int(hunter.name[1])
+        current_index += 1
+        current_points = player_points[current_index]
+        current_points += STAG_POINTS
+
+def reset_stag_hare():
+    global stag_hare
+    global hunters
+    hunters = []  # first things first initalize the hunters and get them ready
+    for i in range(HUMAN_PLAYERS):
+        new_name = "H" + str(i + 1)
+        hunters.append(humanAgent(name=new_name))
+        new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
+        agents.append(new_agent)
+
+    for i in range(AI_AGENTS):
+        new_name = "R" + str(i + 1)
+        hunters.append(Random(name=new_name))
+        new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
+        agents.append(new_agent)
+
+    while True:  # set up stag hunt and avoid weird edgecase
+        stag_hare = StagHare(HEIGHT, WIDTH, hunters)
+        if not stag_hare.is_over():
+            break
+
+    agents.append(stag)
+    agents.append(hare)
 
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.
