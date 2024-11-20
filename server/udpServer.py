@@ -27,16 +27,19 @@ ALL_READY_EVENT = pygame.event.Event(ALL_READY)
 #from agents.dqn import DQNAgent
 
 PAUSE_TIME = 3
-HEIGHT = 10
-WIDTH = 10
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 connected_clients = {}
 client_input = {}
-HEIGHT = 10
-WIDTH = 10
+HEIGHT = 3
+WIDTH = 3
 client_id_dict = {}
 hunters = []
+MAX_ROUNDS = 2
+round = 0
+player_points = []
+HARE_POINTS = 1
+STAG_POINTS = 3
 # these ones always stay the same
 stag = enemy.Enemy("stag", HEIGHT, WIDTH)
 hare = enemy.Enemy("hare", HEIGHT, WIDTH)
@@ -137,7 +140,7 @@ def handle_client(client_socket):
 
 
 def stag_hunt_game_loop():
-    global connected_clients
+    global connected_clients, round
     global stag_hare
     client_input = {}
     pygame.init()  # Initialize pygame
@@ -201,8 +204,36 @@ def stag_hunt_game_loop():
                 stag.update(SCREEN, state.agent_positions["stag"], True)
             print("GAME OVER")
             time.sleep(PAUSE_TIME)
-            running = False
+            if round == MAX_ROUNDS:
+                running = False
+            else:
+                round += 1
+                reset_stag_hare()
 
+
+def reset_stag_hare():
+    global stag_hare
+    global hunters
+    hunters = []  # first things first initalize the hunters and get them ready
+    for i in range(HUMAN_PLAYERS):
+        new_name = "H" + str(i + 1)
+        hunters.append(humanAgent(name=new_name))
+        new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
+        agents.append(new_agent)
+
+    for i in range(AI_AGENTS):
+        new_name = "R" + str(i + 1)
+        hunters.append(Random(name=new_name))
+        new_agent = enemy.Enemy(new_name, HEIGHT, WIDTH)
+        agents.append(new_agent)
+
+    while True:  # set up stag hunt and avoid weird edgecase
+        stag_hare = StagHare(HEIGHT, WIDTH, hunters)
+        if not stag_hare.is_over():
+            break
+
+    agents.append(stag)
+    agents.append(hare)
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.
     SCREEN.fill(WHITECOLOR)
