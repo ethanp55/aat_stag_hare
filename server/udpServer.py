@@ -37,7 +37,7 @@ client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
 round = 0
-player_points = []
+player_points = {}
 HARE_POINTS = 1
 STAG_POINTS = 3
 # these ones always stay the same
@@ -199,8 +199,10 @@ def stag_hunt_game_loop():
 
         if stag_hare.is_over():
             if stag_hare.state.hare_captured():
+                find_hunter_hare()
                 hare.update(SCREEN, state.agent_positions["hare"], True)
             else:
+                find_hunter_stag()
                 stag.update(SCREEN, state.agent_positions["stag"], True)
             print("GAME OVER")
             time.sleep(PAUSE_TIME)
@@ -270,6 +272,33 @@ def get_client_data():
             print(f"Error receiving data from {client}: {e}")
     return data
 
+def find_hunter_hare():
+    global stag_hare, HARE_POINTS, player_points
+    print("distributing points")
+    hare_position = stag_hare.state.agent_positions["hare"] # we need the hare here.
+    for hunter in hunters:
+        positionY = hunter.row_to_return
+        positionX = hunter.col_to_return
+        if ((positionX + 1 == hare_position[1] and positionY == hare_position[0]) or (positionX - 1 == hare_position[1] and positionY == hare_position[0])
+                or (positionY + 1 == hare_position[0] and positionY == hare_position[1]) or (positionX - 1 == hare_position[0] and positionY == hare_position[1])):
+            current_index = hunter.name
+            if current_index not in player_points:
+                player_points[current_index] = HARE_POINTS
+            else:
+                current_points = player_points[current_index]
+                current_points += HARE_POINTS
+                player_points[current_index] = current_points
+
+
+
+def find_hunter_stag():
+    print("distributing points")
+    global hunters, STAG_POINTS, player_points
+    # for hunter in hunters:  # update every player points
+    #     current_index = int(hunter.name[1])
+    #     current_index += 1
+    #     current_points = player_points[current_index]
+    #     current_points += STAG_POINTS
 
 
 if __name__ == "__main__":
