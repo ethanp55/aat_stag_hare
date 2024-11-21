@@ -9,8 +9,12 @@ from gui import enemy
 from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
-#from agents.alegaatr import AlegAATr
-#from agents.dqn import DQNAgent
+from agents.alegaatr import AlegAATr
+from agents.dqn import DQNAgent
+from agents.qalegaatr import QAlegAATr
+from agents.aleqgaatr import AleqgAATr
+from agents.smalegaatr import SMAlegAATr
+from agents.rawo import RawO
 
 PAUSE_TIME = 3
 HEIGHT = 10
@@ -20,16 +24,27 @@ WIDTH = 10
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
-hunters = [Random(name='R1'), Random(name='R2'), humanAgent(name='H')]
 # hunters = [AlegAATr(name='R1', lmbda=0.0, ml_model_type='knn', enhanced=True),
 #            AlegAATr(name='R2', lmbda=0.0, ml_model_type='knn', enhanced=True),
 #            humanAgent(name='H')]
 # hunters = [DQNAgent(name='R1'),
 #            DQNAgent(name='R2'),
 #            humanAgent(name='H')]
+# hunters = [QAlegAATr(name='R1', enhanced=True),
+#            QAlegAATr(name='R2', enhanced=True),
+#            humanAgent(name='H')]
+# hunters = [AleqgAATr(name='R1'),
+#            AleqgAATr(name='R2'),
+#            humanAgent(name='H')]
+# hunters = [SMAlegAATr(name='R1'),
+#            SMAlegAATr(name='R2'),
+#            humanAgent(name='H')]
+hunters = [RawO(name='R1', enhanced=True),
+           RawO(name='R2', enhanced=True),
+           humanAgent(name='H')]
 
 
-SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
+SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
@@ -79,7 +94,6 @@ def main():
                 # Update rewards
                 for i, reward in enumerate(round_rewards):
                     rewards[i] += reward
-
 
             for agent in state.agent_positions:
                 if agent == 'hare':
