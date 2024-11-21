@@ -18,6 +18,7 @@ BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 client_ID = 0
 agents = [] # holds all of the sprites for the various agents.
+points = 0
 
 def start_client():
 
@@ -51,6 +52,8 @@ def start_client():
                 client_ID = server_response["CLIENT_ID"]
             if "HUMAN_AGENTS" in server_response:
                 initalize(server_response)
+            if "PLAYER_POINTS" in server_response:
+                set_points(server_response)
             print_board(server_response)
         message = {
             "NEW_INPUT" : None,
@@ -116,7 +119,7 @@ def adjust_position(pressed_keys):
     return curr_row, curr_col
 
 def print_board(msg):
-
+    global points
     if HEIGHT is not None or WIDTH is not None:
         draw_grid(HEIGHT, WIDTH) # draw the board first
 
@@ -129,7 +132,7 @@ def print_board(msg):
             row = agents_positions[agent.name]["Y_COORD"]
             col = agents_positions[agent.name]["X_COORD"]
             new_tuple = row, col
-            agent.update(SCREEN, new_tuple)
+            agent.update(SCREEN, new_tuple, points)
 
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.
@@ -140,6 +143,16 @@ def draw_grid(height, width): # draws the grid on every frame just so we have it
         for y in range(0, height):
             rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
             pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
+
+def set_points(msg):
+    global points
+    current_dict = msg["PLAYER_POINTS"]
+    name = "H" + str(client_ID)
+    if name in current_dict:
+        points = current_dict[name]
+    else:
+        points = 0
+
 
 if __name__ == "__main__":
     start_client()
