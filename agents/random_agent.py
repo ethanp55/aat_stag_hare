@@ -9,5 +9,3 @@ class Random(Agent):
 
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         return self.random_action(state)
-
-

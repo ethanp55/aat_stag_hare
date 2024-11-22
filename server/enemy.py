@@ -12,12 +12,6 @@ agent_1_color = (40, 30, 245)
 agent_2_color = (135, 135, 245)
 player_color = (45, 135, 35)
 player_2_color = (39, 194, 21)
-my_player = False
-
-
-
-font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
-font_color = (100, 200, 150)
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -51,7 +45,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect()
 
 
-    def update(self, screen, array_position, points, dead=False):
+    def update(self, screen, array_position, dead=False):
         # here
         new_position = calculate_position(self, array_position)
         if dead:
@@ -59,11 +53,6 @@ class Enemy(pygame.sprite.Sprite):
             screen.blit(self.surf, new_position)
         else:
             screen.blit(self.surf, new_position) # so this one works.
-
-
-        if my_player:
-            txt_surf = font.render(str(points), True, font_color)
-            screen.blit(txt_surf, new_position)
 
 
 def calculate_position(self, array_position):
