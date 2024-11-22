@@ -212,6 +212,7 @@ def stag_hunt_game_loop():
             else:
                 find_hunter_stag()
                 stag.update(SCREEN, state.agent_positions["stag"], True)
+            pygame.display.update()
             print("GAME OVER")
             time.sleep(PAUSE_TIME)
             if round == MAX_ROUNDS:
@@ -290,25 +291,30 @@ def find_hunter_hare():
         position = stag_hare.state.agent_positions[hunter]
         positionX = position[1]
         positionY = position[0]
-        if ((positionX + 1 == hare_position[1] and positionY == hare_position[0]) or (positionX - 1 == hare_position[1] and positionY == hare_position[0])
-                or (positionY + 1 == hare_position[0] and positionY == hare_position[1]) or (positionX - 1 == hare_position[0] and positionY == hare_position[1])):
-            if hunter not in player_points:
-                player_points[hunter] = HARE_POINTS
-            else:
-                current_points = player_points[hunter]
-                current_points += HARE_POINTS
-                player_points[hunter] = current_points
+        hare_positionX = hare_position[1]
+        hare_positionY = hare_position[0]
+
+        if ((positionX + 1 == hare_positionX and positionY == hare_positionY) or
+                (positionX - 1 == hare_positionX and positionY == hare_positionY) or
+                (positionY + 1 == hare_positionY and positionX == hare_positionX) or
+                (positionY - 1 == hare_positionY and positionX == hare_positionX)):
+
+            current_points = player_points[hunter]
+            current_points += HARE_POINTS
+            player_points[hunter] = current_points
 
 
 
 def find_hunter_stag():
     print("distributing points")
     global hunters, STAG_POINTS, player_points
-    # for hunter in hunters:  # update every player points
-    #     current_index = int(hunter.name[1])
-    #     current_index += 1
-    #     current_points = player_points[current_index]
-    #     current_points += STAG_POINTS
+    for hunter in stag_hare.state.agent_positions:
+        if not hunter[0] == "H" and not hunter[0] == "R":  # should filter out all non agents.
+            continue
+
+        current_points = player_points[hunter]
+        current_points += HARE_POINTS
+        player_points[hunter] = current_points
 
 
 if __name__ == "__main__":
