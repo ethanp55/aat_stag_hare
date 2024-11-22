@@ -63,9 +63,9 @@ class Enemy(pygame.sprite.Sprite):
         if not self.name[0] == "H" and not self.name[0] == "R":  # should filter out all non agents.
             return
 
-
+        point = points[self.name]
         new_position = calculate_position(self, array_position)
-        txt_surf = font.render(str(points), True, font_color)
+        txt_surf = font.render(str(point), True, font_color)
         screen.blit(txt_surf, new_position)
 
         # create the new font here make sure all the changes work so far tho.
