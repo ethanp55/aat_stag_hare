@@ -38,8 +38,8 @@ hunters = []
 MAX_ROUNDS = 2
 round = 0
 player_points = {}
-HARE_POINTS = 1
-STAG_POINTS = 3
+HARE_POINTS = 1 / HUMAN_PLAYERS # multi threading work around
+STAG_POINTS = 3 / HUMAN_PLAYERS
 # these ones always stay the same
 stag = enemy.Enemy("stag", HEIGHT, WIDTH)
 hare = enemy.Enemy("hare", HEIGHT, WIDTH)
@@ -213,6 +213,19 @@ def stag_hunt_game_loop():
                 find_hunter_stag()
                 stag.update(SCREEN, state.agent_positions["stag"], True)
             pygame.display.update()
+
+            for client in connected_clients: # does this update the points correctly?
+                client_id = client_id_dict[connected_clients[client]]
+                response = {
+                    "CLIENT_ID": client_id,
+                    "AGENT_POSITIONS": current_state,
+                    "POINTS": player_points
+                }
+
+                new_message = json.dumps(response).encode()
+                connected_clients[client].send(new_message)
+
+
             print("GAME OVER")
             time.sleep(PAUSE_TIME)
             if round == MAX_ROUNDS:
