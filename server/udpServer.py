@@ -185,11 +185,10 @@ def stag_hunt_game_loop():
         # Send updated state to all clients
         for client in connected_clients:
             client_id = client_id_dict[connected_clients[client]]
-            name = "H" + str(client_id)
             response = {
-                "CLIENT_ID": client_ID,
+                "CLIENT_ID": client_id,
                 "AGENT_POSITIONS": current_state,
-                "POINTS": player_points[name]
+                "POINTS": player_points
             }
 
 

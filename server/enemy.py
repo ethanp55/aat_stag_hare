@@ -60,6 +60,10 @@ class Enemy(pygame.sprite.Sprite):
             screen.blit(self.surf, new_position) # so this one works.
 
     def update_points(self, screen, array_position, points):
+        if not self.name[0] == "H" and not self.name[0] == "R":  # should filter out all non agents.
+            return
+
+
         new_position = calculate_position(self, array_position)
         txt_surf = font.render(str(points), True, font_color)
         screen.blit(txt_surf, new_position)
