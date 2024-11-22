@@ -14,6 +14,11 @@ player_color = (45, 135, 35)
 player_2_color = (39, 194, 21)
 
 
+
+pygame.font.init()
+font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
+font_color = (100, 200, 150)
+
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, height, width, my_player=False):
         super(Enemy, self).__init__()
@@ -53,6 +58,13 @@ class Enemy(pygame.sprite.Sprite):
             screen.blit(self.surf, new_position)
         else:
             screen.blit(self.surf, new_position) # so this one works.
+
+    def update_points(self, screen, array_position, points):
+        new_position = calculate_position(self, array_position)
+        txt_surf = font.render(str(points), True, font_color)
+        screen.blit(txt_surf, new_position)
+
+        # create the new font here make sure all the changes work so far tho.
 
 
 def calculate_position(self, array_position):

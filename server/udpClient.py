@@ -119,10 +119,13 @@ def print_board(msg):
 
     if HEIGHT is not None or WIDTH is not None:
         draw_grid(HEIGHT, WIDTH) # draw the board first
-
+    points = 0
     self_id = None
-    if "SELF_ID" in msg:
-        self_id = msg["SELF_ID"]
+    if "CLIENT_ID" in msg:
+        self_id = msg["CLIENT_ID"]
+    name = "H" + str(self_id+1)
+    if "POINTS" in msg:
+        points = msg["POINTS"]
     if "AGENT_POSITIONS" in msg:
         agents_positions = msg["AGENT_POSITIONS"]
         for agent in agents:
@@ -130,6 +133,8 @@ def print_board(msg):
             col = agents_positions[agent.name]["X_COORD"]
             new_tuple = row, col
             agent.update(SCREEN, new_tuple)
+            if agent.name == name:
+                agent.update_points(SCREEN, new_tuple, points)
 
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.

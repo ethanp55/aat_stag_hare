@@ -71,6 +71,9 @@ def start_server(host='127.0.0.1', port=12345):
         if not stag_hare.is_over():
             break
 
+    for hunter in hunters:
+        player_points[hunter.name] = 0
+
     agents.append(stag)
     agents.append(hare)
 
@@ -177,13 +180,19 @@ def stag_hunt_game_loop():
             hidden_second_dict["Y_COORD"] = int(stag_hare.state.agent_positions[agent][0])
             current_state[agent] = hidden_second_dict
 
-        response = {
-            "CLIENT_ID": client_ID,
-            "AGENT_POSITIONS": current_state,
-        }
+
 
         # Send updated state to all clients
         for client in connected_clients:
+            client_id = client_id_dict[connected_clients[client]]
+            name = "H" + str(client_id)
+            response = {
+                "CLIENT_ID": client_ID,
+                "AGENT_POSITIONS": current_state,
+                "POINTS": player_points[name]
+            }
+
+
             new_message = json.dumps(response).encode()
             connected_clients[client].send(new_message)
 
