@@ -276,18 +276,20 @@ def find_hunter_hare():
     global stag_hare, HARE_POINTS, player_points
     print("distributing points")
     hare_position = stag_hare.state.agent_positions["hare"] # we need the hare here.
-    for hunter in hunters:
-        positionY = hunter.row_to_return
-        positionX = hunter.col_to_return
+    for hunter in stag_hare.state.agent_positions:
+        if not hunter[0] == "H" and not hunter[0] == "R":  # should filter out all non agents.
+            continue
+        position = stag_hare.state.agent_positions[hunter]
+        positionX = position[1]
+        positionY = position[0]
         if ((positionX + 1 == hare_position[1] and positionY == hare_position[0]) or (positionX - 1 == hare_position[1] and positionY == hare_position[0])
                 or (positionY + 1 == hare_position[0] and positionY == hare_position[1]) or (positionX - 1 == hare_position[0] and positionY == hare_position[1])):
-            current_index = hunter.name
-            if current_index not in player_points:
-                player_points[current_index] = HARE_POINTS
+            if hunter not in player_points:
+                player_points[hunter] = HARE_POINTS
             else:
-                current_points = player_points[current_index]
+                current_points = player_points[hunter]
                 current_points += HARE_POINTS
-                player_points[current_index] = current_points
+                player_points[hunter] = current_points
 
 
 
