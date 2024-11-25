@@ -226,9 +226,10 @@ def stag_hunt_game_loop():
                 connected_clients[client].send(new_message)
 
 
-            print("GAME OVER")
+            pygame.display.update()
             time.sleep(PAUSE_TIME)
             if round == MAX_ROUNDS:
+                print("GAME OVER")
                 running = False
             else:
                 round += 1
