@@ -17,6 +17,18 @@ from agents.human import *
 from environment.world import StagHare
 from server import enemy
 
+import multiprocessing
+
+
+
+def worker(d, key, value):
+    if key in d:
+        new_value = d[key]
+        new_value += value
+        d[key] = new_value
+    else:
+        d[key] = value
+
 HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
 AI_AGENTS = 1 # how many agents we are going to add
 
@@ -37,7 +49,7 @@ client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
 round = 0
-player_points = {}
+
 HARE_POINTS = 1 / HUMAN_PLAYERS # multi threading work around
 STAG_POINTS = 3 / HUMAN_PLAYERS
 # these ones always stay the same
@@ -53,6 +65,9 @@ SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish scr
 def start_server(host='127.0.0.1', port=12345):
     global stag_hare
     global hunters
+    manager = multiprocessing.Manager()
+    player_points = manager.dict()
+
     hunters = []  # first things first initalize the hunters and get them ready
     for i in range(HUMAN_PLAYERS):
         new_name = "H" + str(i + 1)
@@ -72,7 +87,7 @@ def start_server(host='127.0.0.1', port=12345):
             break
 
     for hunter in hunters:
-        player_points[hunter.name] = 0
+        worker(player_points, hunter.name, 0)
 
     agents.append(stag)
     agents.append(hare)
@@ -112,17 +127,17 @@ def start_server(host='127.0.0.1', port=12345):
             print("Received data is not valid JSON.")
             client_socket.send(json.dumps({"error": "Invalid JSON format"}).encode())
 
-        client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+        client_thread = threading.Thread(target=handle_client, args=(client_socket, player_points))
         client_thread.start()
 
 
-def handle_client(client_socket):
+def handle_client(client_socket, player_points):
     global connected_clients
 
     try:
         while True:
             if len(connected_clients) == HUMAN_PLAYERS:
-                stag_hunt_game_loop()
+                stag_hunt_game_loop(player_points)
                 break
 
             response = {
@@ -142,7 +157,7 @@ def handle_client(client_socket):
         client_socket.close()
 
 
-def stag_hunt_game_loop():
+def stag_hunt_game_loop(player_points):
     global connected_clients, round
     global stag_hare
     client_input = {}
@@ -183,12 +198,13 @@ def stag_hunt_game_loop():
 
 
         # Send updated state to all clients
+        send_player_points = player_points.copy()
         for client in connected_clients:
             client_id = client_id_dict[connected_clients[client]]
             response = {
                 "CLIENT_ID": client_id,
                 "AGENT_POSITIONS": current_state,
-                "POINTS": player_points
+                "POINTS": send_player_points
             }
 
 
@@ -207,19 +223,20 @@ def stag_hunt_game_loop():
 
         if stag_hare.is_over():
             if stag_hare.state.hare_captured():
-                find_hunter_hare()
+                find_hunter_hare(player_points)
                 hare.update(SCREEN, state.agent_positions["hare"], True)
             else:
-                find_hunter_stag()
+                find_hunter_stag(player_points)
                 stag.update(SCREEN, state.agent_positions["stag"], True)
             pygame.display.update()
 
+            send_player_points = player_points.copy()
             for client in connected_clients: # does this update the points correctly?
                 client_id = client_id_dict[connected_clients[client]]
                 response = {
                     "CLIENT_ID": client_id,
                     "AGENT_POSITIONS": current_state,
-                    "POINTS": player_points
+                    "POINTS": dict(send_player_points)
                 }
 
                 new_message = json.dumps(response).encode()
@@ -295,8 +312,8 @@ def get_client_data():
             print(f"Error receiving data from {client}: {e}")
     return data
 
-def find_hunter_hare():
-    global stag_hare, HARE_POINTS, player_points
+def find_hunter_hare(player_points):
+    global stag_hare, HARE_POINTS
     print("distributing points")
     hare_position = stag_hare.state.agent_positions["hare"] # we need the hare here.
     for hunter in stag_hare.state.agent_positions:
@@ -313,22 +330,18 @@ def find_hunter_hare():
                 (positionY + 1 == hare_positionY and positionX == hare_positionX) or
                 (positionY - 1 == hare_positionY and positionX == hare_positionX)):
 
-            current_points = player_points[hunter]
-            current_points += HARE_POINTS
-            player_points[hunter] = current_points
+            worker(player_points, hunter, HARE_POINTS)
 
 
 
-def find_hunter_stag():
+def find_hunter_stag(player_points):
     print("distributing points")
-    global hunters, STAG_POINTS, player_points
+    global hunters, STAG_POINTS
     for hunter in stag_hare.state.agent_positions:
         if not hunter[0] == "H" and not hunter[0] == "R":  # should filter out all non agents.
             continue
 
-        current_points = player_points[hunter]
-        current_points += HARE_POINTS
-        player_points[hunter] = current_points
+        worker(player_points, hunter, HARE_POINTS)
 
 
 if __name__ == "__main__":
