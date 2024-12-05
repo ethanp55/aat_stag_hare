@@ -146,7 +146,7 @@ def calculate_points(big_dict, agent_name):
                         points += stag_points
                 if "hare" in big_dict[key][round]:
                     if big_dict[key][round]["hare"] == True:
-                        points += points + hare_points
+                        points += hare_points
 
     return points
 

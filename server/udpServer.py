@@ -24,19 +24,30 @@ import multiprocessing
 
 
 def worker2(dictionary, hunter_name, round, updated_states_dict):
-    if hunter_name in dictionary:
-        current_entry = dictionary[hunter_name]
-        if round in current_entry:
-            if current_entry.count("hare") == 0:
-                current_entry["hare"] = updated_states_dict["hare"]
-            if current_entry.count("hare") == 0:
-                current_entry["stag"] = updated_states_dict["hare"]
-            dictionary[hunter_name][round] = current_entry
-        else:
-            new_round_dict = {}
-            new_round_dict[round] = updated_states_dict
-            dictionary[hunter_name] = new_round_dict
-            print("we have updated or something IDK")
+    print("updated states dict ", updated_states_dict)
+
+    if hunter_name not in dictionary:
+        # If the hunter doesn't exist in the dictionary, create an entry for them
+        dictionary[hunter_name] = {}
+
+    current_entry = dictionary[hunter_name]
+
+    # If the round doesn't exist, create a new entry for that round
+    if round not in current_entry:
+        current_entry[round] = {}
+
+    # Check if "hare" is in the updated states dict and add it if necessary
+    if "hare" in updated_states_dict:
+        current_entry[round]["hare"] = updated_states_dict["hare"]
+
+    # Check if "stag" is in the updated states dict and add it if necessary
+    if "stag" in updated_states_dict:
+        current_entry[round]["stag"] = updated_states_dict["stag"]
+
+    # After updating the round, save it back to the dictionary
+    dictionary[hunter_name] = current_entry
+
+    print("post update states dict ", dictionary)
 
 
 
@@ -66,7 +77,7 @@ HEIGHT = 3
 WIDTH = 3
 client_id_dict = {}
 hunters = []
-MAX_ROUNDS = 2
+MAX_ROUNDS = 6
 round = 0
 
 HARE_POINTS = 1 / HUMAN_PLAYERS # multi threading work around
@@ -171,7 +182,7 @@ def handle_client(client_socket, player_points):
 
 
     except Exception as e:
-        print("Error with something")
+        pass
     finally:
         client_socket.close()
 
@@ -203,7 +214,7 @@ def stag_hunt_game_loop(player_points):
                                     client_input.clear()
 
                 except json.JSONDecodeError:
-                    print(f"Error decoding data from {client}")
+                    pass
 
         current_state = {}
 
@@ -241,6 +252,8 @@ def stag_hunt_game_loop(player_points):
                 running = False
 
         if stag_hare.is_over():
+            print("*************GAME OVER************")
+            print("HERE Are the current playre points" , player_points)
             hare_dead = False
             stag_dead = False
 
@@ -253,19 +266,20 @@ def stag_hunt_game_loop(player_points):
                 stag.update(SCREEN, state.agent_positions["stag"], True)
                 stag_dead = True
 
+            print("here are the post player points", player_points)
             small_dict = {}  # helps me know who to light up red on death.
             small_dict["HARE_DEAD"] = hare_dead
             small_dict["STAG_DEAD"] = stag_dead
 
-            pygame.display.update()
 
-            send_player_points = player_points.copy()
+            points_to_send = dict(player_points)
+            pygame.display.update()
             for client in connected_clients: # does this update the points correctly?
                 client_id = client_id_dict[connected_clients[client]]
                 response = {
                     "CLIENT_ID": client_id,
                     "AGENT_POSITIONS": current_state,
-                    "POINTS": dict(send_player_points),
+                    "POINTS": dict(points_to_send),
                     "GAME_OVER" : small_dict,
                 }
 
@@ -339,31 +353,59 @@ def get_client_data():
             if msg:
                 data[client] = json.loads(msg)
         except Exception as e:
-            print(f"Error receiving data from {client}: {e}")
+            pass
     return data
 
 def find_hunter_hare(player_points, round):
     global stag_hare, HARE_POINTS
     print("distributing points")
-    hare_position = stag_hare.state.agent_positions["hare"] # we need the hare here.
+    hare_position = stag_hare.state.agent_positions["hare"]
+    hare_positionX = hare_position[1]
+    hare_positionY = hare_position[0]
+    # we need the hare here.
+    print("here is the hare position", hare_positionY, ",", hare_positionX)
     for hunter in stag_hare.state.agent_positions:
         if not hunter[0] == "H" and not hunter[0] == "R":  # should filter out all non agents.
             continue
+
         position = stag_hare.state.agent_positions[hunter]
         positionX = position[1]
         positionY = position[0]
-        hare_positionX = hare_position[1]
-        hare_positionY = hare_position[0]
+        print("here is the position of the agent that we think ", positionY, ",", positionX)
 
-        if ((positionX + 1 == hare_positionX and positionY == hare_positionY) or
-                (positionX - 1 == hare_positionX and positionY == hare_positionY) or
-                (positionY + 1 == hare_positionY and positionX == hare_positionX) or
-                (positionY - 1 == hare_positionY and positionX == hare_positionX)):
-
+        if abs(positionX - hare_positionX) == 1 and positionY == hare_positionY or \
+                abs(positionY - hare_positionY) == 1 and positionX == hare_positionX: # if they are right next to eachtoher
             small_dict = {}
             small_dict["hare"] = True
-
+            print("Hunter ", hunter, " was given hare points! next to eachtoher no diff")
             worker2(player_points, hunter, round, small_dict)
+
+
+
+        elif positionX == hare_positionX and (
+                (positionY == 0 and hare_positionY == HEIGHT - 1) or
+                (positionY == HEIGHT - 1 and hare_positionY == 0)
+        ): # seperated by height
+            small_dict = {}
+            small_dict["hare"] = True
+            print("Hunter ", hunter, " was given hare points! shot around wall left or right")
+            worker2(player_points, hunter, round, small_dict)
+
+
+
+        elif positionY == hare_positionY and (
+                (positionX == 0 and hare_positionX == WIDTH - 1) or
+                (positionX == WIDTH - 1 and hare_positionX == 0)
+        ): # seperated by width
+            small_dict = {}
+            small_dict["hare"] = True
+            print("Hunter ", hunter, " was given hare points! shot thorugh celing or floor")
+            worker2(player_points, hunter, round, small_dict)
+
+
+
+
+
 
 
 
@@ -378,7 +420,7 @@ def find_hunter_stag(player_points, round):
         small_dict["stag"] = True
 
         worker2(player_points, hunter, round, small_dict)
-
+        print("Hunter ", hunter, " was given stag points!")
 
 if __name__ == "__main__":
     start_server()
