@@ -1,13 +1,11 @@
 import json
 import socket
 import threading
-from nntplib import decode_header
+from cgitb import small
 
 import select
 
-from server.timer import Timer
 from server.udpClient import client_ID
-from simulations.simulations import hunter
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
@@ -15,37 +13,43 @@ WHITECOLOR = (255, 255, 255)
 import pygame
 import sys
 import time
+from server import timer
 from pygame import K_ESCAPE
 from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
 from server import enemy
-import timer
 
 import multiprocessing
+
+
+def worker2(dictionary, hunter_name, round, updated_states_dict):
+    if hunter_name in dictionary:
+        current_entry = dictionary[hunter_name]
+        if round in current_entry:
+            if current_entry.count("hare") == 0:
+                current_entry["hare"] = updated_states_dict["hare"]
+            if current_entry.count("hare") == 0:
+                current_entry["stag"] = updated_states_dict["hare"]
+            dictionary[hunter_name][round] = current_entry
+        else:
+            new_round_dict = {}
+            new_round_dict[round] = updated_states_dict
+            dictionary[hunter_name] = new_round_dict
+            print("we have updated or something IDK")
 
 
 
 def worker(d, key, value):
     if key in d:
         new_value = d[key]
-
-
         new_value += value
         d[key] = new_value
     else:
         d[key] = value
-# worker2(player_points, hunter, round, small_dict)
 
-def worker2(dictionary, hunter_name, round, updated_states_dict):
-    if hunter_name in dictionary:
-        current_entry = dictionary[hunter_name]
-        if round not in current_entry:
-            current_entry = current_entry.append(updated_states_dict)
-            dictionary[hunter_name][round] = current_entry
-
-HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
-AI_AGENTS = 1 # how many agents we are going to add
+HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
+AI_AGENTS = 2 # how many agents we are going to add
 
 ALL_READY = pygame.USEREVENT + 1
 ALL_READY_EVENT = pygame.event.Event(ALL_READY)
@@ -62,8 +66,8 @@ HEIGHT = 3
 WIDTH = 3
 client_id_dict = {}
 hunters = []
-MAX_ROUNDS = 6
-
+MAX_ROUNDS = 2
+round = 0
 
 HARE_POINTS = 1 / HUMAN_PLAYERS # multi threading work around
 STAG_POINTS = 3 / HUMAN_PLAYERS
@@ -102,7 +106,7 @@ def start_server(host='127.0.0.1', port=12345):
             break
 
     for hunter in hunters:
-        worker(player_points, hunter.name, []) # give them all an empty list to work with
+        worker(player_points, hunter.name, {})
 
     agents.append(stag)
     agents.append(hare)
@@ -110,7 +114,7 @@ def start_server(host='127.0.0.1', port=12345):
     # Create a TCP socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
-    server_socket.listen(HUMAN_PLAYERS)  # Allow only one connection
+    server_socket.listen(2)  # Allow only one connection
 
     print(f"Server listening on {host}:{port}...")
 
@@ -146,7 +150,6 @@ def start_server(host='127.0.0.1', port=12345):
         client_thread.start()
 
 
-
 def handle_client(client_socket, player_points):
     global connected_clients
 
@@ -174,9 +177,8 @@ def handle_client(client_socket, player_points):
 
 
 def stag_hunt_game_loop(player_points):
-    global connected_clients
+    global connected_clients, round
     global stag_hare
-    round = 0 # have everyone handle they round seperately.
     client_input = {}
     pygame.init()  # Initialize pygame
     running = True
@@ -212,6 +214,22 @@ def stag_hunt_game_loop(player_points):
             hidden_second_dict["Y_COORD"] = int(stag_hare.state.agent_positions[agent][0])
             current_state[agent] = hidden_second_dict
 
+
+
+        # Send updated state to all clients
+        send_player_points = player_points.copy()
+        for client in connected_clients:
+            client_id = client_id_dict[connected_clients[client]]
+            response = {
+                "CLIENT_ID": client_id,
+                "AGENT_POSITIONS": current_state,
+                "POINTS": send_player_points
+            }
+
+
+            new_message = json.dumps(response).encode()
+            connected_clients[client].send(new_message)
+
         draw_grid(HEIGHT, WIDTH)
         state = stag_hare.return_state()
 
@@ -223,9 +241,9 @@ def stag_hunt_game_loop(player_points):
                 running = False
 
         if stag_hare.is_over():
-            timer = Timer(3)
             hare_dead = False
             stag_dead = False
+
             if stag_hare.state.hare_captured():
                 find_hunter_hare(player_points, round)
                 hare.update(SCREEN, state.agent_positions["hare"], True)
@@ -234,51 +252,35 @@ def stag_hunt_game_loop(player_points):
                 find_hunter_stag(player_points, round)
                 stag.update(SCREEN, state.agent_positions["stag"], True)
                 stag_dead = True
-            while True:
-                if timer.time_out():
-                    break
 
-                send_player_points = player_points.copy()
-                small_dict = {} # helps me know who to light up red on death.
-                small_dict["HARE_DEAD"] = hare_dead
-                small_dict["STAG_DEAD"] = stag_dead
+            small_dict = {}  # helps me know who to light up red on death.
+            small_dict["HARE_DEAD"] = hare_dead
+            small_dict["STAG_DEAD"] = stag_dead
 
-                for client in connected_clients: # does this update the points correctly?
-                    client_id = client_id_dict[connected_clients[client]]
-                    response = {
-                        "CLIENT_ID": client_id,
-                        "AGENT_POSITIONS": current_state,
-                        "POINTS": dict(send_player_points),
-                        "GAME_OVER" : small_dict,
-                    }
+            pygame.display.update()
 
-                    new_message = json.dumps(response).encode()
-                    connected_clients[client].send(new_message)
+            send_player_points = player_points.copy()
+            for client in connected_clients: # does this update the points correctly?
+                client_id = client_id_dict[connected_clients[client]]
+                response = {
+                    "CLIENT_ID": client_id,
+                    "AGENT_POSITIONS": current_state,
+                    "POINTS": dict(send_player_points),
+                    "GAME_OVER" : small_dict,
+                }
+
+                new_message = json.dumps(response).encode()
+                connected_clients[client].send(new_message)
 
 
+            pygame.display.update()
+            time.sleep(PAUSE_TIME)
             if round == MAX_ROUNDS:
                 print("GAME OVER")
                 running = False
             else:
                 round += 1
                 reset_stag_hare()
-        else:
-            # Send updated state to all clients
-            send_player_points = player_points.copy()
-            for client in connected_clients:
-                client_id = client_id_dict[connected_clients[client]]
-                response = {
-                    "CLIENT_ID": client_id,
-                    "AGENT_POSITIONS": current_state,
-                    "POINTS": send_player_points
-                }
-
-
-                new_message = json.dumps(response).encode()
-                connected_clients[client].send(new_message)
-
-
-
 
 
 def reset_stag_hare():
@@ -365,7 +367,6 @@ def find_hunter_hare(player_points, round):
 
 
 
-
 def find_hunter_stag(player_points, round):
     print("distributing points")
     global hunters, STAG_POINTS
@@ -374,7 +375,7 @@ def find_hunter_stag(player_points, round):
             continue
 
         small_dict = {}
-        small_dict["stag"] = False
+        small_dict["stag"] = True
 
         worker2(player_points, hunter, round, small_dict)
 
