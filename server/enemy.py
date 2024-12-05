@@ -30,42 +30,49 @@ class Enemy(pygame.sprite.Sprite):
         self.height, self.width = height, width
         self.square_height = self.height
         self.square_width = self.width
+        self.my_player = my_player
+        self.set_color()
 
-        if name == "stag":
-            self.surf.fill(stag_color)
-        elif name == "hare":
-            self.surf.fill(hare_color)
-        elif name == "R1":
-            self.surf.fill(agent_1_color)
-        elif name == "R2":
-            self.surf.fill(agent_2_color)
 
-        if name[0] == "H":
-            if my_player:
-                self.surf.fill(player_color)
-            else:
-                self.surf.fill(player_2_color)
 
 
         self.rect = self.surf.get_rect()
+
+
+    def set_color(self):
+        if self.name == "stag":
+            self.surf.fill(stag_color)
+        elif self.name == "hare":
+            self.surf.fill(hare_color)
+        elif self.name == "R1":
+            self.surf.fill(agent_1_color)
+        elif self.name == "R2":
+            self.surf.fill(agent_2_color)
+
+        if self.name[0] == "H":
+            if self.my_player:
+                self.surf.fill(player_color)
+            else:
+                self.surf.fill(player_2_color)
 
 
     def update(self, screen, array_position, dead=False):
         # here
         new_position = calculate_position(self, array_position)
         if dead:
+            print("Dead is going off now, IDK what teh problem is")
             self.surf.fill((200, 60, 20))
             screen.blit(self.surf, new_position)
         else:
+            self.set_color() # should fill it back up with the non dead color. maybe.
             screen.blit(self.surf, new_position) # so this one works.
 
     def update_points(self, screen, array_position, points):
         if not self.name[0] == "H" and not self.name[0] == "R":  # should filter out all non agents.
             return
 
-        point = points[self.name]
         new_position = calculate_position(self, array_position)
-        txt_surf = font.render(str(point), True, font_color)
+        txt_surf = font.render(str(points), True, font_color)
         screen.blit(txt_surf, new_position)
 
         # create the new font here make sure all the changes work so far tho.
