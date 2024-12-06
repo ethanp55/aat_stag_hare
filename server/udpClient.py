@@ -28,7 +28,7 @@ agents = [] # holds all of the sprites for the various agents.
 def start_client():
 
     global client_ID
-    host = '127.0.0.1'  # The server's IP address
+    host = '192.168.30.17'  # The server's IP address
     port = 12345         # The port number to connect to
     pygame.init()  # actually starts the game.
     # Create a TCP socket
