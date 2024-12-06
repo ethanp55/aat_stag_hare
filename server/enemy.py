@@ -30,6 +30,7 @@ class Enemy(pygame.sprite.Sprite):
         self.height, self.width = height, width
         self.square_height = self.height
         self.square_width = self.width
+        self.points = 0
 
         if name == "stag":
             self.surf.fill(stag_color)
@@ -49,6 +50,12 @@ class Enemy(pygame.sprite.Sprite):
 
         self.rect = self.surf.get_rect()
 
+    def setPoints(self, newPoints):
+        self.points += newPoints
+
+    def resetPoints(self):
+        self.points = 0
+
 
     def update(self, screen, array_position, dead=False):
         # here
@@ -59,12 +66,12 @@ class Enemy(pygame.sprite.Sprite):
         else:
             screen.blit(self.surf, new_position) # so this one works.
 
-    def update_points(self, screen, array_position, points):
+    def update_points(self, screen, array_position):
         if not self.name[0] == "H" and not self.name[0] == "R":  # should filter out all non agents.
             return
 
         new_position = calculate_position(self, array_position)
-        txt_surf = font.render(str(points), True, font_color)
+        txt_surf = font.render(str(self.points), True, font_color)
         screen.blit(txt_surf, new_position)
 
         # create the new font here make sure all the changes work so far tho.

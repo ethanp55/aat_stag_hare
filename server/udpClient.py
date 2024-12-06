@@ -4,6 +4,8 @@ import json
 from server import enemy
 import pygame
 
+from server.udpServer import HUMAN_PLAYERS, AI_AGENTS
+
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
@@ -133,8 +135,8 @@ def print_board(msg):
             hare_dead = msg["GAME_OVER"]["hare"]
     if "AGENT_POSITIONS" in msg:
         agents_positions = msg["AGENT_POSITIONS"]
+        calculate_points(msg["POINTS"], agents)
         for agent in agents:
-            points = calculate_points(msg["POINTS"], agent.name)
             row = agents_positions[agent.name]["Y_COORD"]
             col = agents_positions[agent.name]["X_COORD"]
             new_tuple = row, col
@@ -144,21 +146,28 @@ def print_board(msg):
                 agent.update(SCREEN, new_tuple, hare_dead)
             else:
                 agent.update(SCREEN, new_tuple)
-            agent.update_points(SCREEN, new_tuple, points)
+            agent.update_points(SCREEN, new_tuple)
 
-def calculate_points(big_dict, agent_name):
-    points = 0
-    for key in big_dict.keys():
-        if key == agent_name:
-            for round in big_dict[key]:
-                if "stag" in big_dict[key][round]:
-                    if big_dict[key][round]["stag"] == True:
-                        points += stag_points
-                if "hare" in big_dict[key][round]:
-                    if big_dict[key][round]["hare"] == True:
-                        points += hare_points
+def calculate_points(big_dict, agents):
+    for i in range(HUMAN_PLAYERS + AI_AGENTS): # all possible players
+        agents[i].resetPoints()
 
-    return points
+    for currRound in range(len(big_dict["H1"])): # if we ever don't have a player this will blow up
+        peopleWhoKilledHares = 0
+        agents_who_get_points = []
+        for i in range(HUMAN_PLAYERS + AI_AGENTS): # hare points first per round
+            if big_dict[agents[i].name][str(currRound)]["hare"] == True:
+                agents_who_get_points.append(agents[i])
+                peopleWhoKilledHares += 1
+        if peopleWhoKilledHares > 0: # otherwise we get a divide by zewro error
+            points_that_everyone_gets = hare_points / peopleWhoKilledHares
+            for agent in agents_who_get_points:
+                agent.setPoints(points_that_everyone_gets)
+
+        if big_dict["H1"][str(currRound)]["stag"] == True: # if at least one player killed a stag (stag points easy)
+            for agent in agents:
+                agent.setPoints(stag_points)
+
 
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.

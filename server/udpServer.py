@@ -5,7 +5,6 @@ from cgitb import small
 
 import select
 
-from server.udpClient import client_ID
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
@@ -50,14 +49,26 @@ def worker2(dictionary, hunter_name, round, updated_states_dict):
     print("post update states dict ", dictionary)
 
 
+def player_points_initialization(MAX_ROUNDS, player_points, hunters):
+    for hunter in hunters:
+        if hunter.name not in player_points:
+            player_points[hunter.name] = {}  # Initialize an empty dictionary for each hunter (not a list)
 
-def worker(d, key, value):
-    if key in d:
-        new_value = d[key]
-        new_value += value
-        d[key] = new_value
-    else:
-        d[key] = value
+        for round in range(MAX_ROUNDS):
+            # Directly create the round entry with "stag" and "hare" for each hunter
+            current_entry = player_points[hunter.name]
+
+            small_dict = {
+                "stag": False,
+                "hare": False,
+            }
+            # Directly assign the round as a key and small_dict as the value
+            current_entry[round] = small_dict
+            if round not in player_points[hunter.name]:
+                player_points[hunter.name] = current_entry
+    return player_points
+
+
 
 HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
 AI_AGENTS = 2 # how many agents we are going to add
@@ -116,8 +127,8 @@ def start_server(host='127.0.0.1', port=12345):
         if not stag_hare.is_over():
             break
 
-    for hunter in hunters:
-        worker(player_points, hunter.name, {})
+    player_points = player_points_initialization(MAX_ROUNDS, player_points, hunters)
+
 
     agents.append(stag)
     agents.append(hare)
