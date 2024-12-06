@@ -1,10 +1,8 @@
 import socket
 
 import json
-from server import enemy
+import enemy
 import pygame
-
-from server.udpServer import HUMAN_PLAYERS, AI_AGENTS
 
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
@@ -150,12 +148,12 @@ def print_board(msg):
     pygame.display.update()
 
 def calculate_points(big_dict, agents):
-    for i in range(HUMAN_PLAYERS + AI_AGENTS): # all possible players
+    for i in range(3): # all possible players
         agents[i].resetPoints()
     for currRound in range(1, len(big_dict["H1"])+1): # if we ever don't have a player this will blow up
         peopleWhoKilledHares = 0
         agents_who_get_points = []
-        for i in range(HUMAN_PLAYERS + AI_AGENTS): # hare points first per round
+        for i in range(3): # hare points first per round
             if big_dict[agents[i].name][str(currRound)]["hare"] == True:
                 agents_who_get_points.append(agents[i])
                 peopleWhoKilledHares += 1

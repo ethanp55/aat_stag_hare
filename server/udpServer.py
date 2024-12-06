@@ -23,8 +23,8 @@ from server import enemy
 
 import multiprocessing
 
-HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
-AI_AGENTS = 1 # how many agents we are going to add
+HUMAN_PLAYERS = 3 # how many human players (clients) we are expecting
+AI_AGENTS = 0 # how many agents we are going to add
 
 ALL_READY = pygame.USEREVENT + 1
 ALL_READY_EVENT = pygame.event.Event(ALL_READY)
