@@ -75,7 +75,7 @@ def start_client():
             break
 
         client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
-        pygame.display.update()  # try to get things to draw to the screen IG>
+          # try to get things to draw to the screen IG>
 
     # Close the connection
     client_socket.close()
@@ -129,10 +129,12 @@ def print_board(msg):
     if "CLIENT_ID" in msg:
         self_id = msg["CLIENT_ID"]
     if "GAME_OVER" in msg:
-        if "stag" in "GAME_OVER":
-            stag_dead = msg["GAME_OVER"]["stag"]
-        if "hare" in "GAME_OVER":
-            hare_dead = msg["GAME_OVER"]["hare"]
+        if "STAG_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["STAG_DEAD"]:
+            stag_dead = msg["GAME_OVER"]["STAG_DEAD"]
+        if "HARE_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["HARE_DEAD"]:
+            hare_dead = msg["GAME_OVER"]["HARE_DEAD"]
+            if hare_dead:
+                print("HARE DEAD TURN RED PLEASE")
     if "AGENT_POSITIONS" in msg:
         agents_positions = msg["AGENT_POSITIONS"]
         calculate_points(msg["POINTS"], agents)
@@ -147,12 +149,13 @@ def print_board(msg):
             else:
                 agent.update(SCREEN, new_tuple)
             agent.update_points(SCREEN, new_tuple)
+    pygame.display.update()
 
 def calculate_points(big_dict, agents):
     for i in range(HUMAN_PLAYERS + AI_AGENTS): # all possible players
         agents[i].resetPoints()
 
-    for currRound in range(len(big_dict["H1"])): # if we ever don't have a player this will blow up
+    for currRound in range(len(big_dict["H1"])-1): # if we ever don't have a player this will blow up
         peopleWhoKilledHares = 0
         agents_who_get_points = []
         for i in range(HUMAN_PLAYERS + AI_AGENTS): # hare points first per round

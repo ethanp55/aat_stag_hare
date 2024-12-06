@@ -64,7 +64,16 @@ class Enemy(pygame.sprite.Sprite):
             self.surf.fill((200, 60, 20))
             screen.blit(self.surf, new_position)
         else:
+            self.update_alive()
             screen.blit(self.surf, new_position) # so this one works.
+
+    def update_alive(self):
+        if self.name == "stag":
+            self.surf.fill(stag_color)
+        elif self.name == "hare":
+            self.surf.fill(hare_color)
+
+
 
     def update_points(self, screen, array_position):
         if not self.name[0] == "H" and not self.name[0] == "R":  # should filter out all non agents.

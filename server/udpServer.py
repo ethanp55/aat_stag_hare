@@ -4,7 +4,9 @@ import threading
 from cgitb import small
 
 import select
+from numpy.f2py.crackfortran import true_intent_list
 
+from server.timer import Timer
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
@@ -70,8 +72,8 @@ def player_points_initialization(MAX_ROUNDS, player_points, hunters):
 
 
 
-HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
-AI_AGENTS = 2 # how many agents we are going to add
+HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
+AI_AGENTS = 1 # how many agents we are going to add
 
 ALL_READY = pygame.USEREVENT + 1
 ALL_READY_EVENT = pygame.event.Event(ALL_READY)
@@ -84,8 +86,8 @@ SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 connected_clients = {}
 client_input = {}
-HEIGHT = 3
-WIDTH = 3
+HEIGHT = 10
+WIDTH = 10
 client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 6
@@ -263,39 +265,44 @@ def stag_hunt_game_loop(player_points):
                 running = False
 
         if stag_hare.is_over():
-            print("*************GAME OVER************")
-            print("HERE Are the current playre points" , player_points)
+            timer = Timer(2)
             hare_dead = False
             stag_dead = False
+            while True:
 
-            if stag_hare.state.hare_captured():
-                find_hunter_hare(player_points, round)
-                hare.update(SCREEN, state.agent_positions["hare"], True)
-                hare_dead = True
-            else:
-                find_hunter_stag(player_points, round)
-                stag.update(SCREEN, state.agent_positions["stag"], True)
-                stag_dead = True
+                print("*************GAME OVER************")
+                print("HERE Are the current playre points" , player_points)
 
-            print("here are the post player points", player_points)
-            small_dict = {}  # helps me know who to light up red on death.
-            small_dict["HARE_DEAD"] = hare_dead
-            small_dict["STAG_DEAD"] = stag_dead
+                if stag_hare.state.hare_captured():
+                    find_hunter_hare(player_points, round)
+                    hare.update(SCREEN, state.agent_positions["hare"], True)
+                    hare_dead = True
+                else:
+                    find_hunter_stag(player_points, round)
+                    stag.update(SCREEN, state.agent_positions["stag"], True)
+                    stag_dead = True
 
+                print("here are the post player points", player_points)
+                small_dict = {}  # helps me know who to light up red on death.
+                small_dict["HARE_DEAD"] = hare_dead
+                small_dict["STAG_DEAD"] = stag_dead
 
-            points_to_send = dict(player_points)
-            pygame.display.update()
-            for client in connected_clients: # does this update the points correctly?
-                client_id = client_id_dict[connected_clients[client]]
-                response = {
-                    "CLIENT_ID": client_id,
-                    "AGENT_POSITIONS": current_state,
-                    "POINTS": dict(points_to_send),
-                    "GAME_OVER" : small_dict,
-                }
+                points_to_send = dict(player_points)
+                pygame.display.update()
+                for client in connected_clients: # does this update the points correctly?
+                    client_id = client_id_dict[connected_clients[client]]
+                    response = {
+                        "CLIENT_ID": client_id,
+                        "AGENT_POSITIONS": current_state,
+                        "POINTS": dict(points_to_send),
+                        "GAME_OVER" : small_dict,
+                    }
 
-                new_message = json.dumps(response).encode()
-                connected_clients[client].send(new_message)
+                    new_message = json.dumps(response).encode()
+                    connected_clients[client].send(new_message)
+
+                if timer.time_out():
+                    break
 
 
             pygame.display.update()
