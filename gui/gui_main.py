@@ -1,8 +1,6 @@
 from operator import truediv
 
 
-
-
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 

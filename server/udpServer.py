@@ -99,6 +99,7 @@ STAG_POINTS = 3 / HUMAN_PLAYERS
 stag = enemy.Enemy("stag", HEIGHT, WIDTH)
 hare = enemy.Enemy("hare", HEIGHT, WIDTH)
 
+from queue import Queue
 
 agents = [] # holds the actual agents that we want to update
 stag_hare = None
@@ -142,7 +143,7 @@ def start_server(host='127.0.0.1', port=12345):
 
     print(f"Server listening on {host}:{port}...")
 
-    while True:
+    while True: # this here is our wihle true loop, needs to break when we have enough clients
         client_socket, client_address = server_socket.accept()
         connected_clients[len(connected_clients)] = client_socket
         client_id_dict[client_socket] = len(connected_clients)
@@ -170,149 +171,148 @@ def start_server(host='127.0.0.1', port=12345):
             print("Received data is not valid JSON.")
             client_socket.send(json.dumps({"error": "Invalid JSON format"}).encode())
 
-        client_thread = threading.Thread(target=handle_client, args=(client_socket, player_points))
-        client_thread.start()
+        # client_thread = threading.Thread(target=handle_client, args=(client_socket, player_points))
+        # client_thread.start()
+        # # need to make sure all the threads finish
+        # client_thread.join() # make sure all the threads are finished
+        if len(connected_clients) == HUMAN_PLAYERS:
+            break
+
+    main_game_loop(player_points)
 
 
-def handle_client(client_socket, player_points):
-    global connected_clients
-
-    try:
+def main_game_loop(player_points):
+    global client_id_dict
+    while True:
+        client_input = {}
         while True:
-            if len(connected_clients) == HUMAN_PLAYERS:
-                stag_hunt_game_loop(player_points)
+            send_state(player_points) # sends out the current game state
+            data = get_client_data()
+            for client, received_json in data.items():
+                if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
+                    client_input[client_id_dict[client]] = received_json["NEW_INPUT"]
+                    print(f"Received input from {client}: {received_json['NEW_INPUT']}")
+            # Check if all clients have provided input
+            if len(client_input) == len(connected_clients):
                 break
+        print("All clients have provided input. continuing")
 
-            response = {
-                "message": "Hello from the server!",
-                "HUMAN_AGENTS": HUMAN_PLAYERS,
-                "AI_AGENTS": AI_AGENTS,
-                "HEIGHT": HEIGHT,
-                "WIDTH": WIDTH,
-            }
-
-            client_socket.send(json.dumps(response).encode())
+        stag_hunt_game_loop(player_points, client_input)
+        client_input.clear() #
 
 
+def handle_client(client, input_queue):
+    try:
+        data = connected_clients[client].recv(1024)
+        if data:
+            try:
+                received_json = json.loads(data.decode())
+                if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] is not None:
+                    input_data = {client: received_json["NEW_INPUT"]}
+                    input_queue.put(input_data)  # Push the input into the queue
+            except json.JSONDecodeError:
+                pass
     except Exception as e:
-        pass
-    finally:
-        client_socket.close()
+        print(f"Error with client {client}: {e}")
 
 
-def stag_hunt_game_loop(player_points):
+def stag_hunt_game_loop(player_points, player_input):
+
     global connected_clients, round
     global stag_hare
-    client_input = {}
     pygame.init()  # Initialize pygame
-    running = True
     rewards = [0] * (len(hunters) + 2)
 
-    while running:
-        # Receive data from clients
-        for client in connected_clients:
-            data = connected_clients[client].recv(1024)
-            if data:
-                try:
-                    received_json = json.loads(data.decode())
-                    if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] is not None:
-                        client_input[client] = received_json["NEW_INPUT"]
 
-                    if len(client_input) == len(connected_clients):  # Everyone has an answer
-                        for i in range(HUMAN_PLAYERS):
-                            for agent in agents:
-                                check_name = "H" + str(i + 1)
-                                if agent.name == check_name:
-                                    next_round(stag_hare, rewards, client_input)
-                                    client_input.clear()
+    next_round(stag_hare, rewards, player_input)
 
-                except json.JSONDecodeError:
-                    pass
-
-        current_state = {}
-
-        # Prepare current state to send to clients
-        for agent in stag_hare.state.agent_positions:
-            hidden_second_dict = {}
-            hidden_second_dict["X_COORD"] = int(stag_hare.state.agent_positions[agent][1])
-            hidden_second_dict["Y_COORD"] = int(stag_hare.state.agent_positions[agent][0])
-            current_state[agent] = hidden_second_dict
+    send_state(player_points)
 
 
+    draw_grid(HEIGHT, WIDTH)
+    state = stag_hare.return_state()
 
-        # Send updated state to all clients
-        send_player_points = player_points.copy()
-        for client in connected_clients:
-            client_id = client_id_dict[connected_clients[client]]
-            response = {
-                "CLIENT_ID": client_id,
-                "AGENT_POSITIONS": current_state,
-                "POINTS": send_player_points
-            }
+    for agent in agents:
+        agent.update(SCREEN, stag_hare.state.agent_positions[agent.name])
 
 
-            new_message = json.dumps(response).encode()
-            connected_clients[client].send(new_message)
+    if stag_hare.is_over():
+        timer = Timer(2)
+        hare_dead = False
+        stag_dead = False
+        while True:
 
-        draw_grid(HEIGHT, WIDTH)
-        state = stag_hare.return_state()
+            print("*************GAME OVER************")
+            print("HERE Are the current playre points" , player_points)
 
-        for agent in agents:
-            agent.update(SCREEN, stag_hare.state.agent_positions[agent.name])
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-        if stag_hare.is_over():
-            timer = Timer(2)
-            hare_dead = False
-            stag_dead = False
-            while True:
-
-                print("*************GAME OVER************")
-                print("HERE Are the current playre points" , player_points)
-
-                if stag_hare.state.hare_captured():
-                    find_hunter_hare(player_points, round)
-                    hare.update(SCREEN, state.agent_positions["hare"], True)
-                    hare_dead = True
-                else:
-                    find_hunter_stag(player_points, round)
-                    stag.update(SCREEN, state.agent_positions["stag"], True)
-                    stag_dead = True
-
-                print("here are the post player points", player_points)
-                small_dict = {}  # helps me know who to light up red on death.
-                small_dict["HARE_DEAD"] = hare_dead
-                small_dict["STAG_DEAD"] = stag_dead
-
-                points_to_send = dict(player_points)
-                pygame.display.update()
-                for client in connected_clients: # does this update the points correctly?
-                    client_id = client_id_dict[connected_clients[client]]
-                    response = {
-                        "CLIENT_ID": client_id,
-                        "AGENT_POSITIONS": current_state,
-                        "POINTS": dict(points_to_send),
-                        "GAME_OVER" : small_dict,
-                    }
-
-                    new_message = json.dumps(response).encode()
-                    connected_clients[client].send(new_message)
-
-                if timer.time_out():
-                    break
-
-
-            pygame.display.update()
-            time.sleep(PAUSE_TIME)
-            if round == MAX_ROUNDS:
-                print("GAME OVER")
-                running = False
+            if stag_hare.state.hare_captured():
+                find_hunter_hare(player_points, round)
+                hare.update(SCREEN, state.agent_positions["hare"], True)
+                hare_dead = True
             else:
-                round += 1
-                reset_stag_hare()
+                find_hunter_stag(player_points, round)
+                stag.update(SCREEN, state.agent_positions["stag"], True)
+                stag_dead = True
+
+            print("here are the post player points", player_points)
+            small_dict = {}  # helps me know who to light up red on death.
+            small_dict["HARE_DEAD"] = hare_dead
+            small_dict["STAG_DEAD"] = stag_dead
+
+            points_to_send = dict(player_points)
+            pygame.display.update()
+            current_state = create_current_state()
+            for client in connected_clients: # does this update the points correctly?
+                client_id = client_id_dict[connected_clients[client]]
+                response = {
+                    "CLIENT_ID": client_id,
+                    "AGENT_POSITIONS": current_state,
+                    "POINTS": dict(points_to_send),
+                    "GAME_OVER" : small_dict,
+                }
+
+                new_message = json.dumps(response).encode()
+                connected_clients[client].send(new_message)
+
+            if timer.time_out():
+                break
+
+
+        pygame.display.update()
+        time.sleep(PAUSE_TIME)
+        if round == MAX_ROUNDS:
+            print("GAME OVER")
+        else:
+            round += 1
+            reset_stag_hare()
+
+def send_state(player_points):
+    global stag_hare
+    current_state = create_current_state()
+
+    global connected_clients
+    send_player_points = player_points.copy()
+    for client in connected_clients:
+        client_id = client_id_dict[connected_clients[client]]
+        response = {
+            "CLIENT_ID": client_id,
+            "AGENT_POSITIONS": current_state,
+            "POINTS": send_player_points
+        }
+
+        new_message = json.dumps(response).encode()
+        connected_clients[client].send(new_message)
+
+def create_current_state():
+    current_state = {}
+
+    # Prepare current state to send to clients
+    for agent in stag_hare.state.agent_positions:
+        hidden_second_dict = {}
+        hidden_second_dict["X_COORD"] = int(stag_hare.state.agent_positions[agent][1])
+        hidden_second_dict["Y_COORD"] = int(stag_hare.state.agent_positions[agent][0])
+        current_state[agent] = hidden_second_dict
+    return current_state
 
 
 def reset_stag_hare():
@@ -351,11 +351,11 @@ def draw_grid(height, width): # draws the grid on every frame just so we have it
 
 def next_round(stag_hare, rewards, new_positions):
     for client_id in new_positions:
-        client_agent = "H" + str(client_id + 1)
+        client_agent = "H" + str(client_id)
         current_position = stag_hare.state.agent_positions[client_agent]
         new_tuple_row = new_positions[client_id][0] + current_position[0]
         new_tuple_col = new_positions[client_id][1] + current_position[1]
-        hunters[client_id].set_next_action(new_tuple_row, new_tuple_col)
+        hunters[client_id-1].set_next_action(new_tuple_row, new_tuple_col)
         print(f"this is the client_ID, {client_id}")
 
     round_rewards = stag_hare.transition()
