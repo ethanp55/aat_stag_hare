@@ -133,8 +133,6 @@ def print_board(msg):
             stag_dead = msg["GAME_OVER"]["STAG_DEAD"]
         if "HARE_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["HARE_DEAD"]:
             hare_dead = msg["GAME_OVER"]["HARE_DEAD"]
-            if hare_dead:
-                print("HARE DEAD TURN RED PLEASE")
     if "AGENT_POSITIONS" in msg:
         agents_positions = msg["AGENT_POSITIONS"]
         calculate_points(msg["POINTS"], agents)
@@ -154,8 +152,7 @@ def print_board(msg):
 def calculate_points(big_dict, agents):
     for i in range(HUMAN_PLAYERS + AI_AGENTS): # all possible players
         agents[i].resetPoints()
-
-    for currRound in range(len(big_dict["H1"])-1): # if we ever don't have a player this will blow up
+    for currRound in range(1, len(big_dict["H1"])+1): # if we ever don't have a player this will blow up
         peopleWhoKilledHares = 0
         agents_who_get_points = []
         for i in range(HUMAN_PLAYERS + AI_AGENTS): # hare points first per round
@@ -164,6 +161,7 @@ def calculate_points(big_dict, agents):
                 peopleWhoKilledHares += 1
         if peopleWhoKilledHares > 0: # otherwise we get a divide by zewro error
             points_that_everyone_gets = hare_points / peopleWhoKilledHares
+            print("here is who is getting points for round ", currRound, " ", agents_who_get_points, points_that_everyone_gets)
             for agent in agents_who_get_points:
                 agent.setPoints(points_that_everyone_gets)
 

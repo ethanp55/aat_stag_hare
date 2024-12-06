@@ -42,7 +42,7 @@ WIDTH = 3
 client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
-round = 0
+round = 1
 
 HARE_POINTS = 1 / HUMAN_PLAYERS # multi threading work around
 STAG_POINTS = 3 / HUMAN_PLAYERS
@@ -142,8 +142,11 @@ def main_game_loop(player_points):
                 break
         print("All clients have provided input. continuing")
 
-        stag_hunt_game_loop(player_points, client_input)
-        client_input.clear() #
+        running = stag_hunt_game_loop(player_points, client_input)
+        if running == False:
+            break
+        client_input.clear()
+
 
 
 def handle_client(client, input_queue):
@@ -223,6 +226,7 @@ def stag_hunt_game_loop(player_points, player_input):
         time.sleep(PAUSE_TIME)
         if round == MAX_ROUNDS:
             print("GAME OVER")
+            return False
         else:
             round += 1
             reset_stag_hare()
@@ -290,7 +294,7 @@ def player_points_initialization(MAX_ROUNDS, player_points, hunters):
         if hunter.name not in player_points:
             player_points[hunter.name] = {}  # Initialize an empty dictionary for each hunter (not a list)
 
-        for round in range(MAX_ROUNDS):
+        for round in range(1, MAX_ROUNDS+1):
             # Directly create the round entry with "stag" and "hare" for each hunter
             current_entry = player_points[hunter.name]
 
@@ -415,7 +419,7 @@ def find_hunter_hare(player_points, round):
             worker2(player_points, hunter, round, small_dict)
 
 
-# given that we already know that the stag is dead, all players receive points. Much easier than hare.
+# given that we already know that the stag is dead, all players receive points. Much easier than hare.f
 def find_hunter_stag(player_points, round):
     print("distributing points")
     global hunters, STAG_POINTS
@@ -428,6 +432,9 @@ def find_hunter_stag(player_points, round):
 
         worker2(player_points, hunter, round, small_dict)
         print("Hunter ", hunter, " was given stag points!")
+
+def add_player_points(player_points):
+    pass
 
 
 if __name__ == "__main__":
