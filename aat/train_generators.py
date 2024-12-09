@@ -3,6 +3,7 @@ from agents.alegaatr import AlegAATr
 from agents.generator_pool import GeneratorPool
 from agents.greedy import Greedy
 from agents.qalegaatr import QAlegAATr
+from agents.raat import RAAT
 from agents.rawo import RawO
 from agents.smalegaatr import SMAlegAATr
 from agents.team_aware import TeamAware
@@ -134,7 +135,8 @@ def run_training():
                 # agents_to_train_on.append(SMAlegAATr(train=True))
                 # agents_to_train_on.append(AlegAATr(lmbda=0.0, ml_model_type='knn', train=True))
                 # agents_to_train_on.append(QAlegAATr(train=True))
-                agents_to_train_on.append(RawO(train=True))
+                # agents_to_train_on.append(RawO(train=True))
+                agents_to_train_on.append(RAAT(train=True))
 
                 for agent_to_train_on in agents_to_train_on:
                     hunters = deepcopy(other_hunters)
