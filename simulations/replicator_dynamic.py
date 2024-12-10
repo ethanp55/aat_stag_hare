@@ -1,9 +1,11 @@
+from agents.agent import Agent
 from agents.dqn import DQNAgent
 from agents.alegaatr import AlegAATr
 from agents.aleqgaatr import AleqgAATr
 from agents.madqn import MADQN
 from agents.ppo import PPO
 from agents.qalegaatr import QAlegAATr
+from agents.raat import RAAT
 from agents.ralegaatr import RAlegAATr
 from agents.rawo import RawO
 from agents.rdqn import RDQN
@@ -11,48 +13,95 @@ from agents.smalegaatr import SMAlegAATr
 from agents.soaleqgaatr import SOAleqgAATr
 from copy import deepcopy
 from environment.runner import run
+import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 from typing import List
 from utils.utils import N_HUNTERS
 
 
+def _get_other_hunters(pop_selection: List[List[Agent]], frequencies: List[float]) -> List[Agent]:
+    h1_idx = np.random.choice(N_AGENTS, p=frequencies)
+    h2_idx = np.random.choice(N_AGENTS, p=frequencies)
+
+    if h1_idx == h2_idx:
+        return pop_selection[h1_idx]
+
+    return [pop_selection[h1_idx][0], pop_selection[h2_idx][0]]
+
+
 # Variables
-N_AGENTS = 11
-N_ITERATIONS = 500
-GRID_SIZE = (11, 11)
+N_ITERATIONS = 50
+GRID_SIZE = (15, 15)
 progress_percentage_chunk = int(0.05 * N_ITERATIONS)
 n_other_hunters = N_HUNTERS - 1
 
 # Frequencies and population details
-agent_frequencies = [1 / N_AGENTS] * N_AGENTS
 algorithms = [
     DQNAgent(),
-    MADQN(),
-    RDQN(),
+    # MADQN(),
+    # RDQN(),
     AleqgAATr(),
     RAlegAATr(),
-    SOAleqgAATr(),
+    # SOAleqgAATr(),
     AlegAATr(lmbda=0.0, ml_model_type='knn', enhanced=True),
-    SMAlegAATr(enhanced=False),
+    # SMAlegAATr(enhanced=False),
     QAlegAATr(enhanced=True),
     RawO(enhanced=True),
-    PPO()
+    # PPO(),
+    RAAT(enhanced=False)
 ]
-population_selection = [
-    [DQNAgent(f'DQN{i}') for i in range(n_other_hunters)],
-    [MADQN(f'MADQN{i}') for i in range(n_other_hunters)],
-    [RDQN(f'RDQN{i}') for i in range(n_other_hunters)],
-    [AleqgAATr(f'AleqgAATr{i}') for i in range(n_other_hunters)],
-    [RAlegAATr(f'RAlegAATr{i}') for i in range(n_other_hunters)],
-    [SOAleqgAATr(f'SOAleqgAATr{i}') for i in range(n_other_hunters)],
-    [AlegAATr(f'AlegAATr{i}', lmbda=0.0, ml_model_type='knn', enhanced=True) for i in range(n_other_hunters)],
-    [SMAlegAATr(f'SMAlegAATr{i}', enhanced=False) for i in range(n_other_hunters)],
-    [QAlegAATr(f'QAlegAATr{i}', enhanced=True) for i in range(n_other_hunters)],
-    [RawO(f'RawO{i}', enhanced=True) for i in range(n_other_hunters)],
-    [PPO(f'PPO{i}') for i in range(n_other_hunters)]
+algorithms2 = [
+    DQNAgent('DQN1'),
+    # MADQN(),
+    # RDQN(),
+    AleqgAATr('AleqgAATr1'),
+    RAlegAATr('RAlegAATr1'),
+    # SOAleqgAATr(),
+    AlegAATr('AlegAATr1', lmbda=0.0, ml_model_type='knn', enhanced=True),
+    # SMAlegAATr(enhanced=False),
+    QAlegAATr('QAlegAATr1', enhanced=True),
+    RawO('RawO1', enhanced=True),
+    # PPO(),
+    RAAT('RAAT1', enhanced=False)
 ]
-population = [population_selection[i] for i in range(N_AGENTS)]
-population_types = [type(hunters[0]) for hunters in population]
+algorithms3 = [
+    DQNAgent('DQN2'),
+    # MADQN(),
+    # RDQN(),
+    AleqgAATr('AleqgAATr2'),
+    RAlegAATr('RAlegAATr2'),
+    # SOAleqgAATr(),
+    AlegAATr('AlegAATr2', lmbda=0.0, ml_model_type='knn', enhanced=True),
+    # SMAlegAATr(enhanced=False),
+    QAlegAATr('QAlegAATr2', enhanced=True),
+    RawO('RawO2', enhanced=True),
+    # PPO(),
+    RAAT('RAAT2', enhanced=False)
+]
+N_AGENTS = len(algorithms)
+agent_representation_over_time = {agent.name: [1 / N_AGENTS] for agent in algorithms}
+
+R = np.zeros((N_AGENTS, N_AGENTS, N_AGENTS))
+for i, alg1 in enumerate(algorithms):
+    print(f'Agent {i}')
+    for j, alg2 in enumerate(algorithms2):
+        for k, alg3 in enumerate(algorithms3):
+            rewards_j_k = []
+            # for _ in range(N_ITERATIONS):
+            for _ in range(1):
+                hunters = [deepcopy(alg2), deepcopy(alg3), deepcopy(alg1)]
+                rewards = run(hunters, *GRID_SIZE)
+                rewards_j_k.append(rewards[-1])
+            R[i][j][k] = sum(rewards_j_k) / len(rewards_j_k)
+for j in range(len(algorithms2)):
+    for k in range(len(algorithms3)):
+        R[:, j, k] = MinMaxScaler().fit_transform(R[:, j, k].reshape(-1, 1)).reshape(-1,)
+
+print(R)
+
+# R = MinMaxScaler().fit_transform(R)
+# assert R.min() == 0 and R.max() == 1
 
 
 # Used for ensuring that the agent frequencies compose a valid probability distribution
@@ -64,44 +113,64 @@ def convert_to_probs(values: List[float]) -> List[float]:
     return list(probabilities)
 
 
-for iteration in range(N_ITERATIONS):
-    # Progress report
-    curr_iteration = iteration + 1
-    if curr_iteration != 0 and progress_percentage_chunk != 0 and curr_iteration % progress_percentage_chunk == 0:
-        print(f'{100 * (curr_iteration / N_ITERATIONS)}%')
+for include_alegaatr in [True, False]:
+    if include_alegaatr:
+        agent_frequencies = [1 / N_AGENTS] * N_AGENTS
+    else:
+        agent_frequencies = [1 / (N_AGENTS - 1)] * N_AGENTS
+        agent_frequencies[3] = 0
 
-    # Rewards for this iteration
-    agent_rewards, population_rewards = [0] * N_AGENTS, []
+    for iteration in range(N_ITERATIONS):
+        fitnesses = []
+        for i, alg in enumerate(algorithms):
+            if not include_alegaatr and alg.name == 'AlegAATr':
+                fitnesses.append(0)
+                continue
+            fitness = 0
+            for j in range(len(algorithms2)):
+                for k in range(len(algorithms3)):
+                    fitness += R[i][j][k] * agent_frequencies[j] * agent_frequencies[k]
+            fitnesses.append(fitness)
 
-    # Test each algorithm against every algorithm in the population (allows algorithms to re-enter the population)
-    for i, alg in enumerate(algorithms):
-        for other_hunters in population:
-            # Values needed for the simulation - copy each agent to make sure none of the parameters get messed up
-            agent = deepcopy(alg)
-            hunters = deepcopy(other_hunters)
-            hunters.append(agent)
+        avg_fitness = 0
+        for i, alg in enumerate(algorithms):
+            avg_fitness += agent_frequencies[i] * fitnesses[i]
+        for i, alg in enumerate(algorithms):
+            agent_frequencies[i] += agent_frequencies[i] * (fitnesses[i] - avg_fitness)
+        # agent_frequencies = convert_to_probs(agent_frequencies)
+        print(agent_frequencies)
+        # assert round(sum(agent_frequencies), 3) == 1
 
-            # Run the simulation, extract the rewards
-            final_rewards = run(hunters, *GRID_SIZE)
+        # Update data for plot
+        for i, alg in enumerate(algorithms):
+            new_proportion = agent_frequencies[i]
+            agent_representation_over_time[alg.name] += [new_proportion]
 
-            # Update the agent's reward
-            agent_reward = final_rewards[-1]
-            agent_rewards[i] += agent_reward
-
-            # If the agent is in the population, update the population rewards
-            if type(agent) in population_types:
-                population_rewards.append(final_rewards[-1])
-
-    # Update each algorithm's frequency/probability of being added to the population
-    avg_pop_reward = sum(population_rewards) / len(population_rewards)
-    for i in range(len(agent_frequencies)):
-        avg_agent_reward = agent_rewards[i] / len(population)
-        freq_update = agent_frequencies[i] * (avg_agent_reward - avg_pop_reward)
-        agent_frequencies[i] += freq_update
-    agent_frequencies = convert_to_probs(agent_frequencies)  # Ensure the frequencies are a valid distribution
-    population_indices = np.random.choice(N_AGENTS, N_AGENTS, p=agent_frequencies)
-    population = [population_selection[i] for i in population_indices]
-    population_types = [type(hunters[0]) for hunters in population]
-
-    # Status update on the population
-    print([hunters[0].name[:-1] for hunters in population])
+    # Plot agent representations over time
+    colors = ['red', 'green', 'blue', 'orange', 'purple', 'cyan', 'magenta', 'lime', 'pink', 'yellow', 'brown', 'black']
+    name_conversions = {
+        'DQN': 'DQN',
+        'MADQN': 'MADQN',
+        'RDQN': 'RDQN',
+        'AleqgAATr': 'TRawAAT',
+        'RAlegAATr': 'TAAT',
+        'SOAleqgAATr': 'STRawAAT',
+        'AlegAATr': 'AlegAATr',
+        'SMAlegAATr': 'SRRawAAT',
+        'QAlegAATr': 'RRawAAT',
+        'RawO': 'RawR',
+        'PPO': 'PPO',
+        'RAAT': 'RAAT'
+    }
+    plt.figure(figsize=(10, 3))
+    plt.grid()
+    for i, agent in enumerate(agent_representation_over_time.keys()):
+        if not include_alegaatr and agent == 'AlegAATr':
+            continue
+        proportions, color = agent_representation_over_time[agent], colors[i]
+        plt.plot(proportions, label=name_conversions[agent], color=color)
+    plt.xlabel('Iteration', fontsize=18, fontweight='bold')
+    plt.ylabel('Proportion', fontsize=18, fontweight='bold')
+    plt.legend(loc='best', fontsize=10)
+    plt.savefig(f'../simulations/replicator_dynamic_{include_alegaatr}.png', bbox_inches='tight')
+    plt.clf()
