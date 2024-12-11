@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-baselines = {'greedyhare': 3.3769999999999993, 'selfplay': 13.760833333333334}
+baselines = {'greedyhare': 3.3769999999999993, 'selfplay': 13.760833333333334, 'coop': 13.760833333333334}
 results, folder = {}, '../simulations/adaptability_results/'
 minimax_val, lowest_reward = 3.3769999999999993, 0
 
@@ -25,6 +25,12 @@ for file in os.listdir(folder):
         regret = (comparison - minimax_val) - (avg_reward - minimax_val)
         val = 1 - min((regret / (comparison - minimax_val)), 1)
 
+    elif opp_type == 'coop':
+        avg_reward = sum([row[-1] for row in data]) / len(data)
+        regret = (comparison - minimax_val) - (avg_reward - minimax_val)
+        val = 1 - min((regret / (comparison - minimax_val)), 1)
+        val = min(val, 1)
+
     else:
         raise Exception(f'{opp_type} is not a defined opponent type')
 
@@ -34,9 +40,10 @@ for file in os.listdir(folder):
 rc_scores = []
 for agent, res, in results.items():
     print(agent)
-    defect_score, coop_score = res['greedyhare'], res['selfplay']
-    robust_coop_score = min(defect_score, coop_score)
+    defect_score, self_play_score, coop_score = res['greedyhare'], res['selfplay'], res['coop']
+    robust_coop_score = min([defect_score, self_play_score, coop_score])
     print(f'Defect score: {defect_score}')
+    print(f'Self-play score: {self_play_score}')
     print(f'Coop score: {coop_score}')
     print(f'Robust coop score: {robust_coop_score}\n')
     rc_scores.append((agent, robust_coop_score))

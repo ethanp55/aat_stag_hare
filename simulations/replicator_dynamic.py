@@ -31,8 +31,8 @@ def _get_other_hunters(pop_selection: List[List[Agent]], frequencies: List[float
 
 
 # Variables
-N_ITERATIONS = 50
-GRID_SIZE = (15, 15)
+N_ITERATIONS = 100
+GRID_SIZE = (11, 11)
 progress_percentage_chunk = int(0.05 * N_ITERATIONS)
 n_other_hunters = N_HUNTERS - 1
 
@@ -80,7 +80,6 @@ algorithms3 = [
     RAAT('RAAT2', enhanced=False)
 ]
 N_AGENTS = len(algorithms)
-agent_representation_over_time = {agent.name: [1 / N_AGENTS] for agent in algorithms}
 
 R = np.zeros((N_AGENTS, N_AGENTS, N_AGENTS))
 for i, alg1 in enumerate(algorithms):
@@ -89,15 +88,16 @@ for i, alg1 in enumerate(algorithms):
         for k, alg3 in enumerate(algorithms3):
             rewards_j_k = []
             # for _ in range(N_ITERATIONS):
-            for _ in range(1):
+            for _ in range(2):
                 hunters = [deepcopy(alg2), deepcopy(alg3), deepcopy(alg1)]
                 rewards = run(hunters, *GRID_SIZE)
                 rewards_j_k.append(rewards[-1])
             R[i][j][k] = sum(rewards_j_k) / len(rewards_j_k)
-for j in range(len(algorithms2)):
-    for k in range(len(algorithms3)):
-        R[:, j, k] = MinMaxScaler().fit_transform(R[:, j, k].reshape(-1, 1)).reshape(-1,)
-
+# for j in range(len(algorithms2)):
+#     for k in range(len(algorithms3)):
+#         R[:, j, k] = MinMaxScaler().fit_transform(R[:, j, k].reshape(-1, 1)).reshape(-1,)
+min_r, max_r = R.min(), R.max()
+R = (R - min_r) / (max_r - min_r)
 print(R)
 
 # R = MinMaxScaler().fit_transform(R)
@@ -116,9 +116,12 @@ def convert_to_probs(values: List[float]) -> List[float]:
 for include_alegaatr in [True, False]:
     if include_alegaatr:
         agent_frequencies = [1 / N_AGENTS] * N_AGENTS
+        agent_representation_over_time = {agent.name: [1 / N_AGENTS] for agent in algorithms}
     else:
         agent_frequencies = [1 / (N_AGENTS - 1)] * N_AGENTS
         agent_frequencies[3] = 0
+        agent_representation_over_time = {agent.name: [1 / (N_AGENTS - 1)] for agent in algorithms}
+        agent_representation_over_time['AlegAATr'] = [0]
 
     for iteration in range(N_ITERATIONS):
         fitnesses = []
@@ -127,8 +130,12 @@ for include_alegaatr in [True, False]:
                 fitnesses.append(0)
                 continue
             fitness = 0
-            for j in range(len(algorithms2)):
-                for k in range(len(algorithms3)):
+            for j, alg2 in enumerate(algorithms2):
+                if not include_alegaatr and alg2.name == 'AlegAATr':
+                    continue
+                for k, alg3 in enumerate(algorithms3):
+                    if not include_alegaatr and alg3.name == 'AlegAATr':
+                        continue
                     fitness += R[i][j][k] * agent_frequencies[j] * agent_frequencies[k]
             fitnesses.append(fitness)
 
@@ -138,7 +145,7 @@ for include_alegaatr in [True, False]:
         for i, alg in enumerate(algorithms):
             agent_frequencies[i] += agent_frequencies[i] * (fitnesses[i] - avg_fitness)
         # agent_frequencies = convert_to_probs(agent_frequencies)
-        print(agent_frequencies)
+        print(sum(agent_frequencies))
         # assert round(sum(agent_frequencies), 3) == 1
 
         # Update data for plot
