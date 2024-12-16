@@ -15,7 +15,7 @@ player_2_color = (39, 194, 21)
 
 pygame.font.init()
 font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
-font_color = (100, 200, 150)
+font_color = (0,0,0)
 
 
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
@@ -141,6 +141,7 @@ def print_board(msg):
             stag_dead = msg["GAME_OVER"]["STAG_DEAD"]
         if "HARE_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["HARE_DEAD"]:
             hare_dead = msg["GAME_OVER"]["HARE_DEAD"]
+
     if "AGENT_POSITIONS" in msg:
         agents_positions = msg["AGENT_POSITIONS"]
         calculate_points(msg["POINTS"], agents)
@@ -155,6 +156,11 @@ def print_board(msg):
             else:
                 agent.update(SCREEN, new_tuple)
             agent.update_points(SCREEN, new_tuple)
+        draw_round(msg["CURR_ROUND"])
+
+    if "GAME_ENDED" in msg:
+        draw_game_over()
+
     pygame.display.update()
 
 def calculate_points(big_dict, agents):
@@ -169,7 +175,6 @@ def calculate_points(big_dict, agents):
                 peopleWhoKilledHares += 1
         if peopleWhoKilledHares > 0: # otherwise we get a divide by zewro error
             points_that_everyone_gets = hare_points / peopleWhoKilledHares
-            print("here is who is getting points for round ", currRound, " ", agents_who_get_points, points_that_everyone_gets)
             for agent in agents_who_get_points:
                 agent.setPoints(points_that_everyone_gets)
 
@@ -188,6 +193,14 @@ def draw_grid(height, width): # draws the grid on every frame just so we have it
             rect = pygame.Rect(x*widthOffset, y*heightOffset, widthOffset, heightOffset)
             pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
 
+
+def draw_round(current_points_dict):
+    txt_surf = font.render("Round : " + str(current_points_dict), True, font_color)
+    SCREEN.blit(txt_surf, [0,0])
+
+def draw_game_over():
+    txt_surf = font.render("Game over!", True, font_color)
+    SCREEN.blit(txt_surf, [350, 350])
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, height, width, my_player=False):

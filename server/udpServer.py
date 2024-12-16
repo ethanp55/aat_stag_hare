@@ -23,8 +23,8 @@ from server import enemy
 
 import multiprocessing
 
-HUMAN_PLAYERS = 3 # how many human players (clients) we are expecting
-AI_AGENTS = 0 # how many agents we are going to add
+HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
+AI_AGENTS = 2 # how many agents we are going to add
 
 ALL_READY = pygame.USEREVENT + 1
 ALL_READY_EVENT = pygame.event.Event(ALL_READY)
@@ -37,8 +37,8 @@ SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 connected_clients = {}
 client_input = {}
-HEIGHT = 10
-WIDTH = 10
+HEIGHT = 3
+WIDTH = 3
 client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
@@ -213,6 +213,7 @@ def stag_hunt_game_loop(player_points, player_input):
                     "CLIENT_ID": client_id,
                     "AGENT_POSITIONS": current_state,
                     "POINTS": dict(points_to_send),
+                    "CURR_ROUND" : round,
                     "GAME_OVER" : small_dict,
                 }
 
@@ -223,9 +224,23 @@ def stag_hunt_game_loop(player_points, player_input):
                 break
 
         pygame.display.update()
-        time.sleep(PAUSE_TIME)
+
         if round == MAX_ROUNDS:
+            for client in connected_clients: # does this update the points correctly?
+                client_id = client_id_dict[connected_clients[client]]
+                response = {
+                    "CLIENT_ID": client_id,
+                    "AGENT_POSITIONS": current_state,
+                    "POINTS": dict(points_to_send),
+                    "CURR_ROUND" : round,
+                    "GAME_OVER" : small_dict,
+                    "GAME_ENDED" : True,
+                }
+
+                new_message = json.dumps(response).encode()
+                connected_clients[client].send(new_message)
             print("GAME OVER")
+            time.sleep(PAUSE_TIME)
             return False
         else:
             round += 1
@@ -243,7 +258,8 @@ def send_state(player_points):
         response = {
             "CLIENT_ID": client_id,
             "AGENT_POSITIONS": current_state,
-            "POINTS": send_player_points
+            "POINTS": send_player_points,
+            "CURR_ROUND" : round,
         }
 
         new_message = json.dumps(response).encode()
