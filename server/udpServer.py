@@ -22,9 +22,9 @@ from environment.world import StagHare
 from server import enemy
 
 import multiprocessing
-
-HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
-AI_AGENTS = 2 # how many agents we are going to add
+# NOTE: the human + AI agents must always add up to 3. has to do with the way stag_hare is configured.
+HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
+AI_AGENTS = 1 # how many agents we are going to add
 
 ALL_READY = pygame.USEREVENT + 1
 ALL_READY_EVENT = pygame.event.Event(ALL_READY)
