@@ -37,8 +37,8 @@ SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 connected_clients = {}
 client_input = {}
-HEIGHT = 3
-WIDTH = 3
+HEIGHT = 10
+WIDTH = 10
 client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
