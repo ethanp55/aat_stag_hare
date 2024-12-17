@@ -15,15 +15,20 @@ class GameServer():
         self.scheduler()
 
     def scheduler(self):
-        # so what I want to be able to do is make a call w/ the players
+        # **** ROUND 1 *****
         gameInstance(self.connected_clients, self.points, 0, None) # need to somehow include an agent type
+        # calculate and display points (this one is a little more of a doozy)
+        # **** ROUND 2-4 *****
 
+        # **** ROUND 5-7 *****
 
+        # **** ROUND 8-10 ****
 
+        # **** ROUND 11-13 *****
 
-        # now calcualte and display average points
-        # call gameInstance again and go from there.
+        # create 4 different round types and then randomize them so they don't know what agents they are playing with.
 
+        # return (program over)
 
 
 
