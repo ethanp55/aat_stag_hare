@@ -23,6 +23,7 @@ class gameInstance():
         self.HUMAN_PLAYERS = len(connected_clients)
         self.AI_AGENTS = 3 - self.HUMAN_PLAYERS
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
+        self.main_game_loop()
 
     def main_game_loop(self):
         global client_id_dict

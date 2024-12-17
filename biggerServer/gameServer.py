@@ -16,7 +16,11 @@ class GameServer():
 
     def scheduler(self):
         # so what I want to be able to do is make a call w/ the players
-        gameInstance(self.connected_clients, self.points, 0, None) # just with all human players (as warm up)
+        gameInstance(self.connected_clients, self.points, 0, None) # need to somehow include an agent type
+
+
+
+
         # now calcualte and display average points
         # call gameInstance again and go from there.
 
@@ -41,7 +45,7 @@ class GameServer():
                 # Directly assign the round as a key and small_dict as the value
                 current_entry[round] = small_dict
                 if round not in self.points[self.client_id_dict[player]]:
-                    self.points[player] = current_entry
+                    self.points[self.client_id_dict[player]] = current_entry
         return self.points
 
 
