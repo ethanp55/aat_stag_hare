@@ -1,18 +1,12 @@
 import json
 import socket
-import threading
-from cgitb import small
-
 import select
-from numpy.f2py.crackfortran import true_intent_list
-
 from server.timer import Timer
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
 import pygame
-import sys
 import time
 from server import timer
 from pygame import K_ESCAPE
@@ -26,9 +20,6 @@ import multiprocessing
 HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
 AI_AGENTS = 1 # how many agents we are going to add
 
-ALL_READY = pygame.USEREVENT + 1
-ALL_READY_EVENT = pygame.event.Event(ALL_READY)
-
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
 
@@ -37,14 +28,14 @@ SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 connected_clients = {}
 client_input = {}
-HEIGHT = 10
-WIDTH = 10
+HEIGHT = 15
+WIDTH = 15
 client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
 round = 1
 
-HARE_POINTS = 1 / HUMAN_PLAYERS # multi threading work around
+HARE_POINTS = 1 / HUMAN_PLAYERS
 STAG_POINTS = 3 / HUMAN_PLAYERS
 # these ones always stay the same
 stag = enemy.Enemy("stag", HEIGHT, WIDTH)
@@ -448,10 +439,6 @@ def find_hunter_stag(player_points, round):
 
         worker2(player_points, hunter, round, small_dict)
         print("Hunter ", hunter, " was given stag points!")
-
-def add_player_points(player_points):
-    pass
-
 
 if __name__ == "__main__":
     start_server()
