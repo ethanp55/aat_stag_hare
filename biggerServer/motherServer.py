@@ -16,8 +16,8 @@ import gameServer
 
 
 # NOTE: the human + AI agents must always add up to 3. has to do with the way stag_hare is configured.
-HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
-AI_AGENTS = 2 # how many agents we are going to add
+HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
+AI_AGENTS = 1 # how many agents we are going to add
 
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
@@ -80,6 +80,7 @@ def start_server(host='192.168.30.17', port=12345):
             new_player_list = copy.copy(connected_clients)
             GameServer(new_player_list, client_id_dict)
             connected_clients.clear()
+            client_id_dict.clear()
 
 
 if __name__ == "__main__":
