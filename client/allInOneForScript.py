@@ -35,6 +35,16 @@ agents = [] # holds all of the sprites for the various agents.
 
 def start_client():
 
+    clock = pygame.time.Clock()
+    user_text = ''
+
+    input_rect = pygame.Rect(350, 150, 140, 32)
+    color_active = pygame.Color('lightskyblue3')
+    color_passive = pygame.Color('chartreuse4')
+    color = color_passive
+    active = False
+    username = False
+
     global client_ID
     host = '192.168.30.17'  # The server's IP address
     port = 12345         # The port number to connect to
@@ -44,48 +54,113 @@ def start_client():
     # Connect to the server
     client_socket.connect((host, port))
     # Send data to the server
-    message = {
-        "message" : "Hello from the client!"
-    }
-    client_socket.send(json.dumps(message).encode())
+
+
     # Receive a response from the server
     while True:
-        server_response = None
-        data = client_socket.recv(65535)
-        try: # get the stuff first
-            # Deserialize the JSON response from the server
-            server_response = json.loads(data.decode())
+        if username != False:
 
-        except json.JSONDecodeError:
-            pass
+            server_response = None
+            data = client_socket.recv(65535)
+            try: # get the stuff first
+                # Deserialize the JSON response from the server
+                server_response = json.loads(data.decode())
 
-        if server_response != None:
+            except json.JSONDecodeError:
+                pass
 
-            if "CLIENT_ID" in server_response:
-                client_ID = server_response["CLIENT_ID"]
-            if "HUMAN_AGENTS" in server_response:
-                initalize(server_response)
-            print_board(server_response)
-        message = {
-            "NEW_INPUT" : None,
-        }
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                pressed_keys = pygame.key.get_pressed()
-                print("We TRYING to send a new position")
-                message = {
-                    "NEW_INPUT" : adjust_position(pressed_keys),
-                    "CLIENT_ID": client_ID,
-                }
+            if server_response != None:
 
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            break
+                if "CLIENT_ID" in server_response:
+                    client_ID = server_response["CLIENT_ID"]
+                if "HUMAN_AGENTS" in server_response:
+                    initalize(server_response)
+                print_board(server_response)
+            message = {
+                "NEW_INPUT" : None,
+            }
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    pressed_keys = pygame.key.get_pressed()
+                    print("We TRYING to send a new position")
+                    message = {
+                        "NEW_INPUT" : adjust_position(pressed_keys),
+                        "CLIENT_ID": client_ID,
+                    }
 
-        client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
-          # try to get things to draw to the screen IG>
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                break
 
-    # Close the connection
+            client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
+              # try to get things to draw to the screen IG>
+
+        else: # they need to input a username
+            while True:
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if input_rect.collidepoint(event.pos):
+                            active = True
+                        else:
+                            active = False
+
+                    if event.type == pygame.KEYDOWN:
+                        # Check for backspace
+                        if event.key == pygame.K_BACKSPACE:
+
+                            # get text input from 0 to -1 i.e. end.
+                            user_text = user_text[:-1]
+
+                            # Unicode standard is used for string
+                        # formation
+                        elif event.key == pygame.K_RETURN:
+                            # send the packet!
+                            message = {
+                                "USERNAME" : user_text,
+                                "MESSAGE" : "hello from the server!"
+                            }
+                            client_socket.send(json.dumps(message).encode())
+                            username = True
+                        else:
+                            user_text += event.unicode
+                        # it will set background color of screen
+
+                if username == True:
+                    break
+                SCREEN.fill((255, 255, 255))
+                txt_surf = font.render("Please enter your username (Press Enter to submit) : ", True, font_color)
+                SCREEN.blit(txt_surf, (100, 100))
+
+                if active:
+                    color = color_active
+                else:
+                    color = color_passive
+
+                    # draw rectangle and argument passed which should
+                # be on screen
+                pygame.draw.rect(SCREEN, color, input_rect)
+
+                text_surface = font.render(user_text, True, (255, 255, 255))
+
+                # render at position stated in arguments
+                SCREEN.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+
+                # set width of textfield so that text cannot get
+                # outside of user's text input
+                input_rect.w = max(100, text_surface.get_width() + 10)
+
+                # display.flip() will update only a portion of the
+                # screen to updated, not full area
+                pygame.display.flip()
+
+                # clock.tick(60) means that for every second at most
+                # 60 frames should be passed.
+                clock.tick(60)
+
+            username = True
+
+
+                    # Close the connection
     client_socket.close()
 
 
@@ -279,10 +354,6 @@ def calculate_position(self, array_position):
 
 def set_next_action(self, new_row, new_col) -> None:
     self.row_to_return, self.col_to_return = new_row, new_col
-
-
-
-
 
 
 

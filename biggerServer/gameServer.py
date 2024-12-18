@@ -6,9 +6,10 @@ import multiprocessing
 connected_clients = {}
 
 class GameServer():
-    def __init__(self, new_clients, client_id_dict):
+    def __init__(self, new_clients, client_id_dict, client_usernames):
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
+        self.client_usernames = client_usernames
         self.max_rounds = 13 # 1 for warmup, then 12 for actual rounds
         self.points = self.player_points_initialization()
 

@@ -16,8 +16,8 @@ import gameServer
 
 
 # NOTE: the human + AI agents must always add up to 3. has to do with the way stag_hare is configured.
-HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
-AI_AGENTS = 1 # how many agents we are going to add
+HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
+AI_AGENTS = 2 # how many agents we are going to add
 
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
@@ -26,6 +26,7 @@ PAUSE_TIME = 3
 
 connected_clients = {}
 client_input = {}
+client_usernames = {}
 HEIGHT = 3 # leave this hardcoded for now.
 WIDTH = 3
 client_id_dict = {}
@@ -59,6 +60,8 @@ def start_server(host='192.168.30.17', port=12345):
             # Deserialize the JSON data
             received_json = json.loads(data.decode())
             print(f"Received JSON from client: {received_json}")
+            client_usernames[len(connected_clients)] = received_json["USERNAME"]
+
 
             # Create a response
             response = {
@@ -78,9 +81,10 @@ def start_server(host='192.168.30.17', port=12345):
         if len(connected_clients) == HUMAN_PLAYERS:
             # passes down the new player list, calls that object (so we should now be cooking) and then clears out the stuff. Do I need to make threads?
             new_player_list = copy.copy(connected_clients)
-            GameServer(new_player_list, client_id_dict)
+            GameServer(new_player_list, client_id_dict, client_usernames)
             connected_clients.clear()
             client_id_dict.clear()
+            client_usernames.clear()
 
 
 if __name__ == "__main__":
