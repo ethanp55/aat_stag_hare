@@ -16,8 +16,19 @@ class GameServer():
 
     def scheduler(self, new_clients):
         # **** ROUND 1 *****
-        gameInstance(new_clients, self.client_id_dict, self.points, 1, 1, 1) # need to somehow include an agent type
-        # calculate and display points (this one is a little more of a doozy)
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 3) # need to somehow include an agent type
+
+
+        # all gameplay finished, update points
+        dicts_to_merge = [dict(new_points_1.player_points)]
+        self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
+        print(dict(self.points))
+
+
+
+        # display average points to all clients.
+
+
         # **** ROUND 2-4 *****
 
         # **** ROUND 5-7 *****
@@ -33,8 +44,7 @@ class GameServer():
 
 
     def player_points_initialization(self):
-        manager = multiprocessing.Manager()
-        player_points = manager.dict()
+        player_points = {} # have it like this for now see if that changes anything.
         self.points = player_points  # just so its the right kind of object.
         hunters = ["H1","H2","H3","H4","H5","H6","H7","H8","H9","H10","H11","H12"] # max 12 players. Make this dynamic
 
@@ -57,6 +67,15 @@ class GameServer():
         return player_points
 
 
-
+    def merge_dicts(self, dicts_to_merge):
+        for dict_entry in dicts_to_merge:
+            # For each dictionary, loop through its keys (e.g., 'H1', 'H10')
+            for key, updates in dict_entry.items():
+                # Check if the key exists in the main_dict
+                if key in self.points:
+                    # Now apply the updates to the main_dict for the current key (e.g., 'H1', 'H10')
+                    for index, update in updates.items():
+                        if index in self.points[key]:  # Ensure the index exists in the nested dictionary
+                            self.points[key][index].update(update)
 
 

@@ -26,8 +26,8 @@ PAUSE_TIME = 3
 
 connected_clients = {}
 client_input = {}
-HEIGHT = 15 # leave this hardcoded for now.
-WIDTH = 15
+HEIGHT = 3 # leave this hardcoded for now.
+WIDTH = 3
 client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
