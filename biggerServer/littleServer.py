@@ -278,8 +278,7 @@ class gameInstance():
         self.stag_hare = stag_hare
 
     def player_points_initialization(self):
-        manager = multiprocessing.Manager()
-        player_points = manager.dict()
+        player_points = {}
         for hunter in self.hunters:
             if hunter.name not in player_points:
                 player_points[hunter.name] = {}  # Initialize an empty dictionary for each hunter (not a list)
