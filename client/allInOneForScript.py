@@ -51,7 +51,7 @@ def start_client():
     # Receive a response from the server
     while True:
         server_response = None
-        data = client_socket.recv(1024)
+        data = client_socket.recv(65535)
         try: # get the stuff first
             # Deserialize the JSON response from the server
             server_response = json.loads(data.decode())
@@ -144,7 +144,7 @@ def print_board(msg):
 
     if "AGENT_POSITIONS" in msg:
         agents_positions = msg["AGENT_POSITIONS"]
-        calculate_points(msg["POINTS"], agents)
+        #calculate_points(msg["POINTS"], agents)
         for agent in agents:
             row = agents_positions[agent.name]["Y_COORD"]
             col = agents_positions[agent.name]["X_COORD"]
