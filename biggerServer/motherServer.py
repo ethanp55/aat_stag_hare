@@ -16,8 +16,8 @@ import gameServer
 
 
 # NOTE: the human + AI agents must always add up to 3. has to do with the way stag_hare is configured.
-HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting
-AI_AGENTS = 2 # how many agents we are going to add
+HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
+AI_AGENTS = 1 # how many agents we are going to add
 
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent

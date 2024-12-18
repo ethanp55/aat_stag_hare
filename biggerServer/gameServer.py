@@ -3,6 +3,10 @@
 
 from littleServer import gameInstance
 import multiprocessing
+
+STAG_POINTS = 20
+HARE_POINTS = 10
+
 connected_clients = {}
 
 class GameServer():
@@ -12,18 +16,18 @@ class GameServer():
         self.client_usernames = client_usernames
         self.max_rounds = 13 # 1 for warmup, then 12 for actual rounds
         self.points = self.player_points_initialization()
-
+        self.current_round = 0
         self.scheduler(new_clients)
 
     def scheduler(self, new_clients):
+        current_round = 0
         # **** ROUND 1 *****
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 3) # need to somehow include an agent type
-
-
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
         # all gameplay finished, update points
         dicts_to_merge = [dict(new_points_1.player_points)]
         self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
-        print(dict(self.points))
+        points_to_send = self.calc_avg_points(current_round)
+
 
 
 
@@ -78,5 +82,23 @@ class GameServer():
                     for index, update in updates.items():
                         if index in self.points[key]:  # Ensure the index exists in the nested dictionary
                             self.points[key][index].update(update)
+
+
+    def calc_avg_points(self, current_round):
+        new_list = [] # list of tuples, holds the clientID and then the number of points that they have accrued
+        for key in self.points:
+            curr_points = 0
+            for curr_round in self.points[key]:
+                if self.points[key][curr_round]['stag'] == True:
+                    curr_points += STAG_POINTS
+                if self.points[key][curr_round]['hare'] != False:
+                    curr_points += HARE_POINTS / self.points[key][curr_round]['hare']
+            curr_points = curr_points / current_round # just to get the average
+            # lets grab the username while we are here
+            new_tuple = (self.client_usernames[int(key[1])], curr_points)
+            new_list.append(new_tuple)
+
+        sorted_points = sorted(new_list, key=lambda x: x[1])
+        return sorted_points
 
 
