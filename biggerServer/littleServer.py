@@ -26,6 +26,10 @@ class gameInstance():
         self.HUMAN_PLAYERS = len(connected_clients)
         self.AI_AGENTS = 3 - self.HUMAN_PLAYERS
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
+        client_id_list = []
+        for client in self.connected_clients:
+            client_id_list.append(client+1)
+        self.client_id_list = client_id_list
         while True:  # set up stag hunt and avoid weird edgecase
             stag_hare = StagHare(HEIGHT, WIDTH, self.hunters)
             if not stag_hare.is_over():
@@ -61,12 +65,15 @@ class gameInstance():
     def send_state(self):
         current_state = self.create_current_state()
         send_player_points = self.player_points.copy()
+        # lets make a list of all of the connected_clients_ids and use those to generate players
+
+
+
         for client in self.connected_clients:
-            client_id = self.client_id_dict[self.connected_clients[client]]
             response = {
                 "HUMAN_AGENTS": len(self.connected_clients),
                 "AI_AGENTS": 3-len(self.connected_clients),
-                "CLIENT_ID": client_id,
+                "CLIENT_ID_LIST" : self.client_id_list,
                 "AGENT_POSITIONS": current_state,
                 "POINTS": send_player_points,
                 "CURR_ROUND": self.round,
@@ -122,9 +129,7 @@ class gameInstance():
                 points_to_send = dict(player_points)
                 current_state = self.create_current_state()
                 for client in self.connected_clients:  # does this update the points correctly?
-                    client_id = self.client_id_dict[self.connected_clients[client]]
                     response = {
-                        "CLIENT_ID": client_id,
                         "AGENT_POSITIONS": current_state,
                         "POINTS": dict(points_to_send),
                         "CURR_ROUND": self.round,
@@ -141,9 +146,7 @@ class gameInstance():
 
             if self.round == self.max_rounds: #
                 for client in self.connected_clients:  # does this update the points correctly?
-                    client_id = self.client_id_dict[self.connected_clients[client]]
                     response = {
-                        "CLIENT_ID": client_id,
                         "AGENT_POSITIONS": current_state,
                         "POINTS": dict(points_to_send),
                         "CURR_ROUND": self.round,
@@ -164,11 +167,11 @@ class gameInstance():
 
     def next_round(self, rewards, new_positions):
         for client_id in new_positions:
-            client_agent = "H" + str(client_id)
+            client_agent = "H" + str((self.client_id_list.index(client_id))+1) # once again, off by one error
             current_position = self.stag_hare.state.agent_positions[client_agent]
             new_tuple_row = new_positions[client_id][0] + current_position[0]
             new_tuple_col = new_positions[client_id][1] + current_position[1]
-            self.hunters[client_id - 1].set_next_action(new_tuple_row, new_tuple_col)
+            self.hunters[self.client_id_list.index(client_id)].set_next_action(new_tuple_row, new_tuple_col) # change that up
 
         round_rewards = self.stag_hare.transition()
         for i, reward in enumerate(round_rewards):
@@ -311,7 +314,6 @@ class gameInstance():
 
     def adjust_points(self):
         print("here is the dict that we started with ", self.player_points)
-        first_key = list(self.player_points.keys())[0]
         for currRound in range(self.start_round, self.max_rounds + 1):  # if we ever don't have a player this will blow up
             hareKillers = 0
             for key in self.player_points:  # hare points first per round

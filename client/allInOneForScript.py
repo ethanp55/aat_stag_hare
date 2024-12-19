@@ -88,7 +88,7 @@ def game_loop(client_socket):
         if "LEADERBOARD" in server_response:
             draw_leaderboard(server_response["LEADERBOARD"])
         else:
-            if "CLIENT_ID" in server_response:
+            if "message" in server_response:
                 client_ID = server_response["CLIENT_ID"]
             if "HUMAN_AGENTS" in server_response:
                 initalize(server_response)
@@ -140,11 +140,12 @@ def initalize(server_response):
     AI_AGENTS = server_response["AI_AGENTS"]
     HEIGHT = server_response["HEIGHT"]
     WIDTH = server_response["WIDTH"]
+    client_ID_list = server_response["CLIENT_ID_LIST"]
 
     for i in range(HUMAN_AGENTS):
-        new_name = "H" + str(i+1)
+        new_name = "H" + str(i+1)  # Name always needs to be H1, H2, ETC
         my_player = False
-        if str(i+1) == str(client_ID):
+        if client_ID_list[i] == client_ID: # pretty sure there is an off by one error there.
             my_player = True
         new_agent = Enemy(new_name, HEIGHT, WIDTH, my_player)
         agents.append(new_agent)
@@ -181,8 +182,7 @@ def print_board(msg):
     WIDTH = msg["WIDTH"]
     if HEIGHT is not None or WIDTH is not None:
         draw_grid(HEIGHT, WIDTH) # draw the board first
-    if "CLIENT_ID" in msg:
-        self_id = msg["CLIENT_ID"]
+
 
     if "GAME_OVER" in msg:
         if "STAG_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["STAG_DEAD"]:
