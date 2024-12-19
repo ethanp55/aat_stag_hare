@@ -66,8 +66,6 @@ def start_server(host='192.168.30.17', port=12345):
             # Create a response
             response = {
                 "message": "Hello from the server!",
-                "HUMAN_AGENTS": HUMAN_PLAYERS,
-                "AI_AGENTS": AI_AGENTS,
                 "HEIGHT": HEIGHT,
                 "WIDTH": WIDTH,
                 "CLIENT_ID" : client_id_dict[client_socket],

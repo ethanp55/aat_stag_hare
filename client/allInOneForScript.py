@@ -5,7 +5,7 @@ import pygame
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
-
+import time
 stag_color = (151, 151, 151)
 hare_color = (222, 222, 222)
 agent_1_color = (40, 30, 245)
@@ -16,6 +16,8 @@ player_2_color = (39, 194, 21)
 pygame.font.init()
 font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
 font_color = (0,0,0)
+leaderboard_font = pygame.font.Font(None, 64)
+leaderboard_font_color = (0,0,0)
 
 
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
@@ -33,16 +35,16 @@ WHITECOLOR = (255, 255, 255)
 client_ID = 0
 agents = [] # holds all of the sprites for the various agents.
 
+input_rect = pygame.Rect(350, 150, 140, 32)
+color_active = pygame.Color('lightskyblue3')
+color_passive = pygame.Color('chartreuse4')
+color = color_passive
+
 def start_client():
 
     clock = pygame.time.Clock()
-    user_text = ''
 
-    input_rect = pygame.Rect(350, 150, 140, 32)
-    color_active = pygame.Color('lightskyblue3')
-    color_passive = pygame.Color('chartreuse4')
-    color = color_passive
-    active = False
+
     username = False
 
     global client_ID
@@ -60,108 +62,76 @@ def start_client():
     while True:
         if username != False:
 
-            server_response = None
-            data = client_socket.recv(65535)
-            try: # get the stuff first
-                # Deserialize the JSON response from the server
-                server_response = json.loads(data.decode())
-
-            except json.JSONDecodeError:
-                pass
-
-            if server_response != None:
-
-                if "CLIENT_ID" in server_response:
-                    client_ID = server_response["CLIENT_ID"]
-                if "HUMAN_AGENTS" in server_response:
-                    initalize(server_response)
-                print_board(server_response)
-            message = {
-                "NEW_INPUT" : None,
-            }
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    pressed_keys = pygame.key.get_pressed()
-                    print("We TRYING to send a new position")
-                    message = {
-                        "NEW_INPUT" : adjust_position(pressed_keys),
-                        "CLIENT_ID": client_ID,
-                    }
-
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                break
-
-            client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
-              # try to get things to draw to the screen IG>
+            game_loop(client_socket)
 
         else: # they need to input a username
-            while True:
-                for event in pygame.event.get():
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if input_rect.collidepoint(event.pos):
-                            active = True
-                        else:
-                            active = False
-
-                    if event.type == pygame.KEYDOWN:
-                        # Check for backspace
-                        if event.key == pygame.K_BACKSPACE:
-
-                            # get text input from 0 to -1 i.e. end.
-                            user_text = user_text[:-1]
-
-                            # Unicode standard is used for string
-                        # formation
-                        elif event.key == pygame.K_RETURN:
-                            # send the packet!
-                            message = {
-                                "USERNAME" : user_text,
-                                "MESSAGE" : "hello from the server!"
-                            }
-                            client_socket.send(json.dumps(message).encode())
-                            username = True
-                        else:
-                            user_text += event.unicode
-                        # it will set background color of screen
-
-                if username == True:
-                    break
-                SCREEN.fill((255, 255, 255))
-                txt_surf = font.render("Please enter your username (Press Enter to submit) : ", True, font_color)
-                SCREEN.blit(txt_surf, (100, 100))
-
-                if active:
-                    color = color_active
-                else:
-                    color = color_passive
-
-                    # draw rectangle and argument passed which should
-                # be on screen
-                pygame.draw.rect(SCREEN, color, input_rect)
-
-                text_surface = font.render(user_text, True, (255, 255, 255))
-
-                # render at position stated in arguments
-                SCREEN.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
-
-                # set width of textfield so that text cannot get
-                # outside of user's text input
-                input_rect.w = max(100, text_surface.get_width() + 10)
-
-                # display.flip() will update only a portion of the
-                # screen to updated, not full area
-                pygame.display.flip()
-
-                # clock.tick(60) means that for every second at most
-                # 60 frames should be passed.
-                clock.tick(60)
-
-            username = True
+           username = set_username(client_socket, clock, username)
 
 
                     # Close the connection
     client_socket.close()
+
+
+def game_loop(client_socket):
+    global client_ID
+    server_response = None
+    data = client_socket.recv(65535)
+    try:  # get the stuff first
+        # Deserialize the JSON response from the server
+        server_response = json.loads(data.decode())
+
+    except json.JSONDecodeError:
+        pass
+
+    if server_response != None:
+
+        if "LEADERBOARD" in server_response:
+            draw_leaderboard(server_response["LEADERBOARD"])
+        else:
+            if "CLIENT_ID" in server_response:
+                client_ID = server_response["CLIENT_ID"]
+            if "HUMAN_AGENTS" in server_response:
+                initalize(server_response)
+            print_board(server_response)
+    message = {
+        "NEW_INPUT": None,
+    }
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            pressed_keys = pygame.key.get_pressed()
+            message = {
+                "NEW_INPUT": adjust_position(pressed_keys),
+                "CLIENT_ID": client_ID,
+            }
+
+        if event.type == pygame.QUIT:
+            pygame.quit()
+        break
+
+    client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
+
+
+def draw_leaderboard(new_leaderboard):
+    print("this is the currnet leader board ", new_leaderboard)
+    SCREEN.fill(WHITECOLOR)
+    # ok how the fetch do we want to do this leaderboard.
+    # each slot needs: the number, the username, and the points.
+    for i in range(len(new_leaderboard)):
+        txt_surf = leaderboard_font.render(str(i+1) + ": " + str(new_leaderboard[i][0]) + ", " + str(new_leaderboard[i][1]), True, font_color)
+        new_dest = [0,0]
+        if i <= 5:
+            new_dest[0] = 50
+            slot = i
+
+        else:
+            new_dest[0] = 450
+            slot = i-6
+
+        new_dest[1] = slot * 140
+
+        SCREEN.blit(txt_surf, new_dest)
+    pygame.display.update()
+
 
 
 def initalize(server_response):
@@ -207,10 +177,13 @@ def adjust_position(pressed_keys):
 def print_board(msg):
     stag_dead = False
     hare_dead = False
+    HEIGHT = msg["HEIGHT"]
+    WIDTH = msg["WIDTH"]
     if HEIGHT is not None or WIDTH is not None:
         draw_grid(HEIGHT, WIDTH) # draw the board first
     if "CLIENT_ID" in msg:
         self_id = msg["CLIENT_ID"]
+
     if "GAME_OVER" in msg:
         if "STAG_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["STAG_DEAD"]:
             stag_dead = msg["GAME_OVER"]["STAG_DEAD"]
@@ -277,6 +250,88 @@ def draw_game_over():
     txt_surf = font.render("Game over!", True, font_color)
     SCREEN.blit(txt_surf, [350, 350])
 
+def calculate_position(self, array_position):
+    current_x = array_position[0]
+    current_y = array_position[1]
+    current_x = current_x * (SCREEN_WIDTH / self.width)
+    current_y = current_y * (SCREEN_HEIGHT / self.height)
+    return current_y, current_x
+
+
+def set_next_action(self, new_row, new_col) -> None:
+    self.row_to_return, self.col_to_return = new_row, new_col
+
+
+def set_username(client_socket, clock, username):
+    user_text = ''
+    active = False
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_rect.collidepoint(event.pos):
+                    active = True
+                else:
+                    active = False
+
+            if event.type == pygame.KEYDOWN:
+                # Check for backspace
+                if event.key == pygame.K_BACKSPACE:
+
+                    # get text input from 0 to -1 i.e. end.
+                    user_text = user_text[:-1]
+
+                    # Unicode standard is used for string
+                # formation
+                elif event.key == pygame.K_RETURN:
+                    # send the packet!
+                    message = {
+                        "USERNAME": user_text,
+                        "MESSAGE": "hello from the server!"
+                    }
+                    client_socket.send(json.dumps(message).encode())
+                    username = True
+                else:
+                    user_text += event.unicode
+                # it will set background color of screen
+
+        if username == True:
+            break
+        SCREEN.fill((255, 255, 255))
+        txt_surf = font.render("Please enter your username (Press Enter to submit) : ", True, font_color)
+        SCREEN.blit(txt_surf, (100, 100))
+
+        if active:
+            color = color_active
+        else:
+            color = color_passive
+
+            # draw rectangle and argument passed which should
+        # be on screen
+        pygame.draw.rect(SCREEN, color, input_rect)
+
+        text_surface = font.render(user_text, True, (255, 255, 255))
+
+        # render at position stated in arguments
+        SCREEN.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
+
+        # set width of textfield so that text cannot get
+        # outside of user's text input
+        input_rect.w = max(100, text_surface.get_width() + 10)
+
+        # display.flip() will update only a portion of the
+        # screen to updated, not full area
+        pygame.display.flip()
+
+        # clock.tick(60) means that for every second at most
+        # 60 frames should be passed.
+        clock.tick(60)
+
+    username = True
+    return username
+
+
+
+# yes I know it should put this in its own file, its just a pain to export as an EXE if its not all one script. Its a pain.
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, height, width, my_player=False):
         super(Enemy, self).__init__()
@@ -344,16 +399,6 @@ class Enemy(pygame.sprite.Sprite):
         # create the new font here make sure all the changes work so far tho.
 
 
-def calculate_position(self, array_position):
-    current_x = array_position[0]
-    current_y = array_position[1]
-    current_x = current_x * (SCREEN_WIDTH / self.width)
-    current_y = current_y * (SCREEN_HEIGHT / self.height)
-    return current_y, current_x
-
-
-def set_next_action(self, new_row, new_col) -> None:
-    self.row_to_return, self.col_to_return = new_row, new_col
 
 
 

@@ -2,7 +2,11 @@
 
 
 from littleServer import gameInstance
+from multiprocessing import Process
 import multiprocessing
+import json
+import time
+import queue
 
 STAG_POINTS = 20
 HARE_POINTS = 10
@@ -20,33 +24,46 @@ class GameServer():
         self.scheduler(new_clients)
 
     def scheduler(self, new_clients):
-        current_round = 0
-        # **** ROUND 1 *****
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
-        # all gameplay finished, update points
-        dicts_to_merge = [dict(new_points_1.player_points)]
-        self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
+
+        # **** ROUND 1 ***** # just testing threading atm.
+        # current_round = 1
+        # new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
+        # # all gameplay finished, update points
+        # dicts_to_merge = [dict(new_points_1.player_points)]
+        # self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
+        # points_to_send = self.calc_avg_points(current_round)
+        # self.send_leaderboard(points_to_send) # sends out the new fetcher
+
+        # ***** ROUND 2 *****
+        current_round = 1
+        q = multiprocessing.Queue()
+        player_1 = list(new_clients.items())[0]
+        player_1_key, player_1_socket = player_1
+        player_2 = list(new_clients.items())[1]
+        player_2_key, player_2_socket = player_2
+
+        game_1 = Process(target=self.game_thread, args=({player_1_key : player_1_socket}, q))
+        game_2 = Process(target=self.game_thread, args=({player_2_key: player_2_socket}, q))
+
+        game_1.start()
+        game_2.start()
+
+        game_1.join()
+        game_2.join()
+
+        dicts_to_merge = []
+        while not q.empty():
+            item = q.get()
+            dicts_to_merge.append(item)
+        self.merge_dicts(dicts_to_merge)
         points_to_send = self.calc_avg_points(current_round)
+        self.send_leaderboard(points_to_send) # sends out the new fetcher
 
 
-
-
-        # display average points to all clients.
-
-
-        # **** ROUND 2-4 *****
-
-        # **** ROUND 5-7 *****
-
-        # **** ROUND 8-10 ****
-
-        # **** ROUND 11-13 *****
-
-        # create 4 different round types and then randomize them so they don't know what agents they are playing with.
-
-        # return (program over)
-
-
+    def game_thread(self, new_clients, q):
+        print("Thread started for ", new_clients)
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1)  # need to somehow include an agent type
+        q.put(new_points_1.player_points)
 
     def player_points_initialization(self):
         player_points = {} # have it like this for now see if that changes anything.
@@ -89,16 +106,31 @@ class GameServer():
         for key in self.points:
             curr_points = 0
             for curr_round in self.points[key]:
-                if self.points[key][curr_round]['stag'] == True:
-                    curr_points += STAG_POINTS
-                if self.points[key][curr_round]['hare'] != False:
-                    curr_points += HARE_POINTS / self.points[key][curr_round]['hare']
-            curr_points = curr_points / current_round # just to get the average
-            # lets grab the username while we are here
-            new_tuple = (self.client_usernames[int(key[1])], curr_points)
-            new_list.append(new_tuple)
+                if curr_round <= current_round: # calculate only up and to the current round. IDK if it will fix our problem but we shall see.
+                    if self.points[key][curr_round]['stag'] == True:
+                        curr_points += STAG_POINTS
+                    if self.points[key][curr_round]['hare'] != False:
+                        curr_points += HARE_POINTS / self.points[key][curr_round]['hare']
+                else:
+                    break # not sure if that will do what I want it to do.
 
-        sorted_points = sorted(new_list, key=lambda x: x[1])
+            if curr_points > 0:
+                curr_points = curr_points / current_round # just to get the average
+            # lets grab the username while we are here
+            if int(key[1:]) in self.client_usernames: # should always fire but just to prevent null access.
+                new_tuple = (self.client_usernames[int(key[1])], curr_points)
+                new_list.append(new_tuple)
+
+
+        sorted_points = sorted(new_list, key=lambda x: x[1], reverse=True)
         return sorted_points
 
+    def send_leaderboard(self, new_points_dict):
+        message = {
+            "LEADERBOARD": new_points_dict,
+        }
+        new_message = json.dumps(message).encode()
+        for client in self.connected_clients:
+            self.connected_clients[client].send(new_message)
+        time.sleep(2)  # lets everyone see the leaderboard
 

@@ -4,6 +4,8 @@ import json
 
 import time # tit for tat pausing?
 
+from server.udpServer import connected_clients
+
 PAUSE_TIME = 3
 HEIGHT = 3
 WIDTH = 3
@@ -62,10 +64,14 @@ class gameInstance():
         for client in self.connected_clients:
             client_id = self.client_id_dict[self.connected_clients[client]]
             response = {
+                "HUMAN_AGENTS": len(self.connected_clients),
+                "AI_AGENTS": 3-len(self.connected_clients),
                 "CLIENT_ID": client_id,
                 "AGENT_POSITIONS": current_state,
                 "POINTS": send_player_points,
                 "CURR_ROUND": self.round,
+                "HEIGHT" : HEIGHT,
+                "WIDTH" : WIDTH,
             }
 
             new_message = json.dumps(response).encode()
@@ -123,6 +129,8 @@ class gameInstance():
                         "POINTS": dict(points_to_send),
                         "CURR_ROUND": self.round,
                         "GAME_OVER": small_dict,
+                        "HEIGHT" : HEIGHT,
+                        "WIDTH" : WIDTH,
                     }
 
                     new_message = json.dumps(response).encode()
@@ -141,6 +149,8 @@ class gameInstance():
                         "CURR_ROUND": self.round,
                         "GAME_OVER": small_dict,
                         "GAME_ENDED": True,
+                        "HEIGHT" : HEIGHT,
+                        "WIDTH" : WIDTH,
                     }
 
                     new_message = json.dumps(response).encode()
@@ -180,6 +190,8 @@ class gameInstance():
         new_hunters = []
         for i in range(len(self.connected_clients)): # connected clients is only the clients who are supposed to be in the game
             new_name = "H" + str(i+1)
+
+
             new_hunters.append(humanAgent(name=new_name))
 
         for i in range(3 - len(self.connected_clients)): # bc they always need to add up to 3
