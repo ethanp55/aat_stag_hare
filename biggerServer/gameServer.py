@@ -26,16 +26,16 @@ class GameServer():
     def scheduler(self, new_clients):
 
         # **** ROUND 1 ***** # just testing threading atm.
-        # current_round = 1
-        # new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
-        # # all gameplay finished, update points
-        # dicts_to_merge = [dict(new_points_1.player_points)]
-        # self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
-        # points_to_send = self.calc_avg_points(current_round)
-        # self.send_leaderboard(points_to_send) # sends out the new fetcher
+        current_round = 1
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
+        # all gameplay finished, update points
+        dicts_to_merge = [dict(new_points_1.player_points)]
+        self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
+        points_to_send = self.calc_avg_points(current_round)
+        self.send_leaderboard(points_to_send) # sends out the new fetcher
 
         # ***** ROUND 2 *****
-        current_round = 1
+        current_round = 2
         q = multiprocessing.Queue()
         player_1 = list(new_clients.items())[0]
         player_1_key, player_1_socket = player_1
