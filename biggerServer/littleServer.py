@@ -332,7 +332,20 @@ class gameInstance():
         if "R2" in self.player_points:
             del self.player_points["R2"]
 
+        if "H1" in self.player_points:
+            new_name = "H" + str(self.client_id_list[0])
+            self.player_points[new_name] = self.player_points.pop("H1")
+        if "H2" in self.player_points:
+            new_name = "H" + str(self.client_id_list[0])
+            self.player_points[new_name] = self.player_points.pop("H2")
+        if "H3" in self.player_points:
+            new_name = "H" + str(self.client_id_list[0])
+            self.player_points[new_name] = self.player_points.pop("H3")
+
+
+
         print("here is the dict we ended with ", self.player_points)
+        return self.player_points
 
 
 
