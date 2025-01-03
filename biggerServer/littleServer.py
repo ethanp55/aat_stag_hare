@@ -4,9 +4,8 @@ import json
 
 import time # tit for tat pausing?
 
-from server.udpServer import connected_clients
 
-PAUSE_TIME = 3
+PAUSE_TIME = 5
 HEIGHT = 3
 WIDTH = 3
 
@@ -336,10 +335,10 @@ class gameInstance():
             new_name = "H" + str(self.client_id_list[0])
             self.player_points[new_name] = self.player_points.pop("H1")
         if "H2" in self.player_points:
-            new_name = "H" + str(self.client_id_list[0])
+            new_name = "H" + str(self.client_id_list[1])
             self.player_points[new_name] = self.player_points.pop("H2")
         if "H3" in self.player_points:
-            new_name = "H" + str(self.client_id_list[0])
+            new_name = "H" + str(self.client_id_list[2])
             self.player_points[new_name] = self.player_points.pop("H3")
 
 

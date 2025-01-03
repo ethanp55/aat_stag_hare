@@ -45,9 +45,8 @@ class GameServer():
         game_1 = Process(target=self.game_thread, args=({player_1_key : player_1_socket}, q))
         game_2 = Process(target=self.game_thread, args=({player_2_key: player_2_socket}, q))
 
-        game_2.start()
         game_1.start()
-
+        game_2.start()
 
         game_1.join()
         game_2.join()

@@ -48,7 +48,8 @@ def start_client():
     username = False
 
     global client_ID
-    host = '192.168.30.17'  # The server's IP address
+    #host = '192.168.30.17'  # The server's IP address
+    host = '127.0.0.1'  # your local host address cause you're working from home.
     port = 12345         # The port number to connect to
     pygame.init()  # actually starts the game.
     # Create a TCP socket
@@ -136,6 +137,7 @@ def draw_leaderboard(new_leaderboard):
 
 def initalize(server_response):
     global HUMAN_AGENTS, AI_AGENTS, HEIGHT, WIDTH, client_ID
+    agents.clear()
     HUMAN_AGENTS = server_response["HUMAN_AGENTS"]
     AI_AGENTS = server_response["AI_AGENTS"]
     HEIGHT = server_response["HEIGHT"]
@@ -203,7 +205,7 @@ def print_board(msg):
                 agent.update(SCREEN, new_tuple, hare_dead)
             else:
                 agent.update(SCREEN, new_tuple)
-            agent.update_points(SCREEN, new_tuple)
+            #agent.update_points(SCREEN, new_tuple)
         draw_round(msg["CURR_ROUND"])
 
     if "GAME_ENDED" in msg:

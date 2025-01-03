@@ -15,9 +15,8 @@ from gameServer import GameServer
 import gameServer
 
 
-# NOTE: the human + AI agents must always add up to 3. has to do with the way stag_hare is configured.
-HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting
-AI_AGENTS = 1 # how many agents we are going to add
+# NOTE
+HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting (This should be 12 for the full study)
 
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
@@ -39,8 +38,8 @@ STAG_POINTS = 20
 # these ones always stay the same
 stag = enemy.Enemy("stag", HEIGHT, WIDTH)
 hare = enemy.Enemy("hare", HEIGHT, WIDTH)
-
-def start_server(host='192.168.30.17', port=12345):
+# your workstation ip is '192.168.30.17', use local host while at home
+def start_server(host='127.0.0.1', port=12345):
 
     # Create a TCP socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -76,7 +75,7 @@ def start_server(host='192.168.30.17', port=12345):
             print("Received data is not valid JSON.")
             client_socket.send(json.dumps({"error": "Invalid JSON format"}).encode())
 
-        if len(connected_clients) == HUMAN_PLAYERS:
+        if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
             # passes down the new player list, calls that object (so we should now be cooking) and then clears out the stuff. Do I need to make threads?
             new_player_list = copy.copy(connected_clients)
             GameServer(new_player_list, client_id_dict, client_usernames)
