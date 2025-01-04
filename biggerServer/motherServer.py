@@ -16,7 +16,7 @@ import gameServer
 
 
 # NOTE
-HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting (This should be 12 for the full study)
+HUMAN_PLAYERS = 3 # how many human players (clients) we are expecting (This should be 12 for the full study)
 
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent

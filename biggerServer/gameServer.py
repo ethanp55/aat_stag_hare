@@ -26,30 +26,35 @@ class GameServer():
     def scheduler(self, new_clients):
 
         # **** ROUND 1 ***** # just testing threading atm.
-        current_round = 1
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
-        # all gameplay finished, update points
-        dicts_to_merge = [dict(new_points_1.player_points)]
-        self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
-        points_to_send = self.calc_avg_points(current_round)
-        self.send_leaderboard(points_to_send) # sends out the new fetcher
+
+        # current_round = 1
+        # new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
+        # # all gameplay finished, update points
+        # dicts_to_merge = [dict(new_points_1.player_points)]
+        # self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
+        # points_to_send = self.calc_avg_points(current_round)
+        # self.send_leaderboard(points_to_send) # sends out the new fetcher
 
         # ***** ROUND 2 *****
-        current_round = 2
+        current_round = 1
         q = multiprocessing.Queue()
         player_1 = list(new_clients.items())[0]
         player_1_key, player_1_socket = player_1
         player_2 = list(new_clients.items())[1]
         player_2_key, player_2_socket = player_2
+        player_3 = list(new_clients.items())[2]
+        player_3_key, player_3_socket = player_3
 
         game_1 = Process(target=self.game_thread, args=({player_1_key : player_1_socket}, q))
         game_2 = Process(target=self.game_thread, args=({player_2_key: player_2_socket}, q))
+        game_3 = Process(target=self.game_thread, args=({player_3_key: player_3_socket}, q))
+        games_list = [game_1, game_2, game_3]
 
-        game_1.start()
-        game_2.start()
+        for game in games_list:
+            game.start()
 
-        game_1.join()
-        game_2.join()
+        for game in games_list:
+            game.join()
 
         dicts_to_merge = []
         while not q.empty():
@@ -58,6 +63,11 @@ class GameServer():
         self.merge_dicts(dicts_to_merge)
         points_to_send = self.calc_avg_points(current_round)
         self.send_leaderboard(points_to_send) # sends out the new fetcher
+
+
+
+
+
 
 
     def game_thread(self, new_clients, q):

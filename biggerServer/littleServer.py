@@ -13,6 +13,7 @@ from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
 import multiprocessing
+import random
 
 class gameInstance():
     def __init__(self, connected_clients, client_id_dict, agentType, round=0, max_rounds=1):
@@ -171,6 +172,9 @@ class gameInstance():
             new_tuple_row = new_positions[client_id][0] + current_position[0]
             new_tuple_col = new_positions[client_id][1] + current_position[1]
             self.hunters[self.client_id_list.index(client_id)].set_next_action(new_tuple_row, new_tuple_col) # change that up
+
+        for i in range(3 - len(new_positions)): # confusing pausing timimg thingy. 
+            time.sleep(random.random()) # should let me do some tit for tat pausing.
 
         round_rewards = self.stag_hare.transition()
         for i, reward in enumerate(round_rewards):
@@ -331,16 +335,20 @@ class gameInstance():
         if "R2" in self.player_points:
             del self.player_points["R2"]
 
+        new_points = {}
+
+
         if "H1" in self.player_points:
             new_name = "H" + str(self.client_id_list[0])
-            self.player_points[new_name] = self.player_points.pop("H1")
+            new_points[new_name] = self.player_points.pop("H1")
         if "H2" in self.player_points:
             new_name = "H" + str(self.client_id_list[1])
-            self.player_points[new_name] = self.player_points.pop("H2")
+            new_points[new_name] = self.player_points.pop("H2")
         if "H3" in self.player_points:
             new_name = "H" + str(self.client_id_list[2])
-            self.player_points[new_name] = self.player_points.pop("H3")
+            new_points[new_name] = self.player_points.pop("H3")
 
+        self.player_points = new_points # don't worry about it.
 
 
         print("here is the dict we ended with ", self.player_points)
