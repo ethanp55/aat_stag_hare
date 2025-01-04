@@ -6,12 +6,20 @@ SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 import time
-stag_color = (151, 151, 151)
-hare_color = (222, 222, 222)
-agent_1_color = (40, 30, 245)
-agent_2_color = (135, 135, 245)
-player_color = (45, 135, 35)
-player_2_color = (39, 194, 21)
+
+# self.surf.fill = hare_sprite thats how you could do it if you wanted to use color tiles instead of sprites. 
+
+stag_sprite = pygame.image.load("stag.png")
+hare_sprite = pygame.image.load("hare.png")
+my_hunter = pygame.image.load("my_hunter.png")
+other_hunter = pygame.image.load("other_hunter.png")
+
+#stag_color = (151, 151, 151)
+# hare_color = (222, 222, 222)
+# agent_1_color = (40, 30, 245)
+# agent_2_color = (135, 135, 245)
+# player_color = (45, 135, 35)
+# player_2_color = (39, 194, 21)
 
 pygame.font.init()
 font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
@@ -348,19 +356,19 @@ class Enemy(pygame.sprite.Sprite):
         self.points = 0
 
         if name == "stag":
-            self.surf.fill(stag_color)
+            self.surf = stag_sprite
         elif name == "hare":
-            self.surf.fill(hare_color)
+            self.surf = hare_sprite
         elif name == "R1":
-            self.surf.fill(agent_1_color)
+            self.surf = other_hunter
         elif name == "R2":
-            self.surf.fill(agent_2_color)
+            self.surf = other_hunter
 
         if name[0] == "H":
             if my_player:
-                self.surf.fill(player_color)
+                self.surf = my_hunter
             else:
-                self.surf.fill(player_2_color)
+                self.surf = other_hunter
 
 
         self.rect = self.surf.get_rect()
@@ -384,9 +392,9 @@ class Enemy(pygame.sprite.Sprite):
 
     def update_alive(self):
         if self.name == "stag":
-            self.surf.fill(stag_color)
+            self.surf = stag_sprite
         elif self.name == "hare":
-            self.surf.fill(hare_color)
+            self.surf = hare_sprite
 
 
 

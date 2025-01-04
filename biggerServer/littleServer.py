@@ -6,8 +6,8 @@ import time # tit for tat pausing?
 
 
 PAUSE_TIME = 5
-HEIGHT = 3
-WIDTH = 3
+HEIGHT = 15
+WIDTH = 15
 
 from agents.random_agent import *
 from agents.human import *
@@ -173,7 +173,7 @@ class gameInstance():
             new_tuple_col = new_positions[client_id][1] + current_position[1]
             self.hunters[self.client_id_list.index(client_id)].set_next_action(new_tuple_row, new_tuple_col) # change that up
 
-        for i in range(3 - len(new_positions)): # confusing pausing timimg thingy. 
+        for i in range(3 - len(new_positions)): # confusing pausing timimg thingy.
             time.sleep(random.random()) # should let me do some tit for tat pausing.
 
         round_rewards = self.stag_hare.transition()

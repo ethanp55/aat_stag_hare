@@ -16,7 +16,7 @@ import gameServer
 
 
 # NOTE
-HUMAN_PLAYERS = 3 # how many human players (clients) we are expecting (This should be 12 for the full study)
+HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting (This should be 12 for the full study)
 
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
@@ -26,8 +26,8 @@ PAUSE_TIME = 3
 connected_clients = {}
 client_input = {}
 client_usernames = {}
-HEIGHT = 3 # leave this hardcoded for now.
-WIDTH = 3
+HEIGHT = 15 # leave this hardcoded for now.
+WIDTH = 15
 client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
