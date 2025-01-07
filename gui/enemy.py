@@ -10,7 +10,8 @@ stag_color = (151, 151, 151)
 hare_color = (222, 222, 222)
 agent_1_color = (40, 30, 245)
 agent_2_color = (135, 135, 245)
-
+player_color = (45, 135, 35)
+player_2_color = (130, 130, 130)
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, height, width):
@@ -27,10 +28,14 @@ class Enemy(pygame.sprite.Sprite):
             self.surf.fill(stag_color)
         elif name == "hare":
             self.surf.fill(hare_color)
-        elif name == "agent1":
+        elif name == "R1":
             self.surf.fill(agent_1_color)
-        elif name == "agent2":
+        elif name == "R2":
             self.surf.fill(agent_2_color)
+        elif name == "H1":
+            self.surf.fill(player_color)
+        elif name == "H2":
+            self.surf.fill(player_2_color)
 
         self.rect = self.surf.get_rect()
 

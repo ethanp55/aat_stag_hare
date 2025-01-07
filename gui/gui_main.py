@@ -20,7 +20,6 @@ PAUSE_TIME = 3
 HEIGHT = 10
 WIDTH = 10
 
-
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
@@ -66,6 +65,8 @@ def main():
     pygame.init()  # actually starts the game.
     running = True
     rewards = [0] * (len(hunters) + 2)
+
+
 
     while True:
         stag_hare = StagHare(HEIGHT, WIDTH, hunters)
