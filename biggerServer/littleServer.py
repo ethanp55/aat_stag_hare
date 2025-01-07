@@ -6,8 +6,8 @@ import time # tit for tat pausing?
 
 
 PAUSE_TIME = 5
-HEIGHT = 15
-WIDTH = 15
+HEIGHT = 3
+WIDTH = 3
 
 from agents.random_agent import *
 from agents.human import *

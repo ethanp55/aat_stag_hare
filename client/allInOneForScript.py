@@ -346,31 +346,32 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, height, width, my_player=False):
         super(Enemy, self).__init__()
         self.row_to_return, self.col_to_return = None, None # for ethans code
-        square_height = SCREEN_HEIGHT / height
-        square_width = SCREEN_WIDTH / width
+        self.square_height = SCREEN_HEIGHT / height
+        self.square_width = SCREEN_WIDTH / width
         self.name = name
-        self.surf = pygame.surface.Surface((square_height, square_width))
+        self.original_surf = pygame.surface.Surface((self.square_height, self.square_width))
         self.height, self.width = height, width
         self.square_height = self.height
         self.square_width = self.width
         self.points = 0
+        self.new_surf = None
 
         if name == "stag":
-            self.surf = stag_sprite
+            self.original_surf = stag_sprite
         elif name == "hare":
-            self.surf = hare_sprite
+            self.original_surf = hare_sprite
         elif name == "R1":
-            self.surf = other_hunter
+            self.original_surf = other_hunter
         elif name == "R2":
-            self.surf = other_hunter
+            self.original_surf = other_hunter
 
         if name[0] == "H":
             if my_player:
-                self.surf = my_hunter
+                self.original_surf = my_hunter
             else:
-                self.surf = other_hunter
+                self.original_surf = other_hunter
 
-
+        self.surf = self.original_surf.copy()
         self.rect = self.surf.get_rect()
 
     def setPoints(self, newPoints):
@@ -384,17 +385,15 @@ class Enemy(pygame.sprite.Sprite):
         # here
         new_position = calculate_position(self, array_position)
         if dead:
-            self.surf.fill((200, 60, 20))
-            screen.blit(self.surf, new_position)
+            red_surf = self.surf.copy()  # Copy the original surface
+            red_surf.fill((200, 60, 20))  # Fill the copy with red
+            screen.blit(red_surf, new_position)  # Blit the red surface
         else:
-            self.update_alive()
+            self.surf = self.original_surf.copy()
             screen.blit(self.surf, new_position) # so this one works.
 
     def update_alive(self):
-        if self.name == "stag":
-            self.surf = stag_sprite
-        elif self.name == "hare":
-            self.surf = hare_sprite
+        self.surf = self.original_surf
 
 
 

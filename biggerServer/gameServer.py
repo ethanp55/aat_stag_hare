@@ -36,19 +36,12 @@ class GameServer():
         self.send_leaderboard(points_to_send) # sends out the new fetcher
 
         # ***** ROUND 2 *****
-        current_round = 1
+        current_round = 2
         q = multiprocessing.Queue()
-        player_1 = list(new_clients.items())[0]
-        player_1_key, player_1_socket = player_1
-        player_2 = list(new_clients.items())[1]
-        player_2_key, player_2_socket = player_2
-        player_3 = list(new_clients.items())[2]
-        player_3_key, player_3_socket = player_3
-
-        game_1 = Process(target=self.game_thread, args=({player_1_key : player_1_socket}, q))
-        game_2 = Process(target=self.game_thread, args=({player_2_key: player_2_socket}, q))
-        game_3 = Process(target=self.game_thread, args=({player_3_key: player_3_socket}, q))
-        games_list = [game_1, game_2, game_3]
+        # handles player 1 and player 2
+        game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0], new_clients), q))
+        game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([1], new_clients), q))
+        games_list = [game_1, game_2]
 
         for game in games_list:
             game.start()
@@ -64,9 +57,13 @@ class GameServer():
         points_to_send = self.calc_avg_points(current_round)
         self.send_leaderboard(points_to_send) # sends out the new fetcher
 
-
-
-
+    def create_player_dict_pairs(self, new_players, new_clients): # new players is a list containing a bunch of indexes, and returns a dict of pairs.
+        return_players =  {}
+        for player in new_players:
+            player_1 = list(new_clients.items())[player]
+            player_1_key, player_1_socket = player_1
+            return_players[player_1_key] = player_1_socket
+        return return_players
 
 
 
