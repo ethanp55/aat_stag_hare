@@ -4,6 +4,7 @@ import json
 
 import time # tit for tat pausing?
 
+from agents.dqn import *
 
 PAUSE_TIME = 5
 HEIGHT = 3
@@ -204,6 +205,8 @@ class gameInstance():
             new_name = "R" + str(i+1)
             # different types of agents can go here, might be work making a different functioun
             if self.agentType == 1:
+                new_hunters.append(Random(name=new_name))
+            if self.agentType == 2:
                 new_hunters.append(Random(name=new_name))
 
         self.hunters = new_hunters

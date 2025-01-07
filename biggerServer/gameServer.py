@@ -25,24 +25,47 @@ class GameServer():
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
 
+        # # code to test the bots if you need it.
+        # current_round = 1
+        # new_points_1 = gameInstance(new_clients, self.client_id_dict, 2, 1, 1) # need to somehow include an agent type
+        # # all gameplay finished, update points
+        # dicts_to_merge = [dict(new_points_1.player_points)]
+        # self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
+        # points_to_send = self.calc_avg_points(current_round)
+        # self.send_leaderboard(points_to_send) # sends out the new fetcher
+
+        # and boom those are all the possible types that we could need, so thats pretty great.
+
         # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
-        current_round = 1
+        current_round = 1 # what happens if we try to make this 0. like in all honestly what happens.
         # players_to_insert_into_game, list of all players, agent_type (as int) and the number of rounds to execute
         game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0, 1, 2], new_clients), q, current_round, 1, 1))
         game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([3, 4, 5], new_clients), q, current_round, 1, 1))
         games_list = [game_1, game_2]
         self.run_games(games_list, q, current_round)
 
-        # ***** ROUND 2 *****
+        # ***** ROUND 2-4 ***** # human on robot violence - not quite sure how jake wants me to handle this.
         current_round = 2
-        game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0, 1], new_clients), q, current_round, 1, 1))
-        game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([2, 3], new_clients), q, current_round, 1, 1))
-        game_3 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([4, 5], new_clients), q, current_round, 1, 1))
+        rounds_to_run = 3
+        game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0, 1], new_clients), q, current_round, 1, rounds_to_run))
+        game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([2, 3], new_clients), q, current_round, 1, rounds_to_run))
+        game_3 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([4, 5], new_clients), q, current_round, 1, rounds_to_run))
         games_list = [game_1, game_2, game_3]
         self.run_games(games_list, q, current_round)
 
-        # ***** ROUND 3 *****
+        # ***** ROUND 5-7 ***** # each playa get the own game with they own robots
         current_round = 3
+        rounds_to_run = 3
+        game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0], new_clients), q, current_round, 1, 1))
+        game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([1], new_clients), q, current_round, 1, 1))
+        game_3 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([2], new_clients), q, current_round, 1, 1))
+        game_4 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([3], new_clients), q, current_round, 1, 1))
+        game_5 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([4], new_clients), q, current_round, 1, 1))
+        game_6 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([5], new_clients), q, current_round, 1, 1))
+        games_list = [game_1, game_2, game_3, game_4, game_5, game_6]
+        self.run_games(games_list, q, current_round)
+
+
 
 
 
