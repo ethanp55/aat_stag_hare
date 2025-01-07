@@ -1,12 +1,11 @@
 #this is where the scheduling and holding all the big dicts / writing to disk takes place. also instantiates game instances given specific things.
 
-
 from littleServer import gameInstance
 from multiprocessing import Process
 import multiprocessing
 import json
 import time
-import queue
+
 
 STAG_POINTS = 20
 HARE_POINTS = 10
@@ -24,25 +23,31 @@ class GameServer():
         self.scheduler(new_clients)
 
     def scheduler(self, new_clients):
+        q = multiprocessing.Queue()
 
-        # **** ROUND 1 ***** # just testing threading atm.
-
+        # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
         current_round = 1
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
-        # all gameplay finished, update points
-        dicts_to_merge = [dict(new_points_1.player_points)]
-        self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
-        points_to_send = self.calc_avg_points(current_round)
-        self.send_leaderboard(points_to_send) # sends out the new fetcher
+        # players_to_insert_into_game, list of all players, agent_type (as int) and the number of rounds to execute
+        game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0, 1, 2], new_clients), q, current_round, 1, 1))
+        game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([3, 4, 5], new_clients), q, current_round, 1, 1))
+        games_list = [game_1, game_2]
+        self.run_games(games_list, q, current_round)
 
         # ***** ROUND 2 *****
         current_round = 2
-        q = multiprocessing.Queue()
-        # handles player 1 and player 2
-        game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0], new_clients), q))
-        game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([1], new_clients), q))
-        games_list = [game_1, game_2]
+        game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0, 1], new_clients), q, current_round, 1, 1))
+        game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([2, 3], new_clients), q, current_round, 1, 1))
+        game_3 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([4, 5], new_clients), q, current_round, 1, 1))
+        games_list = [game_1, game_2, game_3]
+        self.run_games(games_list, q, current_round)
 
+
+    def run_games(self, games_list, q, current_round):
+        self.start_and_join_games(games_list, q)
+        points_to_send = self.calc_avg_points(current_round)
+        self.send_leaderboard(points_to_send)  # sends out the new fetcher
+
+    def start_and_join_games(self, games_list, q):
         for game in games_list:
             game.start()
 
@@ -53,9 +58,8 @@ class GameServer():
         while not q.empty():
             item = q.get()
             dicts_to_merge.append(item)
+
         self.merge_dicts(dicts_to_merge)
-        points_to_send = self.calc_avg_points(current_round)
-        self.send_leaderboard(points_to_send) # sends out the new fetcher
 
     def create_player_dict_pairs(self, new_players, new_clients): # new players is a list containing a bunch of indexes, and returns a dict of pairs.
         return_players =  {}
@@ -67,9 +71,9 @@ class GameServer():
 
 
 
-    def game_thread(self, new_clients, q):
-        print("Thread started for ", new_clients)
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1)  # need to somehow include an agent type
+    def game_thread(self, new_clients, q, current_round, agent_type, rounds_to_run):
+        rounds_to_run = rounds_to_run - 1 # off by 1 error
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_type, current_round, current_round + rounds_to_run)  # need to somehow include an agent type
         q.put(new_points_1.player_points)
 
     def player_points_initialization(self):
@@ -108,12 +112,12 @@ class GameServer():
                             self.points[key][index].update(update)
 
 
-    def calc_avg_points(self, current_round):
+    def calc_avg_points(self, target_round):
         new_list = [] # list of tuples, holds the clientID and then the number of points that they have accrued
         for key in self.points:
             curr_points = 0
             for curr_round in self.points[key]:
-                if curr_round <= current_round: # calculate only up and to the current round. IDK if it will fix our problem but we shall see.
+                if curr_round <= target_round: # calculate only up and to the current round. IDK if it will fix our problem but we shall see.
                     if self.points[key][curr_round]['stag'] == True:
                         curr_points += STAG_POINTS
                     if self.points[key][curr_round]['hare'] != False:
@@ -122,7 +126,9 @@ class GameServer():
                     break # not sure if that will do what I want it to do.
 
             if curr_points > 0:
-                curr_points = curr_points / current_round # just to get the average
+                curr_points = curr_points / target_round # just to get the average
+                curr_points = round(curr_points, 2)
+
             # lets grab the username while we are here
             if int(key[1:]) in self.client_usernames: # should always fire but just to prevent null access.
                 new_tuple = (self.client_usernames[int(key[1])], curr_points)

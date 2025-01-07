@@ -16,7 +16,7 @@ import gameServer
 
 
 # NOTE
-HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting (This should be 12 for the full study)
+HUMAN_PLAYERS = 6 # how many human players (clients) we are expecting (This should be 12 for the full study)
 
 #from agents.alegaatr import AlegAATr
 #from agents.dqn import DQNAgent
@@ -46,8 +46,6 @@ def start_server(host='127.0.0.1', port=12345):
     server_socket.bind((host, port))
     server_socket.listen(12)  # Allow only one connection
 
-    print(f"Server listening on {host}:{port}...")
-
     while True: # just keeps running and listening for clients, capable of running multiple servers.
         client_socket, client_address = server_socket.accept()
         connected_clients[len(connected_clients)] = client_socket
@@ -58,7 +56,6 @@ def start_server(host='127.0.0.1', port=12345):
         try:
             # Deserialize the JSON data
             received_json = json.loads(data.decode())
-            print(f"Received JSON from client: {received_json}")
             client_usernames[len(connected_clients)] = received_json["USERNAME"]
 
 
@@ -72,8 +69,7 @@ def start_server(host='127.0.0.1', port=12345):
             # Serialize and send the response as JSON
             client_socket.send(json.dumps(response).encode())
         except json.JSONDecodeError:
-            print("Received data is not valid JSON.")
-            client_socket.send(json.dumps({"error": "Invalid JSON format"}).encode())
+            pass # don't do anything but still handle the exception
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
             # passes down the new player list, calls that object (so we should now be cooking) and then clears out the stuff. Do I need to make threads?

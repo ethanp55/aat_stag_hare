@@ -316,7 +316,6 @@ class gameInstance():
         self.player_points = player_points
 
     def adjust_points(self):
-        print("here is the dict that we started with ", self.player_points)
         for currRound in range(self.start_round, self.max_rounds + 1):  # if we ever don't have a player this will blow up
             hareKillers = 0
             for key in self.player_points:  # hare points first per round
@@ -349,9 +348,6 @@ class gameInstance():
             new_points[new_name] = self.player_points.pop("H3")
 
         self.player_points = new_points # don't worry about it.
-
-
-        print("here is the dict we ended with ", self.player_points)
         return self.player_points
 
 

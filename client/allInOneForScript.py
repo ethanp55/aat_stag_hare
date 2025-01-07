@@ -121,7 +121,6 @@ def game_loop(client_socket):
 
 
 def draw_leaderboard(new_leaderboard):
-    print("this is the currnet leader board ", new_leaderboard)
     SCREEN.fill(WHITECOLOR)
     # ok how the fetch do we want to do this leaderboard.
     # each slot needs: the number, the username, and the points.
