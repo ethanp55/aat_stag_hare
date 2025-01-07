@@ -8,7 +8,9 @@ from agents.madqn import MADQN
 from agents.modeller import Modeller
 from agents.ppo import PPO
 from agents.prob_dest import ProbabilisticDestinations
+from agents.qalegaatr import QAlegAATr
 from agents.ralegaatr import RAlegAATr
+from agents.rawo import RawO
 from agents.rdqn import RDQN
 from agents.smalegaatr import SMAlegAATr
 from agents.soaleqgaatr import SOAleqgAATr
@@ -18,7 +20,7 @@ import os
 from utils.utils import N_HUNTERS, STAG_NAME
 
 
-N_EPOCHS = 1
+N_EPOCHS = 5
 GRID_SIZES = [(9, 9), (12, 12), (15, 15)]
 n_training_iterations = N_EPOCHS * len(GRID_SIZES)
 progress_percentage_chunk = int(0.05 * n_training_iterations)
@@ -27,7 +29,7 @@ print(n_training_iterations, progress_percentage_chunk)
 n_other_hunters = N_HUNTERS - 1
 
 # names = ['DQN', 'MADQN', 'RDQN', 'AleqgAATr', 'RAlegAATr', 'SOAleqgAATr', 'AlegAATr', 'SMAlegAATr', 'QAlegAATr', 'RawO', 'PPO']
-names = ['PPO']
+names = ['RawO']
 
 # Reset any existing simulation files (opening a file in write mode will truncate it)
 for file in os.listdir('../simulations/results/'):
@@ -59,26 +61,30 @@ for epoch in range(N_EPOCHS):
 
         for other_hunters, label in list_of_other_hunters:
             agents_to_test = []
-            # agents_to_test.append(DQNAgent())
-            # agents_to_test.append(AlegAATr(lmbda=0.0, ml_model_type='knn', enhanced=True))
-            # agents_to_test.append(AleqgAATr())
-            # agents_to_test.append(MADQN())
-            # agents_to_test.append(SOAleqgAATr())
-            # agents_to_test.append(SMAlegAATr(enhanced=False))
-            # agents_to_test.append(RAlegAATr())
-            # agents_to_test.append(RDQN())
+            agents_to_test.append(DQNAgent())
+            agents_to_test.append(AlegAATr(lmbda=0.0, ml_model_type='knn', enhanced=True))
+            agents_to_test.append(AleqgAATr())
+            agents_to_test.append(MADQN())
+            agents_to_test.append(SOAleqgAATr())
+            agents_to_test.append(SMAlegAATr())
+            agents_to_test.append(RAlegAATr())
+            agents_to_test.append(RDQN())
             agents_to_test.append(PPO())
+            agents_to_test.append(QAlegAATr(enhanced=True))
+            agents_to_test.append(RawO(enhanced=True))
 
             self_play_agents = []
-            # self_play_agents.append([DQNAgent(f'DQN{i}') for i in range(n_other_hunters)])
-            # self_play_agents.append([AlegAATr(f'AlegAATr{i}', lmbda=0.0, ml_model_type='knn', enhanced=True) for i in range(n_other_hunters)])
-            # self_play_agents.append([AleqgAATr(f'AleqgAATr{i}') for i in range(n_other_hunters)])
-            # self_play_agents.append([MADQN(f'MADQN{i}') for i in range(n_other_hunters)])
-            # self_play_agents.append([SOAleqgAATr(f'SOAleqgAATr{i}') for i in range(n_other_hunters)])
-            # self_play_agents.append([SMAlegAATr(f'SMAlegAATr{i}', enhanced=False) for i in range(n_other_hunters)])
-            # self_play_agents.append([RAlegAATr(f'RAlegAATr{i}') for i in range(n_other_hunters)])
-            # self_play_agents.append([RDQN(f'RDQN{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([DQNAgent(f'DQN{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([AlegAATr(f'AlegAATr{i}', lmbda=0.0, ml_model_type='knn', enhanced=True) for i in range(n_other_hunters)])
+            self_play_agents.append([AleqgAATr(f'AleqgAATr{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([MADQN(f'MADQN{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([SOAleqgAATr(f'SOAleqgAATr{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([SMAlegAATr(f'SMAlegAATr{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([RAlegAATr(f'RAlegAATr{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([RDQN(f'RDQN{i}') for i in range(n_other_hunters)])
             self_play_agents.append([PPO(f'PPO{i}') for i in range(n_other_hunters)])
+            self_play_agents.append([QAlegAATr(f'QAlegAATr{i}', enhanced=True) for i in range(n_other_hunters)])
+            self_play_agents.append([RawO(f'RawO{i}', enhanced=True) for i in range(n_other_hunters)])
 
             for i, agent_to_test in enumerate(agents_to_test):
                 if label == 'selfplay':

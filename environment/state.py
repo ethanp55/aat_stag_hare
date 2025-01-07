@@ -40,7 +40,6 @@ class State:
 
         return grid_str[:-1]
 
-    # Same as prev two, but for the other hunters
     def vector_representation(self, hunter_name: str) -> np.array:
         # Grid dimensions
         n_rows, n_cols = self.height, self.width

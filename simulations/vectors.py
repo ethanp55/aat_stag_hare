@@ -10,8 +10,9 @@ def _plot_embeddings(labels: List[str], embeddings: np.array, agent_name: str, t
     labels = np.array(labels)
     unique_labels = np.unique(labels)
     colors = plt.get_cmap('tab20')(Normalize()(unique_labels))
-    fig = plt.figure(figsize=(15, 15))
-    plt.grid()
+    # fig = plt.figure(figsize=(15, 15))
+    # plt.grid()
+    fig = plt.figure(figsize=(3, 3))
 
     if three_dimensions:
         ax = fig.add_subplot(111, projection='3d')
@@ -26,7 +27,9 @@ def _plot_embeddings(labels: List[str], embeddings: np.array, agent_name: str, t
             label_points = embeddings[labels == label]
             plt.scatter(label_points[:, 0], label_points[:, 1], s=10, alpha=1.0, color=colors[j], label=label)
 
-    plt.legend(loc='best', fontsize='18')
+    # plt.legend(loc='best', fontsize='18')
+    plt.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False, left=False, right=False,
+                    labelleft=False)
 
     image_name_adj = '_3d' if three_dimensions else ''
     plt.savefig(f'../simulations/vector_plots/{agent_name}{image_name_adj}.png', bbox_inches='tight')
@@ -35,7 +38,7 @@ def _plot_embeddings(labels: List[str], embeddings: np.array, agent_name: str, t
 
 folder = '../simulations/vectors/'
 gen_vectors = {}
-agents_to_ignore = []  # Agents that converged to output the same vector, regardless of state
+agents_to_ignore = ['AleqgAATr', 'RDQN', 'MADQN', 'RAlegAATr', 'SOAleqgAATr', 'DQN']  # Agents that converged to output the same vector, regardless of state
 
 for file in os.listdir(folder):
     agent_name = file.split('_')[0]
@@ -63,7 +66,7 @@ for agent_name, agent_data in gen_vectors.items():
         all_vectors = np.array(vector_list) if all_vectors is None else np.concatenate(
             [all_vectors, np.array(vector_list)])
 
-    for three_dimensions in [True, False]:
+    for three_dimensions in [False]:
         n_components = 3 if three_dimensions else 2
         all_embeddings = TSNE(n_components=n_components).fit_transform(all_vectors)
         _plot_embeddings(all_labels, all_embeddings, agent_name, three_dimensions=three_dimensions)
