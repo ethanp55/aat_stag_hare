@@ -41,6 +41,10 @@ class GameServer():
         games_list = [game_1, game_2, game_3]
         self.run_games(games_list, q, current_round)
 
+        # ***** ROUND 3 *****
+        current_round = 3
+
+
 
     def run_games(self, games_list, q, current_round):
         self.start_and_join_games(games_list, q)
