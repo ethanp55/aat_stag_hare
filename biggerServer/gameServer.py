@@ -53,17 +53,17 @@ class GameServer():
         games_list = [game_1, game_2, game_3]
         self.run_games(games_list, q, current_round)
 
-        # ***** ROUND 5-7 ***** # each playa get the own game with they own robots
-        current_round = 3
-        rounds_to_run = 3
-        game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0], new_clients), q, current_round, 1, 1))
-        game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([1], new_clients), q, current_round, 1, 1))
-        game_3 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([2], new_clients), q, current_round, 1, 1))
-        game_4 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([3], new_clients), q, current_round, 1, 1))
-        game_5 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([4], new_clients), q, current_round, 1, 1))
-        game_6 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([5], new_clients), q, current_round, 1, 1))
-        games_list = [game_1, game_2, game_3, game_4, game_5, game_6]
-        self.run_games(games_list, q, current_round)
+        # # ***** ROUND 5-7 ***** # each playa get the own game with they own robots
+        # current_round = 3
+        # rounds_to_run = 3
+        # game_1 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([0], new_clients), q, current_round, 1, 1))
+        # game_2 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([1], new_clients), q, current_round, 1, 1))
+        # game_3 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([2], new_clients), q, current_round, 1, 1))
+        # game_4 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([3], new_clients), q, current_round, 1, 1))
+        # game_5 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([4], new_clients), q, current_round, 1, 1))
+        # game_6 = Process(target=self.game_thread, args=(self.create_player_dict_pairs([5], new_clients), q, current_round, 1, 1))
+        # games_list = [game_1, game_2, game_3, game_4, game_5, game_6]
+        # self.run_games(games_list, q, current_round)
 
 
 

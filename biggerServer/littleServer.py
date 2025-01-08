@@ -4,7 +4,7 @@ import json
 
 import time # tit for tat pausing?
 
-from agents.dqn import *
+#from agents.dqn import *
 
 PAUSE_TIME = 5
 HEIGHT = 3
