@@ -26,13 +26,13 @@ class GameServer():
         q = multiprocessing.Queue()
 
         # # code to test the bots if you need it.
-        # current_round = 1
-        # new_points_1 = gameInstance(new_clients, self.client_id_dict, 2, 1, 1) # need to somehow include an agent type
-        # # all gameplay finished, update points
-        # dicts_to_merge = [dict(new_points_1.player_points)]
-        # self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
-        # points_to_send = self.calc_avg_points(current_round)
-        # self.send_leaderboard(points_to_send) # sends out the new fetcher
+        current_round = 1
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, 5, 1, 1) # need to somehow include an agent type
+        # all gameplay finished, update points
+        dicts_to_merge = [dict(new_points_1.player_points)]
+        self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
+        points_to_send = self.calc_avg_points(current_round)
+        self.send_leaderboard(points_to_send) # sends out the new fetcher
 
         # and boom those are all the possible types that we could need, so thats pretty great.
 

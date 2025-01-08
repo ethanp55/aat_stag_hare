@@ -6,7 +6,7 @@ import numpy as np
 import pickle
 import random
 import tensorflow as tf
-from tensorflow import keras
+from tensorflow.python import keras
 from typing import Tuple
 
 

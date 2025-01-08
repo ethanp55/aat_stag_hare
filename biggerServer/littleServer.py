@@ -4,7 +4,11 @@ import json
 
 import time # tit for tat pausing?
 
-#from agents.dqn import *
+from agents.alegaatr import AlegAATr
+from agents.dqn import DQNAgent
+from agents.qalegaatr import QAlegAATr
+from agents.smalegaatr import SMAlegAATr
+from agents.rawo import RawO
 
 PAUSE_TIME = 5
 HEIGHT = 3
@@ -207,7 +211,15 @@ class gameInstance():
             if self.agentType == 1:
                 new_hunters.append(Random(name=new_name))
             if self.agentType == 2:
-                new_hunters.append(Random(name=new_name))
+                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
+            if self.agentType == 3:
+                new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
+            if self.agentType == 4:
+                new_hunters.append(SMAlegAATr(name=new_name))
+            if self.agentType == 5:
+                new_hunters.append(RawO(name=new_name, enhanced=True))
+
+
 
         self.hunters = new_hunters
 
