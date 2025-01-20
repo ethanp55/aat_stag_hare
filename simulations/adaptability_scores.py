@@ -102,11 +102,16 @@ for run_num in range(N_TRAIN_TEST_RUNS):
         val = max(val, 0)
         val = min(val, 1)
         assert 0 <= val <= 1
-        results[agent_name][opp_type] = val
+        if opp_type == 'coop':
+            opp_type_adj = 'coop2' if 'twocopies' in file else 'coop1'
+            results[agent_name][opp_type_adj] = val
+        else:
+            results[agent_name][opp_type] = val
 
     for agent, res, in results.items():
-        defect_score, self_play_score, coop_score = res['greedyhare'], res['selfplay'], res['coop']
-        avg_coop_score = (self_play_score + coop_score) / 2
+        defect_score, self_play_score, coop1_score, coop2_score = \
+            res['greedyhare'], res['selfplay'], res['coop1'], res['coop2']
+        avg_coop_score = (self_play_score + coop1_score + coop2_score) / 3
         adapt_score = min([defect_score, avg_coop_score])
         results_from_every_epoch[agent]['d'] = results_from_every_epoch[agent].get('d', []) + [defect_score]
         results_from_every_epoch[agent]['c'] = results_from_every_epoch[agent].get('c', []) + [avg_coop_score]
