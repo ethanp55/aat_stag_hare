@@ -29,7 +29,7 @@ for file in os.listdir(training_data_folder):
         continue
 
     if is_alignment_vectors:
-        n_zeroes = 10 - data.shape[1]
+        n_zeroes = 12 - data.shape[1]
         data = np.append(data, np.zeros((data.shape[0], n_zeroes)), axis=1)
         if alignment_vectors is None:
             alignment_vectors = data

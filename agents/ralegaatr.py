@@ -68,7 +68,7 @@ class RAlegAATr(Agent):
         self.generator_to_use_idx = None
 
         # DQN model and target model
-        self.state_dim = 10 + 10 + 9 + 9
+        self.state_dim = 12 + 12 + 9 + 9
         self.action_dim = len(self.generator_indices)
         self.model = DQN(self.state_dim, self.action_dim)
         self.target_model = DQN(self.state_dim, self.action_dim)
@@ -144,6 +144,9 @@ class RAlegAATr(Agent):
         #     print(f'Generators used: {self.generators_used}')
 
         return token_allocations
+
+    def is_hunting_hare(self) -> bool:
+        return self.generator_pool.hunting_hare(self.generator_to_use_idx)
 
     def update_networks(self) -> None:
         # Update target network weights periodically

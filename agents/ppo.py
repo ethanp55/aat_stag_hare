@@ -126,6 +126,9 @@ class PPO(Agent):
 
         return token_allocations
 
+    def is_hunting_hare(self) -> bool:
+        return self.generator_pool.hunting_hare(self.generator_to_use_idx)
+
     def train(self) -> None:
         # Extract historical data
         batch = random.sample(self.replay_buffer, len(self.replay_buffer))

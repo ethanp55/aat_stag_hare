@@ -213,3 +213,6 @@ class Modeller(Agent):
                         new_row, new_col, min_dist = next_row, next_col, dist
 
         return new_row, new_col
+
+    def is_hunting_hare(self) -> bool:
+        return False

@@ -29,6 +29,9 @@ class State:
                     self.agent_positions[agent_name] = (row_index, col_index)
                     break
 
+        # Map that keeps track of which agents (if any) are hunting the hare - required for termination conditions
+        self.hunting_hare_map = None
+
     def __hash__(self):
         return hash(str(self.grid))
 
@@ -126,7 +129,7 @@ class State:
 
         return self.grid[row][col] == AVAILABLE
 
-    def hunter_in_position(self, row_val: int, col_val: int) -> bool:
+    def hunter_ready_to_kill(self, row_val: int, col_val: int, hare: bool) -> bool:
         row, col = self.adjust_vals(row_val, col_val)
         hare_row, hare_col = self.agent_positions[HARE_NAME]
         stag_row, stag_col = self.agent_positions[STAG_NAME]
@@ -135,7 +138,16 @@ class State:
         not_stag = (row, col) != (stag_row, stag_col)
         occupied = self.grid[row][col] != AVAILABLE
 
-        return occupied and not_hare and not_stag
+        # If there is a hunter in position, check their intent
+        if occupied and not_hare and not_stag:
+            for name, (r, c) in self.agent_positions.items():
+                if (r, c) == (row, col):
+                    hunting_hare = self.hunting_hare_map[name] if self.hunting_hare_map is not None else True
+                    hunting_stag = not hunting_hare if self.hunting_hare_map is not None else True
+
+                    return (hare and hunting_hare) or (not hare and hunting_stag)
+
+        return False
 
     def neighboring_positions(self, curr_row: int, curr_col: int,
                               filter_availability: bool = True) -> List[Tuple[int, int]]:
@@ -178,6 +190,9 @@ class State:
         n_movements = self.n_movements(row1, col1, row2, col2)
 
         return n_movements <= MAX_MOVEMENT_UNITS
+
+    def update_intent(self, hunting_hare_map: Dict[str, bool]) -> None:
+        self.hunting_hare_map = hunting_hare_map
 
     def process_actions(self, action_map: Dict[str, Tuple[int, int]]) -> List[float]:
         for agent_name, tup in action_map.items():
@@ -222,11 +237,13 @@ class State:
                     continue
 
                 row, col = self.agent_positions[agent_name]
+                hunting_hare = self.hunting_hare_map[agent_name]
+                hunting_stag = not hunting_hare
 
-                if self.neighbors(row, col, hare_row, hare_col):
+                if self.neighbors(row, col, hare_row, hare_col) and hunting_hare:
                     hare_hunters.add(agent_name)
 
-                if self.neighbors(row, col, stag_row, stag_col):
+                if self.neighbors(row, col, stag_row, stag_col) and hunting_stag:
                     stag_hunters.add(agent_name)
 
             # Distribute the rewards to the hunters
@@ -253,7 +270,7 @@ class State:
                 else:
                     new_row, new_col = curr_row, curr_col + delta
 
-                n_hunter_neighbors += 1 if self.hunter_in_position(new_row, new_col) else 0
+                n_hunter_neighbors += 1 if self.hunter_ready_to_kill(new_row, new_col, hare=True) else 0
 
         return n_hunter_neighbors >= N_REQUIRED_TO_CAPTURE_HARE
 
@@ -271,7 +288,7 @@ class State:
                 else:
                     new_row, new_col = curr_row, curr_col + delta
 
-                n_hunter_neighbors += 1 if self.hunter_in_position(new_row, new_col) else 0
+                n_hunter_neighbors += 1 if self.hunter_ready_to_kill(new_row, new_col, hare=False) else 0
 
         return n_hunter_neighbors >= N_REQUIRED_TO_CAPTURE_STAG
 

@@ -172,6 +172,9 @@ class SOAleqgAATr(Agent):
 
         return token_allocations
 
+    def is_hunting_hare(self) -> bool:
+        return self.generator_pool.hunting_hare(self.generator_to_use_idx)
+
     def update_networks(self) -> None:
         # Update target network weights periodically
         self.target_model.set_weights(self.model.get_weights())

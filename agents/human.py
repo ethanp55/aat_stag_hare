@@ -24,3 +24,6 @@ class humanAgent:
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         return self.row_to_return, self.col_to_return
 
+    def is_hunting_hare(self) -> bool:
+        return False
+

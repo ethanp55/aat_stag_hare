@@ -67,3 +67,6 @@ class TeamAware(Agent):
         goal_row, goal_col = goal
 
         return AStar.find_path(curr_row, curr_col, goal_row, goal_col, state)
+
+    def is_hunting_hare(self) -> bool:
+        return False

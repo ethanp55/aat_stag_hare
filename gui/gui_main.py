@@ -23,9 +23,9 @@ WIDTH = 10
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
-# hunters = [AlegAATr(name='R1', lmbda=0.0, ml_model_type='knn', enhanced=True),
-#            AlegAATr(name='R2', lmbda=0.0, ml_model_type='knn', enhanced=True),
-#            humanAgent(name='H')]
+hunters = [AlegAATr(name='R1', lmbda=0.0, ml_model_type='knn', enhanced=True),
+           AlegAATr(name='R2', lmbda=0.0, ml_model_type='knn', enhanced=True),
+           humanAgent(name='H')]
 # hunters = [DQNAgent(name='R1'),
 #            DQNAgent(name='R2'),
 #            humanAgent(name='H')]
@@ -38,9 +38,9 @@ WHITECOLOR = (255, 255, 255)
 # hunters = [SMAlegAATr(name='R1'),
 #            SMAlegAATr(name='R2'),
 #            humanAgent(name='H')]
-hunters = [RawO(name='R1', enhanced=True),
-           RawO(name='R2', enhanced=True),
-           humanAgent(name='H')]
+# hunters = [RawO(name='R1', enhanced=True),
+#            RawO(name='R2', enhanced=True),
+#            humanAgent(name='H')]
 
 
 SCREEN_WIDTH = 800

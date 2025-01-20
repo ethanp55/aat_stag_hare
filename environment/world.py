@@ -29,7 +29,7 @@ class StagHare:
         # Randomize the order in which the agents will act
         indices = list(range(len(self.agents)))
         np.random.shuffle(indices)
-        action_map = {}
+        action_map, hunting_hare_map = {}, {}
         round_num = self.state.round_num
 
         for i in indices:
@@ -37,12 +37,13 @@ class StagHare:
             reward = 0 if (i == 0 or i == 1) else self.rewards[i]
             new_row, new_col = agent.act(self.state, reward, round_num)
             action_map[agent.name] = (new_row, new_col)
+            hunting_hare_map[agent.name] = agent.is_hunting_hare()
 
         if not self.is_over():
-            self.rewards = self.state.process_actions(action_map) # this is where a lot of the magic happens.
+            self.state.update_intent(hunting_hare_map)
+            self.rewards = self.state.process_actions(action_map)
 
         return self.rewards
-
 
     def is_over(self) -> bool:
         # As soon as one of the prey agents is captured, we're done

@@ -76,3 +76,6 @@ class GreedyProbabilistic(Agent):
         use_md = np.random.choice([True, False], p=[p_md, 1 - p_md])
 
         return md if use_md else md_hat
+
+    def is_hunting_hare(self) -> bool:
+        return True

@@ -11,6 +11,9 @@ class Agent:
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         pass
 
+    def is_hunting_hare(self) -> bool:
+        pass
+
     def random_action(self, state: State) -> Tuple[int, int]:
         curr_row, curr_col = state.agent_positions[self.name]
         movement = np.random.choice(POSSIBLE_MOVEMENTS)

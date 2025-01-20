@@ -82,7 +82,7 @@ class SMAlegAATr(Agent):
 
         for generator_idx in self.generator_indices:
             aat_vec = np.array(self.generator_pool.assumptions(generator_idx)).reshape(-1, 1)
-            n_zeroes = 10 - aat_vec.shape[0]
+            n_zeroes = 12 - aat_vec.shape[0]
             aat_vec = np.append(aat_vec, np.zeros(n_zeroes)).reshape(1, -1)
             aat_vec = self.aat_scaler.transform(aat_vec.reshape(1, -1))
             pred = self.model((aat_vec, curr_state)).numpy()[0][0]
@@ -105,3 +105,6 @@ class SMAlegAATr(Agent):
         #     print(f'Generators used: {self.generators_used}')
 
         return token_allocations
+
+    def is_hunting_hare(self) -> bool:
+        return self.generator_pool.hunting_hare(self.generator_to_use_idx)

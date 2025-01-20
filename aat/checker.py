@@ -115,6 +115,8 @@ class TeamAwareChecker(AssumptionChecker):
         # Assumption estimates
         self.getting_closer_to_stag = 0.0
         self.no_collisions = 1.0
+        self.h1_not_hunting_hare = 0.5
+        self.h2_not_hunting_hare = 0.5
 
         # Previous values (used in estimate calculations)
         self.prev_dist_to_stag = None
@@ -133,11 +135,24 @@ class TeamAwareChecker(AssumptionChecker):
         n_collisions = self._check_collisions(state, STAG_NAME)
         self.no_collisions = 1 - (n_collisions / N_HUNTERS)
 
+        # Check if the other hunters are next to the hare but the game isn't over
+        not_hunting_hare_estimates = []
+        hare_row, hare_col = state.agent_positions[HARE_NAME]
+        for name, (r, c) in state.agent_positions.items():
+            if name == self.name or name == STAG_NAME or name == HARE_NAME:
+                continue
+            not_hunting_hare = 1.0 if state.neighbors(hare_row, hare_col, r, c) and not state.hare_captured() else 0.5
+            not_hunting_hare_estimates.append(not_hunting_hare)
+        assert len(not_hunting_hare_estimates) == N_HUNTERS - 1
+        self.h1_not_hunting_hare, self.h2_not_hunting_hare = \
+            not_hunting_hare_estimates[0], not_hunting_hare_estimates[1]
+
         # Check progress
         self._check_progress(state)
 
     def assumptions(self) -> List[float]:
-        return [self.getting_closer_to_stag, self.no_collisions] + AssumptionChecker.assumptions(self)
+        return [self.getting_closer_to_stag, self.no_collisions, self.h1_not_hunting_hare, self.h2_not_hunting_hare] \
+               + AssumptionChecker.assumptions(self)
 
 
 class GreedyPlannerStagChecker(AssumptionChecker):
@@ -147,6 +162,8 @@ class GreedyPlannerStagChecker(AssumptionChecker):
         # Assumption estimates
         self.getting_closer_to_stag = 0.0
         self.no_collisions = 1.0
+        self.h1_not_hunting_hare = 0.5
+        self.h2_not_hunting_hare = 0.5
 
         # Previous values (used in estimate calculations)
         self.prev_dist_to_stag = None
@@ -165,11 +182,24 @@ class GreedyPlannerStagChecker(AssumptionChecker):
         n_collisions = self._check_collisions(state, STAG_NAME)
         self.no_collisions = 1 - (n_collisions / N_HUNTERS)
 
+        # Check if the other hunters are next to the hare but the game isn't over
+        not_hunting_hare_estimates = []
+        hare_row, hare_col = state.agent_positions[HARE_NAME]
+        for name, (r, c) in state.agent_positions.items():
+            if name == self.name or name == STAG_NAME or name == HARE_NAME:
+                continue
+            not_hunting_hare = 1.0 if state.neighbors(hare_row, hare_col, r, c) and not state.hare_captured() else 0.5
+            not_hunting_hare_estimates.append(not_hunting_hare)
+        assert len(not_hunting_hare_estimates) == N_HUNTERS - 1
+        self.h1_not_hunting_hare, self.h2_not_hunting_hare = \
+            not_hunting_hare_estimates[0], not_hunting_hare_estimates[1]
+
         # Check progress
         self._check_progress(state)
 
     def assumptions(self) -> List[float]:
-        return [self.getting_closer_to_stag, self.no_collisions] + AssumptionChecker.assumptions(self)
+        return [self.getting_closer_to_stag, self.no_collisions, self.h1_not_hunting_hare, self.h2_not_hunting_hare] \
+               + AssumptionChecker.assumptions(self)
 
 
 class GreedyHareChecker(AssumptionChecker):

@@ -71,3 +71,6 @@ class ProbabilisticDestinations(Agent):
 
         # If we have tried multiple iterations and cannot find a place to move, just stay where we are
         return curr_row, curr_col
+
+    def is_hunting_hare(self) -> bool:
+        return True

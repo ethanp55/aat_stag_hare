@@ -61,3 +61,6 @@ class Greedy(Agent):
                 return next_row, next_col
 
         return self.random_action(state)
+
+    def is_hunting_hare(self) -> bool:
+        return self.target == HARE_NAME

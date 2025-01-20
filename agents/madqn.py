@@ -143,6 +143,9 @@ class MADQN(Agent):
 
         return token_allocations
 
+    def is_hunting_hare(self) -> bool:
+        return self.generator_pool.hunting_hare(self.generator_to_use_idx)
+
     def train(self) -> None:
         for i in self.generator_indices:
             batch_size = min(len(self.replay_buffers[i]), self.batch_size)

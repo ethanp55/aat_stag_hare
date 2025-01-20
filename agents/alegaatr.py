@@ -86,7 +86,7 @@ class AlegAATr(Agent):
 
         self.generator_to_use_idx = best_generator_idx
         best_vector = best_vector.reshape(-1, 1)
-        n_zeroes = 10 - best_vector.shape[0]
+        n_zeroes = 12 - best_vector.shape[0]
         best_vector = np.append(best_vector, np.zeros(n_zeroes)).reshape(1, -1)
         self.tracked_vector = best_vector[0, :]
 
@@ -106,7 +106,10 @@ class AlegAATr(Agent):
         done = state.hare_captured() or state.stag_captured()
         if done and self.train:
             self.generator_pool.train_aat(enhanced=True)
-        # if done:
+        # elif done and not self.train:
         #     print(f'Generators used: {self.generators_used}')
 
         return token_allocations
+
+    def is_hunting_hare(self) -> bool:
+        return self.generator_pool.hunting_hare(self.generator_to_use_idx)
