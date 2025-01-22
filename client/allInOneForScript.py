@@ -21,7 +21,7 @@ stag_button = Button(
     fontSize=30, margin=20,
     inactiveColour=(255,0,0),
     pressedColour=(0,255,0), radius=20,
-    onclick=lambda: change_hare(False)
+    onclick=lambda: print("BUTTON CLICKED")
 )
 
 hare_button = Button(
@@ -29,7 +29,7 @@ hare_button = Button(
     fontSize=30, margin=20,
     inactiveColour=(255,0,0),
     pressedColour=(0,255,0), radius=20,
-    onclick=lambda: change_hare(True)
+    onclick=lambda: print("BUTTON CLICKED")
 )
 
 
@@ -107,7 +107,6 @@ def game_loop(client_socket):
     global client_ID
     server_response = None
     data = client_socket.recv(65535)
-    print("are things happenign at all?)(")
     try:  # get the stuff first
         # Deserialize the JSON response from the server
         server_response = json.loads(data.decode())
@@ -359,7 +358,7 @@ def set_username(client_socket, clock, username):
 
         # display.flip() will update only a portion of the
         # screen to updated, not full area
-        pygame.display.flip()
+        pygame.display.update()
 
         # clock.tick(60) means that for every second at most
         # 60 frames should be passed.
@@ -370,8 +369,10 @@ def set_username(client_socket, clock, username):
 
 
 def change_hare(new_value):
+    global preference
+    print("This is our current preference! ", preference)
     preference = new_value
-
+    print("This is our current preference! ", preference)
 
 # yes I know it should put this in its own file, its just a pain to export as an EXE if its not all one script. Its a pain.
 class Enemy(pygame.sprite.Sprite):
