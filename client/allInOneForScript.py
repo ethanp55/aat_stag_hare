@@ -1,11 +1,37 @@
 import socket
 import json
 import pygame
+import pygame_widgets
+from pygame_widgets.button import Button
+
 
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 import time
+
+pygame.font.init()
+font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
+font_color = (0,0,0)
+leaderboard_font = pygame.font.Font(None, 64)
+leaderboard_font_color = (0,0,0)
+
+stag_button = Button(
+    SCREEN, 700, 700, 30, 30, text="stag",
+    fontSize=30, margin=20,
+    inactiveColour=(255,0,0),
+    pressedColour=(0,255,0), radius=20,
+    onclick=lambda: change_hare(False)
+)
+
+hare_button = Button(
+    SCREEN, 700, 750, 30, 30, text="hare",
+    fontSize=30, margin=20,
+    inactiveColour=(255,0,0),
+    pressedColour=(0,255,0), radius=20,
+    onclick=lambda: change_hare(True)
+)
+
 
 # self.surf.fill = hare_sprite thats how you could do it if you wanted to use color tiles instead of sprites. 
 
@@ -21,11 +47,7 @@ other_hunter = pygame.image.load("other_hunter.png")
 # player_color = (45, 135, 35)
 # player_2_color = (39, 194, 21)
 
-pygame.font.init()
-font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
-font_color = (0,0,0)
-leaderboard_font = pygame.font.Font(None, 64)
-leaderboard_font_color = (0,0,0)
+
 
 
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
@@ -85,6 +107,7 @@ def game_loop(client_socket):
     global client_ID
     server_response = None
     data = client_socket.recv(65535)
+    print("are things happenign at all?)(")
     try:  # get the stuff first
         # Deserialize the JSON response from the server
         server_response = json.loads(data.decode())
@@ -92,10 +115,13 @@ def game_loop(client_socket):
     except json.JSONDecodeError:
         pass
 
+
     if server_response != None:
 
         if "LEADERBOARD" in server_response:
             draw_leaderboard(server_response["LEADERBOARD"])
+
+
         else:
             if "message" in server_response:
                 client_ID = server_response["CLIENT_ID"]
@@ -105,8 +131,10 @@ def game_loop(client_socket):
     message = {
         "NEW_INPUT": None,
     }
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.KEYDOWN:
+            print("We have received an input")
             pressed_keys = pygame.key.get_pressed()
             message = {
                 "NEW_INPUT": adjust_position(pressed_keys),
@@ -117,6 +145,8 @@ def game_loop(client_socket):
             pygame.quit()
         break
 
+    pygame_widgets.update(events)
+    pygame.display.update()
     client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
 
 
@@ -338,6 +368,9 @@ def set_username(client_socket, clock, username):
     username = True
     return username
 
+
+def change_hare(new_value):
+    preference = new_value
 
 
 # yes I know it should put this in its own file, its just a pain to export as an EXE if its not all one script. Its a pain.
