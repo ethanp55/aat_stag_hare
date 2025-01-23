@@ -47,12 +47,14 @@ class gameInstance():
     def main_game_loop(self):
         while True:
             client_input = {}
+            client_intent = {}
             while True:
                 self.send_state()  # sends out the current game state
                 data = self.get_client_data()
                 for client, received_json in data.items():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
+                        client_intent[self.client_id_dict[client]] = received_json["INTENT"]
 
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):

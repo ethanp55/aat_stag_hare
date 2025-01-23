@@ -145,6 +145,7 @@ def game_loop(client_socket):
             message = {
                 "NEW_INPUT": adjust_position(pressed_keys),
                 "CLIENT_ID": client_ID,
+                "INTENT" : active_button
             }
 
         if event.type == pygame.QUIT:
