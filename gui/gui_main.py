@@ -1,6 +1,7 @@
 from operator import truediv
 
 import pygame
+import pygame_widgets
 import sys
 import time
 from pygame import K_ESCAPE
@@ -15,6 +16,7 @@ from agents.qalegaatr import QAlegAATr
 from agents.aleqgaatr import AleqgAATr
 from agents.smalegaatr import SMAlegAATr
 from agents.rawo import RawO
+from pygame_widgets.button import Button
 
 PAUSE_TIME = 3
 HEIGHT = 10
@@ -46,13 +48,22 @@ hunters = [AlegAATr(name='R1', lmbda=0.0, ml_model_type='knn', enhanced=True),
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 
+# for the sake of ease, hare is false and stag is true. considered false by default
+preference = False
+
+
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
+
+
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
     K_UP,
     K_DOWN,
     K_LEFT,
     K_RIGHT,
 )
+
+def change_hare(new_value):
+    preference = new_value
 
 
 def main():
@@ -79,6 +90,7 @@ def main():
 
         state = stag_hare.return_state()
 
+        events = pygame.event.get()
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
@@ -96,6 +108,8 @@ def main():
                 for i, reward in enumerate(round_rewards):
                     rewards[i] += reward
 
+
+
             for agent in state.agent_positions:
                 if agent == 'hare':
                     hare.update(SCREEN, state.agent_positions[agent])
@@ -111,11 +125,16 @@ def main():
                     this_player.update(SCREEN, state.agent_positions[agent])
 
 
-            pygame.display.update()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:  # gives us a way to stop execution.
                     running = False
+
+
+
+
+
+
 
         if stag_hare.is_over():
             if stag_hare.state.hare_captured():
@@ -125,6 +144,7 @@ def main():
             pygame.display.update()
             time.sleep(PAUSE_TIME)
             running = False
+
 
 
 def draw_grid(height, width): # draws the grid on every frame just so we have it.

@@ -1,11 +1,41 @@
 import socket
 import json
 import pygame
+import pygame_widgets
+from pygame_widgets.button import Button
+
 
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 import time
+
+
+
+pygame.font.init()
+font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
+font_color = (0,0,0)
+leaderboard_font = pygame.font.Font(None, 64)
+leaderboard_font_color = (0,0,0)
+
+stag_button = Button(
+    SCREEN, 700, 700, 30, 30, text="stag",
+    fontSize=30, margin=20,
+    inactiveColour=(255,0,0),
+    pressedColour=(0,255,0), radius=20,
+    onClick=lambda: set_active_button("stag")
+)
+
+hare_button = Button(
+    SCREEN, 700, 750, 30, 30, text="hare",
+    fontSize=30, margin=20,
+    inactiveColour=(255,0,0),
+    pressedColour=(0,255,0), radius=20,
+    onClick=lambda: set_active_button("hare")
+)
+
+active_button = "hare" # WHEEE
+
 
 # self.surf.fill = hare_sprite thats how you could do it if you wanted to use color tiles instead of sprites. 
 
@@ -21,11 +51,10 @@ other_hunter = pygame.image.load("other_hunter.png")
 # player_color = (45, 135, 35)
 # player_2_color = (39, 194, 21)
 
-pygame.font.init()
-font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
-font_color = (0,0,0)
-leaderboard_font = pygame.font.Font(None, 64)
-leaderboard_font_color = (0,0,0)
+def set_active_button(button_text):
+    global active_button
+    active_button = button_text
+
 
 
 from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
@@ -92,10 +121,13 @@ def game_loop(client_socket):
     except json.JSONDecodeError:
         pass
 
+
     if server_response != None:
 
         if "LEADERBOARD" in server_response:
             draw_leaderboard(server_response["LEADERBOARD"])
+
+
         else:
             if "message" in server_response:
                 client_ID = server_response["CLIENT_ID"]
@@ -105,18 +137,33 @@ def game_loop(client_socket):
     message = {
         "NEW_INPUT": None,
     }
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.KEYDOWN:
+            print("We have received an input")
             pressed_keys = pygame.key.get_pressed()
             message = {
                 "NEW_INPUT": adjust_position(pressed_keys),
                 "CLIENT_ID": client_ID,
+                "INTENT" : active_button
             }
 
         if event.type == pygame.QUIT:
             pygame.quit()
         break
 
+
+    pygame_widgets.update(events)
+
+    if active_button == "stag":
+        stag_button.inactiveColour = (0, 255, 0)
+        hare_button.inactiveColour = (255,0,0)
+    if active_button == "hare":
+        hare_button.inactiveColour = (0, 255, 0)
+        stag_button.inactiveColour = (255, 0, 0)
+
+
+    pygame.display.update()
     client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
 
 
@@ -138,7 +185,7 @@ def draw_leaderboard(new_leaderboard):
         new_dest[1] = slot * 140
 
         SCREEN.blit(txt_surf, new_dest)
-    pygame.display.update()
+#   pygame.display.update()
 
 
 
@@ -198,6 +245,7 @@ def print_board(msg):
             stag_dead = msg["GAME_OVER"]["STAG_DEAD"]
         if "HARE_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["HARE_DEAD"]:
             hare_dead = msg["GAME_OVER"]["HARE_DEAD"]
+    #print("this is the stag dead and hare_dead variables ", stag_dead, " ", hare_dead)
 
     if "AGENT_POSITIONS" in msg:
         agents_positions = msg["AGENT_POSITIONS"]
@@ -218,7 +266,7 @@ def print_board(msg):
     if "GAME_ENDED" in msg:
         draw_game_over()
 
-    pygame.display.update()
+    #pygame.display.update()
 
 def calculate_points(big_dict, agents):
     for i in range(3): # all possible players
@@ -329,7 +377,7 @@ def set_username(client_socket, clock, username):
 
         # display.flip() will update only a portion of the
         # screen to updated, not full area
-        pygame.display.flip()
+        pygame.display.update()
 
         # clock.tick(60) means that for every second at most
         # 60 frames should be passed.
@@ -339,6 +387,11 @@ def set_username(client_socket, clock, username):
     return username
 
 
+def change_hare(new_value):
+    global preference
+    print("This is our current preference! ", preference)
+    preference = new_value
+    print("This is our current preference! ", preference)
 
 # yes I know it should put this in its own file, its just a pain to export as an EXE if its not all one script. Its a pain.
 class Enemy(pygame.sprite.Sprite):
@@ -390,6 +443,7 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.surf = self.original_surf.copy()
             screen.blit(self.surf, new_position) # so this one works.
+        pygame.display.update(self.rect)
 
     def update_alive(self):
         self.surf = self.original_surf

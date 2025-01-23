@@ -2,7 +2,6 @@ from agents.agent import Agent
 from agents.generator import GreedyHareGen, GreedyPlannerHareGen, GreedyPlannerStagGen, TeamAwareGen
 import csv
 from environment.state import State
-import fcntl
 import numpy as np
 from typing import List
 
@@ -98,27 +97,27 @@ class GeneratorPool(Agent):
                     file_path = f'../aat/training_data/generator_{generator_idx}_sin_c_vectors{adjustment}.csv'
 
                     with open(file_path, 'a', newline='') as file:
-                        fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
                         writer = csv.writer(file)
                         writer.writerow(alignment_vector)
-                        fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
 
                     # Store the state
                     assert state is not None
                     file_path = f'../aat/training_data/generator_{generator_idx}_sin_c_states{adjustment}.csv'
                     with open(file_path, 'a', newline='') as file:
-                        fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
                         writer = csv.writer(file)
                         writer.writerow(state)
-                        fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
 
                     # Store the discounted reward
                     file_path = f'../aat/training_data/generator_{generator_idx}_sin_c_correction_terms{adjustment}.csv'
                     with open(file_path, 'a', newline='') as file:
-                        fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
                         writer = csv.writer(file)
                         writer.writerow([discounted_reward])
-                        fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
 
                 else:
                     # Store the alignment vector
@@ -126,18 +125,18 @@ class GeneratorPool(Agent):
                     file_path = f'../aat/training_data/generator_{generator_idx}_vectors{adjustment}.csv'
 
                     with open(file_path, 'a', newline='') as file:
-                        fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
                         writer = csv.writer(file)
                         writer.writerow(alignment_vector)
-                        fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
 
                     # Store the correction term
                     file_path = f'../aat/training_data/generator_{generator_idx}_correction_terms{adjustment}.csv'
                     with open(file_path, 'a', newline='') as file:
-                        fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_EX)  # Lock the file (for write safety)
                         writer = csv.writer(file)
                         writer.writerow([correction_term])
-                        fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
+                        #fcntl.flock(file.fileno(), fcntl.LOCK_UN)  # Unlock the file
 
     def assumptions(self, generator_idx: int) -> List[float]:
         return self.generators[generator_idx].assumptions()
