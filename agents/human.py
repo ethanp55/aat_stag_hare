@@ -16,7 +16,7 @@ class humanAgent:
     def __init__(self, name) -> None:
         Agent.__init__(self, name)
         self.name = name
-        self.is_hunting_hare = True # want it to be true by default, seems either that way.
+        self.hunting_hare = True # really close but needed the name to be different.
         self.row_to_return, self.col_to_return = None, None
 
     def set_next_action(self, new_row, new_col) -> None:
@@ -27,10 +27,10 @@ class humanAgent:
 
     def set_hare_hunting(self, new_value): # new value is either hare or stag.
         if new_value == "hare":
-            self.is_hunting_hare = True
+            self.hunting_hare = True
         else:
-            self.is_hunting_hare = False
+            self.hunting_hare = False
 
     def is_hunting_hare(self) -> bool:
-        return self.is_hunting_hare
+        return self.hunting_hare
 

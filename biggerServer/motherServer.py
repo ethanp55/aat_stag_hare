@@ -11,7 +11,6 @@ from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
 from server import enemy
-from gameServer import GameServer
 import gameServer
 
 
@@ -74,7 +73,7 @@ def start_server(host='127.0.0.1', port=12345):
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
             # passes down the new player list, calls that object (so we should now be cooking) and then clears out the stuff. Do I need to make threads?
             new_player_list = copy.copy(connected_clients)
-            GameServer(new_player_list, client_id_dict, client_usernames)
+            gameServer.GameServer(new_player_list, client_id_dict, client_usernames)
             connected_clients.clear()
             client_id_dict.clear()
             client_usernames.clear()

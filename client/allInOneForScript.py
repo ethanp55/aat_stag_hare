@@ -91,6 +91,9 @@ def start_client():
     pygame.init()  # actually starts the game.
     # Create a TCP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    client_socket.settimeout(5.0)
+
     # Connect to the server
     client_socket.connect((host, port))
     # Send data to the server

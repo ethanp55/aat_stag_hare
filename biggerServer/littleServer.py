@@ -9,6 +9,7 @@ from agents.dqn import DQNAgent
 from agents.qalegaatr import QAlegAATr
 from agents.smalegaatr import SMAlegAATr
 from agents.rawo import RawO
+from biggerServer.motherServer import client_usernames
 
 PAUSE_TIME = 5
 HEIGHT = 3
@@ -62,7 +63,7 @@ class gameInstance():
 
 
 
-            running = self.stag_hunt_game_loop(self.player_points, client_input)
+            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent)
             if running == False:
                 break
             client_input.clear()
@@ -108,11 +109,11 @@ class gameInstance():
                 pass
         return data
 
-    def stag_hunt_game_loop(self, player_points, player_input):
+    def stag_hunt_game_loop(self, player_points, player_input, client_intent):
 
         rewards = [0] * (len(self.hunters) + 2)
 
-        self.next_round(rewards, player_input)
+        self.next_round(rewards, player_input, client_intent)
 
         self.send_state()
 
@@ -175,14 +176,15 @@ class gameInstance():
                 self.round += 1
                 self.reset_stag_hare()
 
-    def next_round(self, rewards, new_positions):
+    def next_round(self, rewards, new_positions, client_intent):
         for client_id in new_positions:
             client_agent = "H" + str((self.client_id_list.index(client_id))+1) # once again, off by one error
             current_position = self.stag_hare.state.agent_positions[client_agent]
             new_tuple_row = new_positions[client_id][0] + current_position[0]
             new_tuple_col = new_positions[client_id][1] + current_position[1]
+
             self.hunters[self.client_id_list.index(client_id)].set_next_action(new_tuple_row, new_tuple_col) # change that up
-            self.hunters[self.client_id_dict.index(client_id)].
+            self.hunters[self.client_id_list.index(client_id)].set_hare_hunting(client_intent[client_id])
 
         for i in range(3 - len(new_positions)): # confusing pausing timimg thingy.
             time.sleep(random.random()) # should let me do some tit for tat pausing.
