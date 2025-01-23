@@ -116,37 +116,40 @@ class gameInstance():
 
         if self.stag_hare.is_over():
             timer = Timer(2) # well fetch thats not going to get fixed is it.
+
+            # formualtes the server response to client.
             hare_dead = False
             stag_dead = False
-            while True:
 
-                if self.stag_hare.state.hare_captured():
-                    self.find_hunter_hare()
-                    hare_dead = True
-                else:
-                    self.find_hunter_stag()
-                    stag_dead = True
+            if self.stag_hare.state.hare_captured():
+                self.find_hunter_hare()
+                hare_dead = True
+            else:
+                self.find_hunter_stag()
+                stag_dead = True
 
-                small_dict = {}  # helps me know who to light up red on death.
-                small_dict["HARE_DEAD"] = hare_dead
-                small_dict["STAG_DEAD"] = stag_dead
+            small_dict = {}  # helps me know who to light up red on death.
+            small_dict["HARE_DEAD"] = hare_dead
+            small_dict["STAG_DEAD"] = stag_dead
 
-                points_to_send = dict(player_points)
-                current_state = self.create_current_state()
+            points_to_send = dict(player_points)
+            current_state = self.create_current_state()
+            response = {
+                "AGENT_POSITIONS": current_state,
+                "POINTS": dict(points_to_send),
+                "CURR_ROUND": self.round,
+                "GAME_OVER": small_dict,
+                "HEIGHT": HEIGHT,
+                "WIDTH": WIDTH,
+            }
+
+            while True: # send out the packet for 2 seconds.
+                print("this is the small dict that we are sending out ", small_dict)
                 for client in self.connected_clients:  # does this update the points correctly?
-                    response = {
-                        "AGENT_POSITIONS": current_state,
-                        "POINTS": dict(points_to_send),
-                        "CURR_ROUND": self.round,
-                        "GAME_OVER": small_dict,
-                        "HEIGHT" : HEIGHT,
-                        "WIDTH" : WIDTH,
-                    }
-
                     new_message = json.dumps(response).encode()
                     self.connected_clients[client].send(new_message)
 
-                if timer.time_out(): # import timer at some point.
+                if timer.time_out(): # break out of the while loop after 2 seconds based on timer.
                     break
 
             if self.round == self.max_rounds: #

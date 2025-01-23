@@ -10,6 +10,8 @@ SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 import time
 
+
+
 pygame.font.init()
 font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
 font_color = (0,0,0)
@@ -21,7 +23,7 @@ stag_button = Button(
     fontSize=30, margin=20,
     inactiveColour=(255,0,0),
     pressedColour=(0,255,0), radius=20,
-    onclick=lambda: print("BUTTON CLICKED")
+    onClick=lambda: print('Click')
 )
 
 hare_button = Button(
@@ -29,8 +31,10 @@ hare_button = Button(
     fontSize=30, margin=20,
     inactiveColour=(255,0,0),
     pressedColour=(0,255,0), radius=20,
-    onclick=lambda: print("BUTTON CLICKED")
+    onClick=lambda: print('Click')
 )
+
+active_button = "hare" # WHEEE
 
 
 # self.surf.fill = hare_sprite thats how you could do it if you wanted to use color tiles instead of sprites. 
@@ -47,6 +51,9 @@ other_hunter = pygame.image.load("other_hunter.png")
 # player_color = (45, 135, 35)
 # player_2_color = (39, 194, 21)
 
+def set_active_button(button_text):
+    global active_button
+    active_button = button_text
 
 
 
@@ -144,6 +151,7 @@ def game_loop(client_socket):
             pygame.quit()
         break
 
+
     pygame_widgets.update(events)
     pygame.display.update()
     client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
@@ -167,7 +175,7 @@ def draw_leaderboard(new_leaderboard):
         new_dest[1] = slot * 140
 
         SCREEN.blit(txt_surf, new_dest)
-    pygame.display.update()
+#   pygame.display.update()
 
 
 
@@ -227,6 +235,7 @@ def print_board(msg):
             stag_dead = msg["GAME_OVER"]["STAG_DEAD"]
         if "HARE_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["HARE_DEAD"]:
             hare_dead = msg["GAME_OVER"]["HARE_DEAD"]
+    #print("this is the stag dead and hare_dead variables ", stag_dead, " ", hare_dead)
 
     if "AGENT_POSITIONS" in msg:
         agents_positions = msg["AGENT_POSITIONS"]
@@ -247,7 +256,7 @@ def print_board(msg):
     if "GAME_ENDED" in msg:
         draw_game_over()
 
-    pygame.display.update()
+    #pygame.display.update()
 
 def calculate_points(big_dict, agents):
     for i in range(3): # all possible players
@@ -424,6 +433,7 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.surf = self.original_surf.copy()
             screen.blit(self.surf, new_position) # so this one works.
+        pygame.display.update(self.rect)
 
     def update_alive(self):
         self.surf = self.original_surf
