@@ -23,7 +23,7 @@ stag_button = Button(
     fontSize=30, margin=20,
     inactiveColour=(255,0,0),
     pressedColour=(0,255,0), radius=20,
-    onClick=lambda: print('Click')
+    onClick=lambda: set_active_button("stag")
 )
 
 hare_button = Button(
@@ -31,7 +31,7 @@ hare_button = Button(
     fontSize=30, margin=20,
     inactiveColour=(255,0,0),
     pressedColour=(0,255,0), radius=20,
-    onClick=lambda: print('Click')
+    onClick=lambda: set_active_button("hare")
 )
 
 active_button = "hare" # WHEEE
@@ -153,6 +153,15 @@ def game_loop(client_socket):
 
 
     pygame_widgets.update(events)
+
+    if active_button == "stag":
+        stag_button.inactiveColour = (0, 255, 0)
+        hare_button.inactiveColour = (255,0,0)
+    if active_button == "hare":
+        hare_button.inactiveColour = (0, 255, 0)
+        stag_button.inactiveColour = (255, 0, 0)
+
+
     pygame.display.update()
     client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
 
