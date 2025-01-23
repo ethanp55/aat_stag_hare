@@ -4,7 +4,11 @@ import json
 
 import time # tit for tat pausing?
 
-#from agents.dqn import *
+from agents.alegaatr import AlegAATr
+from agents.dqn import DQNAgent
+from agents.qalegaatr import QAlegAATr
+from agents.smalegaatr import SMAlegAATr
+from agents.rawo import RawO
 
 PAUSE_TIME = 5
 HEIGHT = 3
@@ -43,12 +47,14 @@ class gameInstance():
     def main_game_loop(self):
         while True:
             client_input = {}
+            client_intent = {}
             while True:
                 self.send_state()  # sends out the current game state
                 data = self.get_client_data()
                 for client, received_json in data.items():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
+                        client_intent[self.client_id_dict[client]] = received_json["INTENT"]
 
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
@@ -112,37 +118,40 @@ class gameInstance():
 
         if self.stag_hare.is_over():
             timer = Timer(2) # well fetch thats not going to get fixed is it.
+
+            # formualtes the server response to client.
             hare_dead = False
             stag_dead = False
-            while True:
 
-                if self.stag_hare.state.hare_captured():
-                    self.find_hunter_hare()
-                    hare_dead = True
-                else:
-                    self.find_hunter_stag()
-                    stag_dead = True
+            if self.stag_hare.state.hare_captured():
+                self.find_hunter_hare()
+                hare_dead = True
+            else:
+                self.find_hunter_stag()
+                stag_dead = True
 
-                small_dict = {}  # helps me know who to light up red on death.
-                small_dict["HARE_DEAD"] = hare_dead
-                small_dict["STAG_DEAD"] = stag_dead
+            small_dict = {}  # helps me know who to light up red on death.
+            small_dict["HARE_DEAD"] = hare_dead
+            small_dict["STAG_DEAD"] = stag_dead
 
-                points_to_send = dict(player_points)
-                current_state = self.create_current_state()
+            points_to_send = dict(player_points)
+            current_state = self.create_current_state()
+            response = {
+                "AGENT_POSITIONS": current_state,
+                "POINTS": dict(points_to_send),
+                "CURR_ROUND": self.round,
+                "GAME_OVER": small_dict,
+                "HEIGHT": HEIGHT,
+                "WIDTH": WIDTH,
+            }
+
+            while True: # send out the packet for 2 seconds.
+                print("this is the small dict that we are sending out ", small_dict)
                 for client in self.connected_clients:  # does this update the points correctly?
-                    response = {
-                        "AGENT_POSITIONS": current_state,
-                        "POINTS": dict(points_to_send),
-                        "CURR_ROUND": self.round,
-                        "GAME_OVER": small_dict,
-                        "HEIGHT" : HEIGHT,
-                        "WIDTH" : WIDTH,
-                    }
-
                     new_message = json.dumps(response).encode()
                     self.connected_clients[client].send(new_message)
 
-                if timer.time_out(): # import timer at some point.
+                if timer.time_out(): # break out of the while loop after 2 seconds based on timer.
                     break
 
             if self.round == self.max_rounds: #
@@ -173,6 +182,7 @@ class gameInstance():
             new_tuple_row = new_positions[client_id][0] + current_position[0]
             new_tuple_col = new_positions[client_id][1] + current_position[1]
             self.hunters[self.client_id_list.index(client_id)].set_next_action(new_tuple_row, new_tuple_col) # change that up
+            self.hunters[self.client_id_dict.index(client_id)].
 
         for i in range(3 - len(new_positions)): # confusing pausing timimg thingy.
             time.sleep(random.random()) # should let me do some tit for tat pausing.
@@ -207,7 +217,15 @@ class gameInstance():
             if self.agentType == 1:
                 new_hunters.append(Random(name=new_name))
             if self.agentType == 2:
-                new_hunters.append(Random(name=new_name))
+                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
+            if self.agentType == 3:
+                new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
+            if self.agentType == 4:
+                new_hunters.append(SMAlegAATr(name=new_name))
+            if self.agentType == 5:
+                new_hunters.append(RawO(name=new_name, enhanced=True))
+
+
 
         self.hunters = new_hunters
 
