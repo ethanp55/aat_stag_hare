@@ -74,23 +74,24 @@ class gameInstance():
         current_state = self.create_current_state()
         send_player_points = self.player_points.copy()
         # lets make a list of all of the connected_clients_ids and use those to generate players
-
+        response = {}
+        response = { # KEEP THIS OUTSIDE THE LOOP PLEASE
+            "HUMAN_AGENTS": len(self.connected_clients),
+            "AI_AGENTS": 3 - len(self.connected_clients),
+            "CLIENT_ID_LIST": self.client_id_list,
+            "AGENT_POSITIONS": current_state,
+            "POINTS": send_player_points,
+            "CURR_ROUND": self.round,
+            "HEIGHT": HEIGHT,
+            "WIDTH": WIDTH,
+        }
 
 
         for client in self.connected_clients:
-            response = {
-                "HUMAN_AGENTS": len(self.connected_clients),
-                "AI_AGENTS": 3-len(self.connected_clients),
-                "CLIENT_ID_LIST" : self.client_id_list,
-                "AGENT_POSITIONS": current_state,
-                "POINTS": send_player_points,
-                "CURR_ROUND": self.round,
-                "HEIGHT" : HEIGHT,
-                "WIDTH" : WIDTH,
-            }
-
             new_message = json.dumps(response).encode()
+            print("This is the new message size ", len(new_message))
             self.connected_clients[client].send(new_message)
+        time.sleep(0.1) # makes sure not to overwhelm the client.
 
     def get_client_data(self):
         ready_to_read, _, _ = select.select(list(self.connected_clients.values()), [], [], 0.1)
@@ -118,7 +119,6 @@ class gameInstance():
         self.send_state()
 
         if self.stag_hare.is_over():
-            timer = Timer(2) # well fetch thats not going to get fixed is it.
 
             # formualtes the server response to client.
             hare_dead = False
@@ -137,6 +137,7 @@ class gameInstance():
 
             points_to_send = dict(player_points)
             current_state = self.create_current_state()
+            response = {}
             response = {
                 "AGENT_POSITIONS": current_state,
                 "POINTS": dict(points_to_send),
@@ -146,30 +147,29 @@ class gameInstance():
                 "WIDTH": WIDTH,
             }
 
-            while True: # send out the packet for 2 seconds.
-                print("this is the small dict that we are sending out ", small_dict)
+            for i in range(4):
                 for client in self.connected_clients:  # does this update the points correctly?
                     new_message = json.dumps(response).encode()
+                    print("This is the new message size ", len(new_message))
                     self.connected_clients[client].send(new_message)
+                time.sleep(0.1) # slow down packet transmission.
 
-                if timer.time_out(): # break out of the while loop after 2 seconds based on timer.
-                    break
+
 
             if self.round == self.max_rounds: #
+                response = {} # clear the response I guess.
+                response = { # KEEP THIS OUTSIDE TEH LOOP
+                    "AGENT_POSITIONS": current_state,
+                    "POINTS": dict(points_to_send),
+                    "CURR_ROUND": self.round,
+                    "GAME_OVER": small_dict,
+                    "GAME_ENDED": True,
+                    "HEIGHT": HEIGHT,
+                    "WIDTH": WIDTH,
+                }
                 for client in self.connected_clients:  # does this update the points correctly?
-                    response = {
-                        "AGENT_POSITIONS": current_state,
-                        "POINTS": dict(points_to_send),
-                        "CURR_ROUND": self.round,
-                        "GAME_OVER": small_dict,
-                        "GAME_ENDED": True,
-                        "HEIGHT" : HEIGHT,
-                        "WIDTH" : WIDTH,
-                    }
-
                     new_message = json.dumps(response).encode()
                     self.connected_clients[client].send(new_message)
-                time.sleep(PAUSE_TIME)
                 return False
 
             else:

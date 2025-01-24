@@ -35,6 +35,7 @@ hare_button = Button(
 )
 
 active_button = "hare" # WHEEE
+buttons_active = True
 
 
 # self.surf.fill = hare_sprite thats how you could do it if you wanted to use color tiles instead of sprites.
@@ -117,6 +118,7 @@ def game_loop(client_socket):
     global client_ID
     server_response = None
     data = client_socket.recv(65535)
+
     try:  # get the stuff first
         # Deserialize the JSON response from the server
         server_response = json.loads(data.decode())
@@ -127,7 +129,10 @@ def game_loop(client_socket):
 
     if server_response != None:
 
+        print("this is the server_response", server_response)
+
         if "LEADERBOARD" in server_response:
+            print("we should be drawing the fetching leaderboard")
             draw_leaderboard(server_response["LEADERBOARD"])
 
 
@@ -155,15 +160,15 @@ def game_loop(client_socket):
             pygame.quit()
         break
 
+    if buttons_active == True:
+        pygame_widgets.update(events)
 
-    pygame_widgets.update(events)
-
-    if active_button == "stag":
-        stag_button.inactiveColour = (0, 255, 0)
-        hare_button.inactiveColour = (255,0,0)
-    if active_button == "hare":
-        hare_button.inactiveColour = (0, 255, 0)
-        stag_button.inactiveColour = (255, 0, 0)
+        if active_button == "stag":
+            stag_button.inactiveColour = (0, 255, 0)
+            hare_button.inactiveColour = (255,0,0)
+        if active_button == "hare":
+            hare_button.inactiveColour = (0, 255, 0)
+            stag_button.inactiveColour = (255, 0, 0)
 
 
     pygame.display.update()
@@ -171,6 +176,7 @@ def game_loop(client_socket):
 
 
 def draw_leaderboard(new_leaderboard):
+    print("Its time to draw the leaderboard")
     SCREEN.fill(WHITECOLOR)
     # ok how the fetch do we want to do this leaderboard.
     # each slot needs: the number, the username, and the points.
