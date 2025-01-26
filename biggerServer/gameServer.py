@@ -25,14 +25,15 @@ class GameServer():
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
 
-        # # # code to test the bots if you need it.
-        current_round = 1
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
-        # all gameplay finished, update points
-        dicts_to_merge = [dict(new_points_1.player_points)]
-        self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
-        points_to_send = self.calc_avg_points(current_round)
-        self.send_leaderboard(points_to_send) # sends out the new fetcher
+        # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
+        # current_round = 1
+        # # players_to_insert_into_game, list of all players, agent_type (as int) and the number of rounds to execute
+        # game_1 = Process(target=self.game_thread,
+        #                  args=(self.create_player_dict_pairs([0], new_clients), q, current_round, 1, 1))
+        # game_2 = Process(target=self.game_thread,
+        #                  args=(self.create_player_dict_pairs([1], new_clients), q, current_round, 1, 1))
+        # games_list = [game_1, game_2]
+        # self.run_games(games_list, q, current_round)
 
         # and boom those are all the possible types that we could need, so thats pretty great.
 
@@ -94,6 +95,7 @@ class GameServer():
 
         self.merge_dicts(dicts_to_merge)
 
+
     def create_player_dict_pairs(self, new_players, new_clients): # new players is a list containing a bunch of indexes, and returns a dict of pairs.
         return_players =  {}
         for player in new_players:
@@ -102,13 +104,27 @@ class GameServer():
             return_players[player_1_key] = player_1_socket
         return return_players
 
+    # def create_player_dict_pairs(self, new_players, new_clients): # new players is a list containing a bunch of indexes, and returns a dict of pairs.
+    #     return_players =  {}
+    #     for player in new_players:
+    #         player_1 = list(new_clients.items())[player]
+    #         player_1_key, player_1_socket = player_1
+    #         return_players[player_1_key] = player_1_socket
+    #     return return_players
+
 
 
     def game_thread(self, new_clients, q, current_round, agent_type, rounds_to_run):
-        print("we should be starting the game here, and here are the new clients, ", new_clients)
         rounds_to_run = rounds_to_run - 1 # off by 1 error
         new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_type, current_round, current_round + rounds_to_run)  # need to somehow include an agent type
         q.put(new_points_1.player_points)
+
+    # up[dated one that isn't working
+    # def game_thread(self, new_clients, q, current_round, agent_type, rounds_to_run):
+    #     print("we should be starting the game here, and here are the new clients, ", new_clients)
+    #     rounds_to_run = rounds_to_run - 1 # off by 1 error
+    #     new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_type, current_round, current_round + rounds_to_run)  # need to somehow include an agent type
+    #     q.put(new_points_1.player_points)
 
     def player_points_initialization(self):
         player_points = {} # have it like this for now see if that changes anything.

@@ -93,7 +93,6 @@ def start_client():
     # Create a TCP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    client_socket.settimeout(5.0)
 
     # Connect to the server
     client_socket.connect((host, port))
