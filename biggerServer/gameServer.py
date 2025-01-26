@@ -44,8 +44,10 @@ class GameServer():
         player_indices_round_1 = [[0], [1]]
         print("attempting to start the game")
         game_1 = Process(target=self.game_thread,
-                         args=(self.create_player_dict_pairs([0, 1], new_clients), q, current_round, 1, 1))
-        games_list = [game_1]
+                         args=(self.create_player_dict_pairs([0], new_clients), q, current_round, 1, 1))
+        game_2 = Process(target=self.game_thread,
+                         args=(self.create_player_dict_pairs([1], new_clients), q, current_round, 1, 1))
+        games_list = [game_1, game_2]
         self.run_games(games_list, q, current_round)
 
         # ***** ROUND 2-4 ***** # human on robot violence - not quite sure how jake wants me to handle this.
