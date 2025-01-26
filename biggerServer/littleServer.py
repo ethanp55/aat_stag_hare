@@ -10,6 +10,7 @@ from agents.qalegaatr import QAlegAATr
 from agents.smalegaatr import SMAlegAATr
 from agents.rawo import RawO
 from biggerServer.motherServer import client_usernames
+from server.udpServer import connected_clients
 
 PAUSE_TIME = 5
 HEIGHT = 3
@@ -71,6 +72,7 @@ class gameInstance():
         return self.adjust_points()
 
     def send_state(self):
+        print("here are teh connected clients ", self.connected_clients)
         current_state = self.create_current_state()
         send_player_points = self.player_points.copy()
         # lets make a list of all of the connected_clients_ids and use those to generate players

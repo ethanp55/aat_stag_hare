@@ -26,13 +26,13 @@ class GameServer():
         q = multiprocessing.Queue()
 
         # # # code to test the bots if you need it.
-        # current_round = 1
-        # new_points_1 = gameInstance(new_clients, self.client_id_dict, 5, 1, 1) # need to somehow include an agent type
-        # # all gameplay finished, update points
-        # dicts_to_merge = [dict(new_points_1.player_points)]
-        # self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
-        # points_to_send = self.calc_avg_points(current_round)
-        # self.send_leaderboard(points_to_send) # sends out the new fetcher
+        current_round = 1
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, 1, 1, 1) # need to somehow include an agent type
+        # all gameplay finished, update points
+        dicts_to_merge = [dict(new_points_1.player_points)]
+        self.merge_dicts(dicts_to_merge) # make a list of all the dicts that we need to merge and go from there
+        points_to_send = self.calc_avg_points(current_round)
+        self.send_leaderboard(points_to_send) # sends out the new fetcher
 
         # and boom those are all the possible types that we could need, so thats pretty great.
 
@@ -40,8 +40,8 @@ class GameServer():
         current_round = 1 # what happens if we try to make this 0. like in all honestly what happens.
         agent_type = 1
         #player_indices_round_1 = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]]
-        #player_indices_round_1 = [[0], [1]]
-        #games_list = self.create_game_processes(player_indices_round_1, current_round, 1, new_clients, q, agent_type)
+        player_indices_round_1 = [[0], [1]]
+        print("attempting to start the game")
         game_1 = Process(target=self.game_thread,
                          args=(self.create_player_dict_pairs([0, 1], new_clients), q, current_round, 1, 1))
         games_list = [game_1]
