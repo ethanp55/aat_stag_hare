@@ -7,18 +7,13 @@ import copy
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
-from agents.random_agent import *
-from agents.human import *
-from environment.world import StagHare
+
 from server import enemy
 import gameServer
 
 
 # NOTE
-HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting (This should be 12 for the full study)
-
-#from agents.alegaatr import AlegAATr
-#from agents.dqn import DQNAgent
+HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting (This should be 12 for the full study)
 
 PAUSE_TIME = 3
 
@@ -35,17 +30,17 @@ round = 1
 HARE_POINTS = 10
 STAG_POINTS = 20
 # these ones always stay the same
-stag = enemy.Enemy("stag", HEIGHT, WIDTH)
-hare = enemy.Enemy("hare", HEIGHT, WIDTH)
+
 # your workstation ip is '192.168.30.17', use local host while at home
 def start_server(host='127.0.0.1', port=12345):
-
+    print("is this going off")
     # Create a TCP socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(12)  # Allow only one connection
 
     while True: # just keeps running and listening for clients, capable of running multiple servers.
+        print("is this what is going pn")
         client_socket, client_address = server_socket.accept()
         connected_clients[len(connected_clients)] = client_socket
         client_id_dict[client_socket] = len(connected_clients)
@@ -72,6 +67,7 @@ def start_server(host='127.0.0.1', port=12345):
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
             # passes down the new player list, calls that object (so we should now be cooking) and then clears out the stuff. Do I need to make threads?
+            print("nnothing should be happenign here yet")
             new_player_list = copy.copy(connected_clients)
             gameServer.GameServer(new_player_list, client_id_dict, client_usernames)
             connected_clients.clear()

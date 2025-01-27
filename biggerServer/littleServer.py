@@ -9,8 +9,6 @@ from agents.dqn import DQNAgent
 from agents.qalegaatr import QAlegAATr
 from agents.smalegaatr import SMAlegAATr
 from agents.rawo import RawO
-from biggerServer.motherServer import client_usernames
-from server.udpServer import connected_clients
 
 PAUSE_TIME = 5
 HEIGHT = 3
@@ -19,8 +17,9 @@ WIDTH = 3
 from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
-import multiprocessing
+
 import random
+print('and of course is this oging off')
 
 class gameInstance():
     def __init__(self, connected_clients, client_id_dict, agentType, round=0):
@@ -38,6 +37,7 @@ class gameInstance():
             client_id_list.append(client+1)
         self.client_id_list = client_id_list
         while True:  # set up stag hunt and avoid weird edgecase
+            print("is this whats gettign thrown")
             stag_hare = StagHare(HEIGHT, WIDTH, self.hunters)
             if not stag_hare.is_over():
                 break

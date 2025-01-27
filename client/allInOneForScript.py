@@ -10,9 +10,9 @@ SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 import time
 
+print("so when is this firing")
 
-
-pygame.font.init()
+pygame.init()  # actually starts the game.
 font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
 font_color = (0,0,0)
 leaderboard_font = pygame.font.Font(None, 64)
@@ -89,7 +89,7 @@ def start_client():
     #host = '192.168.30.17'  # The server's IP address
     host = '127.0.0.1'  # your local host address cause you're working from home.
     port = 12345         # The port number to connect to
-    pygame.init()  # actually starts the game.
+
     # Create a TCP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

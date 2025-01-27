@@ -6,6 +6,7 @@ import multiprocessing
 import json
 import time
 
+print("is this going off in gameserver ")
 
 STAG_POINTS = 20
 HARE_POINTS = 10
@@ -37,21 +38,21 @@ class GameServer():
 
         # and boom those are all the possible types that we could need, so thats pretty great.
 
-        # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
-        current_round = 1 # what happens if we try to make this 0. like in all honestly what happens.
-        agent_type = 1
-        player_indices_round_2 = [[0]] # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
-        self.run_games(games_list, q, current_round)
+        # # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
+        # current_round = 1 # what happens if we try to make this 0. like in all honestly what happens.
+        # agent_type = 1
+        # player_indices_round_2 = [[0]] # start them in the same game
+        # games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        # self.run_games(games_list, q, current_round)
 
 
 
 
         # ***** ROUND 2-4 ***** # human on robot violence - not quite sure how jake wants me to handle this.
-        for i in range(2, 5):
+        for i in range(1, 4):
             current_round = i
             agent_type = 1
-            player_indices_round_2 = [[0]]
+            player_indices_round_2 = [[0], [1]]
             games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
             self.run_games(games_list, q, current_round)
 
