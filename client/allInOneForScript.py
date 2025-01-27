@@ -114,7 +114,7 @@ def start_client():
 
 
 def game_loop(client_socket):
-    global client_ID
+    global client_ID, buttons_active
     server_response = None
     data = client_socket.recv(65535)
 
@@ -128,14 +128,13 @@ def game_loop(client_socket):
 
     if server_response != None:
 
-        print("this is the server_response", server_response)
-
         if "LEADERBOARD" in server_response:
+            buttons_active = False
             print("we should be drawing the fetching leaderboard")
             draw_leaderboard(server_response["LEADERBOARD"])
 
-
         else:
+            buttons_active = True
             if "message" in server_response:
                 client_ID = server_response["CLIENT_ID"]
             if "HUMAN_AGENTS" in server_response:
@@ -159,7 +158,8 @@ def game_loop(client_socket):
             pygame.quit()
         break
 
-    if buttons_active == True:
+    if buttons_active:
+        print("the buttons are considered active")
         pygame_widgets.update(events)
 
         if active_button == "stag":
@@ -168,6 +168,9 @@ def game_loop(client_socket):
         if active_button == "hare":
             hare_button.inactiveColour = (0, 255, 0)
             stag_button.inactiveColour = (255, 0, 0)
+    else:
+        print("the buttons should NOT be active")
+
 
 
     pygame.display.update()
@@ -175,7 +178,7 @@ def game_loop(client_socket):
 
 
 def draw_leaderboard(new_leaderboard):
-    print("Its time to draw the leaderboard")
+
     SCREEN.fill(WHITECOLOR)
     # ok how the fetch do we want to do this leaderboard.
     # each slot needs: the number, the username, and the points.
@@ -242,6 +245,7 @@ def adjust_position(pressed_keys):
 def print_board(msg):
     stag_dead = False
     hare_dead = False
+
     HEIGHT = msg["HEIGHT"]
     WIDTH = msg["WIDTH"]
     if HEIGHT is not None or WIDTH is not None:
