@@ -50,8 +50,7 @@ class GameServer():
         # ***** ROUND 2-4 ***** # human on robot violence - not quite sure how jake wants me to handle this.
         for i in range(2, 5):
             current_round = i
-            rounds_to_run = 1
-            agent_type = 2
+            agent_type = 1
             player_indices_round_2 = [[0]]
             games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
             self.run_games(games_list, q, current_round)

@@ -158,8 +158,7 @@ def game_loop(client_socket):
             pygame.quit()
         break
 
-    if buttons_active:
-        print("the buttons are considered active")
+    if buttons_active: # we need to do this here bc we need access to the events from pygame. really annoying to pass around.
         pygame_widgets.update(events)
 
         if active_button == "stag":
@@ -168,9 +167,6 @@ def game_loop(client_socket):
         if active_button == "hare":
             hare_button.inactiveColour = (0, 255, 0)
             stag_button.inactiveColour = (255, 0, 0)
-    else:
-        print("the buttons should NOT be active")
-
 
 
     pygame.display.update()
