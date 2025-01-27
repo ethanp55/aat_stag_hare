@@ -23,16 +23,16 @@ import multiprocessing
 import random
 
 class gameInstance():
-    def __init__(self, connected_clients, client_id_dict, agentType, round=0, max_rounds=1):
+    def __init__(self, connected_clients, client_id_dict, agentType, round=0):
         self.connected_clients = connected_clients
         self.client_id_dict = client_id_dict
         self.agentType = agentType
         self.create_hunters()
         self.start_round = round # needed for dictionary purposes
-        self.max_rounds = max_rounds # have it be 1 if nothing is given, just becuase.
         self.HUMAN_PLAYERS = len(connected_clients)
         self.AI_AGENTS = 3 - self.HUMAN_PLAYERS
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
+        self.max_rounds = round
         client_id_list = []
         for client in self.connected_clients:
             client_id_list.append(client+1)
@@ -72,7 +72,6 @@ class gameInstance():
         return self.adjust_points()
 
     def send_state(self):
-        print("here are teh connected clients ", self.connected_clients)
         current_state = self.create_current_state()
         send_player_points = self.player_points.copy()
         # lets make a list of all of the connected_clients_ids and use those to generate players
@@ -91,7 +90,6 @@ class gameInstance():
 
         for client in self.connected_clients:
             new_message = json.dumps(response).encode()
-            print("This is the new message size ", len(new_message))
             self.connected_clients[client].send(new_message)
         time.sleep(0.1) # makes sure not to overwhelm the client.
 
@@ -157,7 +155,7 @@ class gameInstance():
                 time.sleep(0.1) # slow down packet transmission.
 
 
-
+            print("this is our round ", self.round, " and this is our max round", self.max_rounds)
             if self.round == self.max_rounds: #
                 response = {} # clear the response I guess.
                 response = { # KEEP THIS OUTSIDE TEH LOOP
@@ -172,6 +170,7 @@ class gameInstance():
                 for client in self.connected_clients:  # does this update the points correctly?
                     new_message = json.dumps(response).encode()
                     self.connected_clients[client].send(new_message)
+                time.sleep(2) # when game ends, give them a second to realize that it has, in fact, ended.
                 return False
 
             else:

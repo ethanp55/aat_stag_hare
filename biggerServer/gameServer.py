@@ -25,7 +25,7 @@ class GameServer():
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
 
-        # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
+        # # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
         # current_round = 1
         # # players_to_insert_into_game, list of all players, agent_type (as int) and the number of rounds to execute
         # game_1 = Process(target=self.game_thread,
@@ -40,23 +40,20 @@ class GameServer():
         # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
         current_round = 1 # what happens if we try to make this 0. like in all honestly what happens.
         agent_type = 1
-        #player_indices_round_1 = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]]
-        player_indices_round_1 = [[0], [1]]
-        print("attempting to start the game")
-        game_1 = Process(target=self.game_thread,
-                         args=(self.create_player_dict_pairs([0], new_clients), q, current_round, 1, 1))
-        game_2 = Process(target=self.game_thread,
-                         args=(self.create_player_dict_pairs([1], new_clients), q, current_round, 1, 1))
-        games_list = [game_1, game_2]
+        player_indices_round_2 = [[0]] # start them in the same game
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
+
+
+
 
         # ***** ROUND 2-4 ***** # human on robot violence - not quite sure how jake wants me to handle this.
         for i in range(2, 5):
             current_round = i
             rounds_to_run = 1
             agent_type = 2
-            player_indices_round_2 = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [10, 11]]
-            games_list = self.create_game_processes(player_indices_round_2, current_round, rounds_to_run, new_clients, q, agent_type)
+            player_indices_round_2 = [[0]]
+            games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
             self.run_games(games_list, q, current_round)
 
         # # ***** ROUND 5-7 ***** # each playa get the own game with they own robots
@@ -66,17 +63,23 @@ class GameServer():
             rounds_to_run = 1
             agent_type = 3
             player_indices_round_2 = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [10, 11]]
-            games_list = self.create_game_processes(player_indices_round_2, current_round, rounds_to_run, new_clients, q,
+            games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q,
                                                     agent_type)
             self.run_games(games_list, q, current_round)
 
 
+    def create_game_processes(self, player_indices, current_round, new_clients, q, agent_type):
+        games_list = []
 
-    def create_game_processes(self, player_indices, current_round, rounds_to_run, new_clients, q, agent_type):
-        return [
-            Process(target=self.game_thread, args = (self.create_player_dict_pairs(player_indices, new_clients), q, current_round, agent_type, rounds_to_run))
-            for index in player_indices
-        ]
+        for indices in player_indices:
+            # Create a new process for each list of indices
+            game_process = Process(target=self.game_thread,
+                                   args=(
+                                   self.create_player_dict_pairs(indices, new_clients), q, current_round,
+                                   agent_type))
+            games_list.append(game_process)
+
+        return games_list
 
     def run_games(self, games_list, q, current_round):
         self.start_and_join_games(games_list, q)
@@ -116,9 +119,8 @@ class GameServer():
 
 
 
-    def game_thread(self, new_clients, q, current_round, agent_type, rounds_to_run):
-        rounds_to_run = rounds_to_run - 1 # off by 1 error
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_type, current_round, current_round + rounds_to_run)  # need to somehow include an agent type
+    def game_thread(self, new_clients, q, current_round, agent_type):
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_type, current_round)  # need to somehow include an agent type
         q.put(new_points_1.player_points)
 
     # up[dated one that isn't working
