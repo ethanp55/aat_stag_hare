@@ -118,8 +118,10 @@ for run_num in range(N_TRAIN_TEST_RUNS):
         results_from_every_epoch[agent]['a'] = results_from_every_epoch[agent].get('a', []) + [adapt_score]
 
 
-alg_names = ['DQN', 'RAlegAATr', 'AleqgAATr', 'RawO', 'RAAT', 'QAlegAATr', 'AlegAATr']
-alg_plot_names = ['EG-Raw', 'EG-AAT', 'EG-RawAAT', 'REGAE-Raw', 'REGAE-AAT', 'REGAE-RawAAT', 'AlegAATr']
+alg_names = ['DQN', 'RawO', 'RAlegAATr', 'RAAT', 'AleqgAATr', 'QAlegAATr', 'AlegAATr']
+alg_plot_names = ['EG-Raw', 'REGAE-Raw', 'EG-AAT', 'REGAE-AAT', 'EG-RawAAT', 'REGAE-RawAAT', 'AlegAATr']
+colors = ['#ef8a62', '#67a9cf', '#ef8a62', '#67a9cf', '#ef8a62', '#67a9cf', '#999999']
+a_scores, learning_algs, features = [], [], []
 for cond in ['d', 'c', 'a']:
     avgs, ses = [], []
     for alg in alg_names:
@@ -127,11 +129,25 @@ for cond in ['d', 'c', 'a']:
         avgs.append(np.mean(alg_data))
         ses.append(np.std(alg_data, ddof=1) / np.sqrt(len(alg_data)))
 
+        if cond == 'a' and alg != 'AlegAATr':
+            a_scores.extend(alg_data)
+            name = alg_plot_names[alg_names.index(alg)]
+            learning_alg = name.split('-')[0]
+            feature_set = name.split('-')[1]
+            learning_algs.extend([learning_alg] * len(alg_data))
+            features.extend([feature_set] * len(alg_data))
+
     plt.figure(figsize=(10, 3))
     plt.grid()
-    plt.bar(alg_plot_names, avgs, yerr=ses, capsize=5)
+    plt.bar(alg_plot_names, avgs, yerr=ses, capsize=5, color=colors)
     plt.xlabel('Algorithm', fontsize=18, fontweight='bold')
     plt.ylabel('Score', fontsize=18, fontweight='bold')
     plt.savefig(f'../simulations/{cond}.png', bbox_inches='tight')
     plt.clf()
 
+df = pd.DataFrame({
+    'adaptability': a_scores,
+    'learning_alg': learning_algs,
+    'feature_set': features
+})
+df.to_csv('./pursuit_adaptability_results.csv', index=False)
