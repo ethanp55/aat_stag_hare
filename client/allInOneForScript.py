@@ -21,7 +21,7 @@ leaderboard_font_color = (0,0,0)
 stag_button = Button(
     SCREEN, 700, 700, 30, 30, text="stag",
     fontSize=30, margin=20,
-    inactiveColour=(255,0,0),
+    inactiveColour=(135, 126, 126),
     pressedColour=(0,255,0), radius=20,
     onClick=lambda: set_active_button("stag")
 )
@@ -29,7 +29,7 @@ stag_button = Button(
 hare_button = Button(
     SCREEN, 700, 750, 30, 30, text="hare",
     fontSize=30, margin=20,
-    inactiveColour=(255,0,0),
+    inactiveColour=(135, 126, 126),
     pressedColour=(0,255,0), radius=20,
     onClick=lambda: set_active_button("hare")
 )
@@ -163,10 +163,10 @@ def game_loop(client_socket):
 
         if active_button == "stag":
             stag_button.inactiveColour = (0, 255, 0)
-            hare_button.inactiveColour = (255,0,0)
+            hare_button.inactiveColour = (135, 126, 126)
         if active_button == "hare":
             hare_button.inactiveColour = (0, 255, 0)
-            stag_button.inactiveColour = (255, 0, 0)
+            stag_button.inactiveColour = (135, 126, 126)
 
 
     pygame.display.update()
@@ -256,6 +256,7 @@ def print_board(msg):
     #print("this is the stag dead and hare_dead variables ", stag_dead, " ", hare_dead)
 
     if "AGENT_POSITIONS" in msg:
+        print("we are now receiving the state")
         agents_positions = msg["AGENT_POSITIONS"]
         #calculate_points(msg["POINTS"], agents)
         for agent in agents:
@@ -451,7 +452,6 @@ class Enemy(pygame.sprite.Sprite):
         else:
             self.surf = self.original_surf.copy()
             screen.blit(self.surf, new_position) # so this one works.
-        pygame.display.update(self.rect)
 
     def update_alive(self):
         self.surf = self.original_surf

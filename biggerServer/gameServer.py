@@ -8,7 +8,8 @@ import time
 
 print("is this going off in gameserver ")
 
-# 1. Random, 2. AlegAAtr, 3. QAlegAATr, 4. SMAlegAATr 5.RAW0,  ## agent types. 
+# 1. Random, 2. AlegAAtr, 3. QAlegAATr, 4. SMAlegAATr 5.RAW0,  ## agent types. # we won't need these anymore
+# but this is where we will put the bot types once those have been cleared up.
 
 STAG_POINTS = 20
 HARE_POINTS = 10
@@ -29,41 +30,25 @@ class GameServer():
         q = multiprocessing.Queue()
 
         # # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
-        # current_round = 1
-        # # players_to_insert_into_game, list of all players, agent_type (as int) and the number of rounds to execute
-        # game_1 = Process(target=self.game_thread,
-        #                  args=(self.create_player_dict_pairs([0], new_clients), q, current_round, 1, 1))
-        # game_2 = Process(target=self.game_thread,
-        #                  args=(self.create_player_dict_pairs([1], new_clients), q, current_round, 1, 1))
-        # games_list = [game_1, game_2]
-        # self.run_games(games_list, q, current_round)
-
-        # and boom those are all the possible types that we could need, so thats pretty great.
-
-        # # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
         current_round = 1 # what happens if we try to make this 0. like in all honestly what happens.
-        agent_type = 1
-        player_indices_round_2 = [[0, 1]] # start them in the same game
+        agent_type = [1,1] # what type each bot should be. We check to make sure there are always 3.
+        player_indices_round_2 = [[0]] # start them in the same game
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
-
-
-
         # ***** ROUND 2-4 ***** # human on robot violence - not quite sure how jake wants me to handle this.
-        for i in range(1, 4):
+        for i in range(1, 4): # runs this loop 3 times, using the current round, the agent types, and the players we want grouped together.
             current_round = i
-            agent_type = 1
+            agent_type = [1,1]
             player_indices_round_2 = [[0, 1]]
             games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
             self.run_games(games_list, q, current_round)
 
-        # # ***** ROUND 5-7 ***** # each playa get the own game with they own robots
-
+        # # ***** ROUND 5-7 ***** # more rounds.
         for i in range(5, 8):
             current_round = i
             rounds_to_run = 1
-            agent_type = 3
+            agent_type = [3, 2]
             player_indices_round_2 = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [10, 11]]
             games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q,
                                                     agent_type)
@@ -72,6 +57,10 @@ class GameServer():
 
     def create_game_processes(self, player_indices, current_round, new_clients, q, agent_type):
         games_list = []
+
+        if len(agent_type) + len(player_indices[0]) != 3: # we don't have the right number of bots and players.
+            print("UH OH FETCHER! YOU DIDN'T configure this round correctly!")
+            return [] # empty list so no rounds run.
 
         for indices in player_indices:
             # Create a new process for each list of indices
@@ -83,10 +72,12 @@ class GameServer():
 
         return games_list
 
+
     def run_games(self, games_list, q, current_round):
         self.start_and_join_games(games_list, q)
         points_to_send = self.calc_avg_points(current_round)
-        self.send_leaderboard(points_to_send)  # sends out the new fetcher
+        self.send_leaderboard(points_to_send)  # sends out the updated leaderboard.
+
 
     def start_and_join_games(self, games_list, q):
         for game in games_list:
@@ -111,26 +102,11 @@ class GameServer():
             return_players[player_1_key] = player_1_socket
         return return_players
 
-    # def create_player_dict_pairs(self, new_players, new_clients): # new players is a list containing a bunch of indexes, and returns a dict of pairs.
-    #     return_players =  {}
-    #     for player in new_players:
-    #         player_1 = list(new_clients.items())[player]
-    #         player_1_key, player_1_socket = player_1
-    #         return_players[player_1_key] = player_1_socket
-    #     return return_players
-
-
 
     def game_thread(self, new_clients, q, current_round, agent_type):
         new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_type, current_round)  # need to somehow include an agent type
         q.put(new_points_1.player_points)
 
-    # up[dated one that isn't working
-    # def game_thread(self, new_clients, q, current_round, agent_type, rounds_to_run):
-    #     print("we should be starting the game here, and here are the new clients, ", new_clients)
-    #     rounds_to_run = rounds_to_run - 1 # off by 1 error
-    #     new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_type, current_round, current_round + rounds_to_run)  # need to somehow include an agent type
-    #     q.put(new_points_1.player_points)
 
     def player_points_initialization(self):
         player_points = {} # have it like this for now see if that changes anything.
@@ -190,9 +166,9 @@ class GameServer():
                 new_tuple = (self.client_usernames[int(key[1])], curr_points)
                 new_list.append(new_tuple)
 
-
         sorted_points = sorted(new_list, key=lambda x: x[1], reverse=True)
         return sorted_points
+
 
     def send_leaderboard(self, new_points_dict):
         time.sleep(2)  # lets everyone see the leaderboard

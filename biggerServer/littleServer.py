@@ -4,11 +4,11 @@ import json
 
 import time # tit for tat pausing?
 
-from agents.alegaatr import AlegAATr
-from agents.dqn import DQNAgent
-from agents.qalegaatr import QAlegAATr
-from agents.smalegaatr import SMAlegAATr
-from agents.rawo import RawO
+# from agents.alegaatr import AlegAATr
+# from agents.dqn import DQNAgent
+# from agents.qalegaatr import QAlegAATr
+# from agents.smalegaatr import SMAlegAATr
+# from agents.rawo import RawO
 
 PAUSE_TIME = 5
 HEIGHT = 3
@@ -62,8 +62,6 @@ class gameInstance():
                 if len(client_input) == len(self.connected_clients):
                     break
 
-
-
             running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent)
             if running == False:
                 break
@@ -76,6 +74,7 @@ class gameInstance():
         send_player_points = self.player_points.copy()
         # lets make a list of all of the connected_clients_ids and use those to generate players
         response = {}
+        print("We are now sending the state")
         response = { # KEEP THIS OUTSIDE THE LOOP PLEASE
             "HUMAN_AGENTS": len(self.connected_clients),
             "AI_AGENTS": 3 - len(self.connected_clients),
@@ -189,6 +188,7 @@ class gameInstance():
 
         for i in range(3 - len(new_positions)): # confusing pausing timimg thingy.
             time.sleep(random.random()) # should let me do some tit for tat pausing.
+        time.sleep(random.random())  # this ensures that full player games don't go too smoothly, no suspicion.
 
         round_rewards = self.stag_hare.transition()
         for i, reward in enumerate(round_rewards):
@@ -215,18 +215,23 @@ class gameInstance():
             new_hunters.append(humanAgent(name=new_name))
 
         for i in range(3 - len(self.connected_clients)): # bc they always need to add up to 3
+            index = 0
             new_name = "R" + str(i+1)
+            agent_type = self.agentType[index]
             # different types of agents can go here, might be work making a different functioun
-            if self.agentType == 1:
+            if agent_type == 1:
                 new_hunters.append(Random(name=new_name))
-            if self.agentType == 2:
-                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
-            if self.agentType == 3:
-                new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
-            if self.agentType == 4:
-                new_hunters.append(SMAlegAATr(name=new_name))
-            if self.agentType == 5:
-                new_hunters.append(RawO(name=new_name, enhanced=True))
+            if agent_type == 2:
+                new_hunters.append(Random(name=new_name))
+            # if self.agentType == 2:
+            #     new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
+            # if self.agentType == 3:
+            #     new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
+            # if self.agentType == 4:
+            #     new_hunters.append(SMAlegAATr(name=new_name))
+            # if self.agentType == 5:
+            #     new_hunters.append(RawO(name=new_name, enhanced=True))
+            index += 1 # go through the list bc we are expecting it to be an array now.
 
 
 
