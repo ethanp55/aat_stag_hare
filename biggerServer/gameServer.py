@@ -28,19 +28,169 @@ class GameServer():
 
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
+        # TEST FOR SOMETHING -- DELETE LATER (needed to make sure that we could cycle through agent types as well. this is gonna be fun.
+        # current_round = 1
+        # agent_types = [[1, 1], [1, 1]] # what type each bot should be. We check to make sure there are always 3.
+        # player_indices_round_2 = [[0], [1]]  # start them in the same game
+        # games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_types)
+        # self.run_games(games_list, q, current_round)
 
-        # # **** ROUND 1 ***** # 6 players, human on human violence (practice round)
-        current_round = 1 # what happens if we try to make this 0. like in all honestly what happens.
-        agent_type = [1,1] # what type each bot should be. We check to make sure there are always 3.
-        player_indices_round_2 = [[0]] # start them in the same game
+        # # **** ROUND 1 ***** # 6 players, each human in their own game (w/ hare first)
+        current_round = 1
+        agent_types = [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]] # what type each bot should be. We check to make sure there are always 3.
+        player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]] # start them in the same game
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_types)
+        self.run_games(games_list, q, current_round)
+
+        # # **** ROUND 2 ***** # 6 players, each human in their own game (w/ stag greedy first)
+        current_round = 2
+        agent_type = [[2, 2],[2, 2],[2, 2],[2, 2],[2, 2],[2, 2],[2, 2]]  # what type each bot should be. We check to make sure there are always 3.
+        player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # start them in the same game
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
+
+
+        # so based on my understanding, doing this SHOULD just overwrite the practice rounds, unless we want to keep them.
+
+        # B is []
+        # A is [1,1]
+        # C is [2,2]
+        # D is [2]
+
+        # # **** ROUND 3 ***** # 6 players, each human in their own game (w/ stag greedy first)
+        current_round = 1
+        player_indices_round_2 = [[0, 1, 5], [2], [3, 4], [6]]  # start them in the same game
+        agent_type = [[], [2], [2,2], [1,1]]  # what type each bot should be. We check to make sure there are always 3.
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 2
+        player_indices_round_2 = [[0, 1, 5], [2, 4], [3], [6]]  # start them in the same game
+        agent_type = [[], [2,2], [1,1], [2]]  # what type each bot should be. We check to make sure there are always 3.
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 3
+        player_indices_round_2 = [[0, 3, 6], [1, 2], [4], [5]]  # start them in the same game
+        agent_type = [[], [2,2], [1,1], [2]]  # what type each bot should be. We check to make sure there are always 3.
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 4
+        player_indices_round_2 = [[0, 1, 2], [3], [4], [5,6]]  # start them in the same game
+        agent_type = [[], [1,1], [2], [2,2]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 5
+        player_indices_round_2 = [[0, 6], [1,2,5], [3], [4]]  # start them in the same game
+        agent_type = [[2,2], [], [2], [1,1]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 6
+        player_indices_round_2 = [[0,2,3], [1,4], [5], [6]]  # start them in the same game
+        agent_type = [[], [2,2], [2], [1,1]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 7
+        player_indices_round_2 = [[0,6], [1], [2], [3,4,5]]  # start them in the same game
+        agent_type = [[2,2], [2], [1,1], []]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 8
+        player_indices_round_2 = [[0, 5], [1,2,6], [3], [4]]  # start them in the same game
+        agent_type = [[2,2], [], [1,1], [2]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 9
+        player_indices_round_2 = [[0, 2, 3], [1, 5], [4], [6]]  # start them in the same game
+        agent_type = [[], [2,2], [2], [1,1]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 10
+        player_indices_round_2 = [[0], [1, 4, 6], [2], [3,5]]  # start them in the same game
+        agent_type = [[1,1], [], [2], [2,2]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 11
+        player_indices_round_2 = [[0], [1, 3], [2,4,6], [5]]  # start them in the same game
+        agent_type = [[2], [2,2], [], [1,1]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 12
+        player_indices_round_2 = [[0,3], [1,4,6], [2], [5]]  # start them in the same game
+        agent_type = [[2,2], [], [1,1], [2]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 13
+        player_indices_round_2 = [[0, 2, 6], [1], [3,4], [5]]  # start them in the same game
+        agent_type = [[], [2], [2,2], [1,1]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 14
+        player_indices_round_2 = [[0, 3, 4], [1], [2,5], [6]]  # start them in the same game
+        agent_type = [[], [1,1], [2,2], [2]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 15
+        player_indices_round_2 = [[0, 3, 6], [1,4], [2], [5]]  # start them in the same game
+        agent_type = [[], [2,2], [2], [1,1]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 16
+        player_indices_round_2 = [[0], [1], [2, 6], [3, 4, 5]]  # start them in the same game
+        agent_type = [[1,1], [2], [2,2], []]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 17
+        player_indices_round_2 = [[0, 4], [1,3,5], [2], [6]]  # start them in the same game
+        agent_type = [[2,2], [], [1,1], [2]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 18
+        player_indices_round_2 = [[0, 2], [1], [3], [4,5,6]]  # start them in the same game
+        agent_type = [[2,2], [1,1], [2], []]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 19
+        player_indices_round_2 = [[0], [1], [2,6], [3,4,5]]  # start them in the same game
+        agent_type = [[2], [1,1], [2,2], []]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 20
+        player_indices_round_2 = [[0], [1,2,6], [3,5], [4]]  # start them in the same game
+        agent_type = [[2], [], [2,2], [1,1]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+        current_round = 21
+        player_indices_round_2 = [[0], [1,6], [2,4,5], [6]]  # start them in the same game
+        agent_type = [[1,1], [2,2], [], [2]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
+        self.run_games(games_list, q, current_round)
+
+
 
         # ***** ROUND 2-4 ***** # human on robot violence - not quite sure how jake wants me to handle this.
         for i in range(1, 4): # runs this loop 3 times, using the current round, the agent types, and the players we want grouped together.
             current_round = i
             agent_type = [1,1]
-            player_indices_round_2 = [[0, 1]]
+            player_indices_round_2 = [[0]]
             games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
             self.run_games(games_list, q, current_round)
 
@@ -55,19 +205,19 @@ class GameServer():
             self.run_games(games_list, q, current_round)
 
 
-    def create_game_processes(self, player_indices, current_round, new_clients, q, agent_type):
+    def create_game_processes(self, player_indices, current_round, new_clients, q, agent_types):
         games_list = []
 
-        if len(agent_type) + len(player_indices[0]) != 3: # we don't have the right number of bots and players.
+        if len(agent_types[0]) + len(player_indices[0]) != 3: # we don't have the right number of bots and players.
             print("UH OH FETCHER! YOU DIDN'T configure this round correctly!")
             return [] # empty list so no rounds run.
 
-        for indices in player_indices:
+        for i, indices in enumerate(player_indices): # should? now sort through the agent types and make sure it spits out the correct thing.
             # Create a new process for each list of indices
             game_process = Process(target=self.game_thread,
                                    args=(
                                    self.create_player_dict_pairs(indices, new_clients), q, current_round,
-                                   agent_type))
+                                   agent_types[i]))
             games_list.append(game_process)
 
         return games_list
@@ -103,8 +253,8 @@ class GameServer():
         return return_players
 
 
-    def game_thread(self, new_clients, q, current_round, agent_type):
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_type, current_round)  # need to somehow include an agent type
+    def game_thread(self, new_clients, q, current_round, agent_types):
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, agent_types, current_round)  # need to somehow include an agent type
         q.put(new_points_1.player_points)
 
 

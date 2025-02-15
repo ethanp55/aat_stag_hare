@@ -50,19 +50,28 @@ class gameInstance():
         while True:
             client_input = {}
             client_intent = {}
+            client_time = []
             while True:
+                current_time = time.time()
                 self.send_state()  # sends out the current game state
                 data = self.get_client_data()
                 for client, received_json in data.items():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
+                        new_time = time.time() - current_time
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
                         client_intent[self.client_id_dict[client]] = received_json["INTENT"]
+                        client_time.append(new_time)
 
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
-                    break
+                    pause_time = max(3.0, sum(client_time) / len(client_time))  # keeps the AI agents paused, but for no more than 3 seconds tops.
+                    print("WE HAVE FINISHED, here is the client wait time : ", pause_time)
+                    for i in range(3 - len(client_input)):  # confusing pausing timimg thingy.
+                        time.sleep(pause_time)
 
-            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent)
+                    break # gets us out of the input loop. hopefully.
+
+            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, client_time)
             if running == False:
                 break
             client_input.clear()
@@ -109,11 +118,11 @@ class gameInstance():
                 pass
         return data
 
-    def stag_hunt_game_loop(self, player_points, player_input, client_intent):
+    def stag_hunt_game_loop(self, player_points, player_input, client_intent, client_time):
 
         rewards = [0] * (len(self.hunters) + 2)
 
-        self.next_round(rewards, player_input, client_intent)
+        self.next_round(rewards, player_input, client_intent, client_time)
 
         self.send_state()
 
@@ -176,7 +185,7 @@ class gameInstance():
                 self.round += 1
                 self.reset_stag_hare()
 
-    def next_round(self, rewards, new_positions, client_intent):
+    def next_round(self, rewards, new_positions, client_intent, client_time):
         for client_id in new_positions:
             client_agent = "H" + str((self.client_id_list.index(client_id))+1) # once again, off by one error
             current_position = self.stag_hare.state.agent_positions[client_agent]
@@ -185,10 +194,6 @@ class gameInstance():
 
             self.hunters[self.client_id_list.index(client_id)].set_next_action(new_tuple_row, new_tuple_col) # change that up
             self.hunters[self.client_id_list.index(client_id)].set_hare_hunting(client_intent[client_id])
-
-        for i in range(3 - len(new_positions)): # confusing pausing timimg thingy.
-            time.sleep(random.random()) # should let me do some tit for tat pausing.
-        time.sleep(random.random())  # this ensures that full player games don't go too smoothly, no suspicion.
 
         round_rewards = self.stag_hare.transition()
         for i, reward in enumerate(round_rewards):
