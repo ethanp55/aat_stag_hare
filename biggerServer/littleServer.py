@@ -19,7 +19,6 @@ from agents.human import *
 from environment.world import StagHare
 
 import random
-print('and of course is this oging off')
 
 class gameInstance():
     def __init__(self, connected_clients, client_id_dict, agentType, round=0):
@@ -37,7 +36,6 @@ class gameInstance():
             client_id_list.append(client+1)
         self.client_id_list = client_id_list
         while True:  # set up stag hunt and avoid weird edgecase
-            print("is this whats gettign thrown")
             stag_hare = StagHare(HEIGHT, WIDTH, self.hunters)
             if not stag_hare.is_over():
                 break
@@ -66,8 +64,8 @@ class gameInstance():
                 if len(client_input) == len(self.connected_clients):
                     pause_time = max(3.0, sum(client_time) / len(client_time))  # keeps the AI agents paused, but for no more than 3 seconds tops.
                     print("WE HAVE FINISHED, here is the client wait time : ", pause_time)
-                    for i in range(3 - len(client_input)):  # confusing pausing timimg thingy.
-                        time.sleep(pause_time)
+                    # for i in range(3 - len(client_input)):  # confusing pausing timimg thingy.
+                    #     time.sleep(pause_time) # put this back in later. fast for now.
 
                     break # gets us out of the input loop. hopefully.
 
@@ -83,7 +81,6 @@ class gameInstance():
         send_player_points = self.player_points.copy()
         # lets make a list of all of the connected_clients_ids and use those to generate players
         response = {}
-        print("We are now sending the state")
         response = { # KEEP THIS OUTSIDE THE LOOP PLEASE
             "HUMAN_AGENTS": len(self.connected_clients),
             "AI_AGENTS": 3 - len(self.connected_clients),
@@ -158,12 +155,10 @@ class gameInstance():
             for i in range(4):
                 for client in self.connected_clients:  # does this update the points correctly?
                     new_message = json.dumps(response).encode()
-                    print("This is the new message size ", len(new_message))
                     self.connected_clients[client].send(new_message)
                 time.sleep(0.1) # slow down packet transmission.
 
 
-            print("this is our round ", self.round, " and this is our max round", self.max_rounds)
             if self.round == self.max_rounds: #
                 response = {} # clear the response I guess.
                 response = { # KEEP THIS OUTSIDE TEH LOOP

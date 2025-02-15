@@ -6,7 +6,6 @@ import multiprocessing
 import json
 import time
 
-print("is this going off in gameserver ")
 
 # 1. Random, 2. AlegAAtr, 3. QAlegAATr, 4. SMAlegAATr 5.RAW0,  ## agent types. # we won't need these anymore
 # but this is where we will put the bot types once those have been cleared up.
@@ -37,10 +36,29 @@ class GameServer():
 
         # # **** ROUND 1 ***** # 6 players, each human in their own game (w/ hare first)
         current_round = 1
+        agent_types = [[1, 1], [1, 1]]
+        player_indices_round_2 = [[0], [1]]  # start them in the same game
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_types)
+        self.run_games(games_list, q, current_round)
+        self.append_average_points(current_round)
+
+
+
+        current_round = 1
+        agent_types = [[1, 1], [1, 1]]
+        player_indices_round_2 = [[0], [1]]  # start them in the same game
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_types)
+        self.run_games(games_list, q, current_round)
+        self.append_average_points(current_round)
+
+
+        # # **** ROUND 1 ***** # 6 players, each human in their own game (w/ hare first)
+        current_round = 1
         agent_types = [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]] # what type each bot should be. We check to make sure there are always 3.
         player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]] # start them in the same game
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_types)
         self.run_games(games_list, q, current_round)
+
 
         # # **** ROUND 2 ***** # 6 players, each human in their own game (w/ stag greedy first)
         current_round = 2
@@ -52,158 +70,133 @@ class GameServer():
 
         # so based on my understanding, doing this SHOULD just overwrite the practice rounds, unless we want to keep them.
 
-        # B is []
-        # A is [1,1]
-        # C is [2,2]
-        # D is [2]
 
         # # **** ROUND 3 ***** # 6 players, each human in their own game (w/ stag greedy first)
         current_round = 1
-        player_indices_round_2 = [[0, 1, 5], [2], [3, 4], [6]]  # start them in the same game
-        agent_type = [[], [2], [2,2], [1,1]]  # what type each bot should be. We check to make sure there are always 3.
+        player_indices_round_2 = [[0, 1, 5], [2], [3, 4], [6]]   # the players that will be in the same game
+        agent_type = [[], [2], [2,2], [1,1]]  # the number and type of bot we are expecting.
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 2
-        player_indices_round_2 = [[0, 1, 5], [2, 4], [3], [6]]  # start them in the same game
-        agent_type = [[], [2,2], [1,1], [2]]  # what type each bot should be. We check to make sure there are always 3.
+        player_indices_round_2 = [[0, 1, 5], [2, 4], [3], [6]]
+        agent_type = [[], [2,2], [1,1], [2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 3
-        player_indices_round_2 = [[0, 3, 6], [1, 2], [4], [5]]  # start them in the same game
-        agent_type = [[], [2,2], [1,1], [2]]  # what type each bot should be. We check to make sure there are always 3.
+        player_indices_round_2 = [[0, 3, 6], [1, 2], [4], [5]]
+        agent_type = [[], [2,2], [1,1], [2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 4
-        player_indices_round_2 = [[0, 1, 2], [3], [4], [5,6]]  # start them in the same game
+        player_indices_round_2 = [[0, 1, 2], [3], [4], [5,6]]
         agent_type = [[], [1,1], [2], [2,2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 5
-        player_indices_round_2 = [[0, 6], [1,2,5], [3], [4]]  # start them in the same game
+        player_indices_round_2 = [[0, 6], [1,2,5], [3], [4]]
         agent_type = [[2,2], [], [2], [1,1]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 6
-        player_indices_round_2 = [[0,2,3], [1,4], [5], [6]]  # start them in the same game
+        player_indices_round_2 = [[0,2,3], [1,4], [5], [6]]
         agent_type = [[], [2,2], [2], [1,1]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 7
-        player_indices_round_2 = [[0,6], [1], [2], [3,4,5]]  # start them in the same game
+        player_indices_round_2 = [[0,6], [1], [2], [3,4,5]]
         agent_type = [[2,2], [2], [1,1], []]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 8
-        player_indices_round_2 = [[0, 5], [1,2,6], [3], [4]]  # start them in the same game
+        player_indices_round_2 = [[0, 5], [1,2,6], [3], [4]]
         agent_type = [[2,2], [], [1,1], [2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 9
-        player_indices_round_2 = [[0, 2, 3], [1, 5], [4], [6]]  # start them in the same game
+        player_indices_round_2 = [[0, 2, 3], [1, 5], [4], [6]]
         agent_type = [[], [2,2], [2], [1,1]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 10
-        player_indices_round_2 = [[0], [1, 4, 6], [2], [3,5]]  # start them in the same game
+        player_indices_round_2 = [[0], [1, 4, 6], [2], [3,5]]
         agent_type = [[1,1], [], [2], [2,2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 11
-        player_indices_round_2 = [[0], [1, 3], [2,4,6], [5]]  # start them in the same game
+        player_indices_round_2 = [[0], [1, 3], [2,4,6], [5]]
         agent_type = [[2], [2,2], [], [1,1]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 12
-        player_indices_round_2 = [[0,3], [1,4,6], [2], [5]]  # start them in the same game
+        player_indices_round_2 = [[0,3], [1,4,6], [2], [5]]
         agent_type = [[2,2], [], [1,1], [2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 13
-        player_indices_round_2 = [[0, 2, 6], [1], [3,4], [5]]  # start them in the same game
+        player_indices_round_2 = [[0, 2, 6], [1], [3,4], [5]]
         agent_type = [[], [2], [2,2], [1,1]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 14
-        player_indices_round_2 = [[0, 3, 4], [1], [2,5], [6]]  # start them in the same game
+        player_indices_round_2 = [[0, 3, 4], [1], [2,5], [6]]
         agent_type = [[], [1,1], [2,2], [2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 15
-        player_indices_round_2 = [[0, 3, 6], [1,4], [2], [5]]  # start them in the same game
+        player_indices_round_2 = [[0, 3, 6], [1,4], [2], [5]]
         agent_type = [[], [2,2], [2], [1,1]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 16
-        player_indices_round_2 = [[0], [1], [2, 6], [3, 4, 5]]  # start them in the same game
+        player_indices_round_2 = [[0], [1], [2, 6], [3, 4, 5]]
         agent_type = [[1,1], [2], [2,2], []]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 17
-        player_indices_round_2 = [[0, 4], [1,3,5], [2], [6]]  # start them in the same game
+        player_indices_round_2 = [[0, 4], [1,3,5], [2], [6]]
         agent_type = [[2,2], [], [1,1], [2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 18
-        player_indices_round_2 = [[0, 2], [1], [3], [4,5,6]]  # start them in the same game
+        player_indices_round_2 = [[0, 2], [1], [3], [4,5,6]]
         agent_type = [[2,2], [1,1], [2], []]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 19
-        player_indices_round_2 = [[0], [1], [2,6], [3,4,5]]  # start them in the same game
+        player_indices_round_2 = [[0], [1], [2,6], [3,4,5]]
         agent_type = [[2], [1,1], [2,2], []]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 20
-        player_indices_round_2 = [[0], [1,2,6], [3,5], [4]]  # start them in the same game
+        player_indices_round_2 = [[0], [1,2,6], [3,5], [4]]
         agent_type = [[2], [], [2,2], [1,1]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
 
         current_round = 21
-        player_indices_round_2 = [[0], [1,6], [2,4,5], [6]]  # start them in the same game
+        player_indices_round_2 = [[0], [1,6], [2,4,5], [6]]
         agent_type = [[1,1], [2,2], [], [2]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
         self.run_games(games_list, q, current_round)
-
-
-
-        # ***** ROUND 2-4 ***** # human on robot violence - not quite sure how jake wants me to handle this.
-        for i in range(1, 4): # runs this loop 3 times, using the current round, the agent types, and the players we want grouped together.
-            current_round = i
-            agent_type = [1,1]
-            player_indices_round_2 = [[0]]
-            games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, agent_type)
-            self.run_games(games_list, q, current_round)
-
-        # # ***** ROUND 5-7 ***** # more rounds.
-        for i in range(5, 8):
-            current_round = i
-            rounds_to_run = 1
-            agent_type = [3, 2]
-            player_indices_round_2 = [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9], [10, 11]]
-            games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q,
-                                                    agent_type)
-            self.run_games(games_list, q, current_round)
-
 
     def create_game_processes(self, player_indices, current_round, new_clients, q, agent_types):
         games_list = []
@@ -225,7 +218,8 @@ class GameServer():
 
     def run_games(self, games_list, q, current_round):
         self.start_and_join_games(games_list, q)
-        points_to_send = self.calc_avg_points(current_round)
+        points_to_send, points_to_save = self.calc_avg_points(current_round)
+        self.points_to_save = points_to_save
         self.send_leaderboard(points_to_send)  # sends out the updated leaderboard.
 
 
@@ -261,7 +255,7 @@ class GameServer():
     def player_points_initialization(self):
         player_points = {} # have it like this for now see if that changes anything.
         self.points = player_points  # just so its the right kind of object.
-        hunters = ["H1","H2","H3","H4","H5","H6","H7","H8","H9","H10","H11","H12"] # max 12 players. Make this dynamic
+        hunters = ["H1","H2","H3","H4","H5","H6","H7"] # max 7 players. I SHOULD make this dynamic.
 
         for hunter in hunters:
             if hunter not in player_points:
@@ -274,6 +268,7 @@ class GameServer():
                 small_dict = {
                     "stag": False,
                     "hare": False,
+                    "avg_points" : 0,
                 }
                 # Directly assign the round as a key and small_dict as the value
                 current_entry[round] = small_dict
@@ -295,7 +290,8 @@ class GameServer():
 
 
     def calc_avg_points(self, target_round):
-        new_list = [] # list of tuples, holds the clientID and then the number of points that they have accrued
+        new_list_to_send = [] # list of tuples, holds the clientID and then the number of points that they have accrued
+        new_list_to_save = []
         for key in self.points:
             curr_points = 0
             for curr_round in self.points[key]:
@@ -314,10 +310,13 @@ class GameServer():
             # lets grab the username while we are here
             if int(key[1:]) in self.client_usernames: # should always fire but just to prevent null access.
                 new_tuple = (self.client_usernames[int(key[1])], curr_points)
-                new_list.append(new_tuple)
+                new_list_to_send.append(new_tuple)
+                save_tuple = (key, curr_points)
+                new_list_to_save.append(save_tuple)
 
-        sorted_points = sorted(new_list, key=lambda x: x[1], reverse=True)
-        return sorted_points
+        sorted_points = sorted(new_list_to_send, key=lambda x: x[1], reverse=True)
+        sorted_save_tuples = sorted(new_list_to_save, key=lambda x: x[1], reverse=True)
+        return sorted_points, sorted_save_tuples
 
 
     def send_leaderboard(self, new_points_dict):
@@ -329,3 +328,11 @@ class GameServer():
         for client in self.connected_clients:
             self.connected_clients[client].send(new_message)
         time.sleep(2)  # lets everyone see the leaderboard
+
+    def append_average_points(self, current_round):
+        # we need to modify self.points to include another feild - the average points
+        # here's how we are going to do this
+        for tuple in self.points_to_save:
+            self.points[tuple[0]][current_round]["avg_points"] = tuple[1]
+        print(self.points_to_save, "thats the points we were supposed to save")
+        print(self.points, "\n and that is the overall points dict at the end")

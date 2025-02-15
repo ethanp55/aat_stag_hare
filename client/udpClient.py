@@ -62,7 +62,6 @@ def start_client():
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 pressed_keys = pygame.key.get_pressed()
-                print("We TRYING to send a new position")
                 message = {
                     "NEW_INPUT" : adjust_position(pressed_keys),
                     "CLIENT_ID": client_ID,
@@ -159,7 +158,6 @@ def calculate_points(big_dict, agents):
                 peopleWhoKilledHares += 1
         if peopleWhoKilledHares > 0: # otherwise we get a divide by zewro error
             points_that_everyone_gets = hare_points / peopleWhoKilledHares
-            print("here is who is getting points for round ", currRound, " ", agents_who_get_points, points_that_everyone_gets)
             for agent in agents_who_get_points:
                 agent.setPoints(points_that_everyone_gets)
 

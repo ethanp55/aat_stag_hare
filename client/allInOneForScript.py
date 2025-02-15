@@ -10,8 +10,6 @@ SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
 import time
 
-print("so when is this firing")
-
 pygame.init()  # actually starts the game.
 font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
 font_color = (0,0,0)
@@ -130,7 +128,6 @@ def game_loop(client_socket):
 
         if "LEADERBOARD" in server_response:
             buttons_active = False
-            print("we should be drawing the fetching leaderboard")
             draw_leaderboard(server_response["LEADERBOARD"])
 
         else:
@@ -146,7 +143,6 @@ def game_loop(client_socket):
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.KEYDOWN:
-            print("We have received an input")
             pressed_keys = pygame.key.get_pressed()
             message = {
                 "NEW_INPUT": adjust_position(pressed_keys),
@@ -256,7 +252,6 @@ def print_board(msg):
     #print("this is the stag dead and hare_dead variables ", stag_dead, " ", hare_dead)
 
     if "AGENT_POSITIONS" in msg:
-        print("we are now receiving the state")
         agents_positions = msg["AGENT_POSITIONS"]
         #calculate_points(msg["POINTS"], agents)
         for agent in agents:
@@ -398,9 +393,7 @@ def set_username(client_socket, clock, username):
 
 def change_hare(new_value):
     global preference
-    print("This is our current preference! ", preference)
     preference = new_value
-    print("This is our current preference! ", preference)
 
 # yes I know it should put this in its own file, its just a pain to export as an EXE if its not all one script. Its a pain.
 class Enemy(pygame.sprite.Sprite):
