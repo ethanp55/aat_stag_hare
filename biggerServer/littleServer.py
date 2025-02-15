@@ -252,6 +252,10 @@ class gameInstance():
             position = self.stag_hare.state.agent_positions[hunter]
             positionX = position[1]
             positionY = position[0]
+            agent = next(agent for agent in self.stag_hare.agents if agent.name == str(hunter))
+            if not (agent.is_hunting_hare()): # if we aren't hunting the hare, then don't consider us.
+                continue
+
 
 
             if abs(positionX - hare_positionX) == 1 and positionY == hare_positionY or \
