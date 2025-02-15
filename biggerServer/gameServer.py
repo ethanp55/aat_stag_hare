@@ -47,7 +47,7 @@ class GameServer():
         self.save_stuff()
 
 
-        current_round = 1
+        current_round = 2
         situations = [["C"]]
         player_indices_round_2 = [[0, 1]]  # start them in the same game
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations)
