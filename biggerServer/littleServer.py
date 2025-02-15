@@ -21,16 +21,18 @@ from environment.world import StagHare
 import random
 
 class gameInstance():
-    def __init__(self, connected_clients, client_id_dict, agentType, round=0):
+    def __init__(self, connected_clients, client_id_dict, situation, round=0):
         self.connected_clients = connected_clients
         self.client_id_dict = client_id_dict
-        self.agentType = agentType
+        #self.agentType = situation
+        self.agentType = self.set_situation(situation)
         self.create_hunters()
         self.start_round = round # needed for dictionary purposes
         self.HUMAN_PLAYERS = len(connected_clients)
         self.AI_AGENTS = 3 - self.HUMAN_PLAYERS
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
         self.max_rounds = round
+        self.kills = None
         client_id_list = []
         for client in self.connected_clients:
             client_id_list.append(client+1)
@@ -43,6 +45,19 @@ class gameInstance():
         self.stag_hare = stag_hare  # just to have that down.
         self.main_game_loop()
 
+    def set_situation(self, situation):
+        situation = situation[0]
+        self.situation = situation
+        agent_types = []
+        if situation == "A":
+            agent_types = [1,1] # two hare greedy
+        if situation == "B":
+            agent_types = [] # empty
+        if situation == "C":
+            agent_types = [2] # one stag greedy
+        if situation == "D":
+            agent_types = [2,2]
+        return agent_types
 
     def main_game_loop(self):
         while True:
@@ -74,7 +89,11 @@ class gameInstance():
                 break
             client_input.clear()
 
-        return self.adjust_points()
+
+        new_points = self.adjust_points()
+        new_dict = {}
+        new_dict[self.situation] = new_points
+        return new_dict
 
     def send_state(self):
         current_state = self.create_current_state()
