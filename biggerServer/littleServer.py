@@ -33,6 +33,7 @@ class gameInstance():
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
         self.max_rounds = round
         self.kills = None
+        self.big_dict = {} # responsible for the second file upstream. Yeah its a lot.  # just have indexes instead of rounds as K.
         client_id_list = []
         for client in self.connected_clients:
             client_id_list.append(client+1)
@@ -60,12 +61,13 @@ class gameInstance():
         return agent_types
 
     def main_game_loop(self):
+        index = 0
         while True:
             client_input = {}
             client_intent = {}
             client_time = []
+            current_time = time.time()
             while True:
-                current_time = time.time()
                 self.send_state()  # sends out the current game state
                 data = self.get_client_data()
                 for client, received_json in data.items():
@@ -77,14 +79,16 @@ class gameInstance():
 
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
-                    pause_time = max(3.0, sum(client_time) / len(client_time))  # keeps the AI agents paused, but for no more than 3 seconds tops.
+                    print("here is the client_time as well. ", client_time)
+                    pause_time = min(3.0, (sum(client_time) / len(client_time)))  # keeps the AI agents paused, but for no more than 3 seconds tops.
                     print("WE HAVE FINISHED, here is the client wait time : ", pause_time)
                     # for i in range(3 - len(client_input)):  # confusing pausing timimg thingy.
                     #     time.sleep(pause_time) # put this back in later. fast for now.
 
                     break # gets us out of the input loop. hopefully.
 
-            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, client_time)
+            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, client_time, index)
+            index += 1
             if running == False:
                 break
             client_input.clear()
@@ -93,6 +97,9 @@ class gameInstance():
         new_points = self.adjust_points()
         new_dict = {}
         new_dict[self.situation] = new_points
+        big_dict_finalized = {}
+        big_dict_finalized[self.situation] = self.big_dict
+        self.big_dict = big_dict_finalized
         return new_dict
 
     def send_state(self):
@@ -134,11 +141,11 @@ class gameInstance():
                 pass
         return data
 
-    def stag_hunt_game_loop(self, player_points, player_input, client_intent, client_time):
+    def stag_hunt_game_loop(self, player_points, player_input, client_intent, client_time, index):
 
         rewards = [0] * (len(self.hunters) + 2)
 
-        self.next_round(rewards, player_input, client_intent, client_time)
+        self.next_round(rewards, player_input, client_intent, client_time, index)
 
         self.send_state()
 
@@ -199,7 +206,27 @@ class gameInstance():
                 self.round += 1
                 self.reset_stag_hare()
 
-    def next_round(self, rewards, new_positions, client_intent, client_time):
+    def next_round(self, rewards, new_positions, client_intent, client_time, index):
+        new_dict = {}
+        new_dict["stag"] = {}
+        new_dict["hare"] = {}
+
+        # set up the dict for players and bots, dynamically.
+
+        for i in range(len(self.connected_clients)):
+            new_name = "H" + str(i+1)
+            new_dict[new_name] = {}
+        bot_number = 1
+        for i in range(3-len(self.connected_clients), 4):
+            new_name = "R" + str(bot_number)
+            bot_number+=1
+            new_dict[new_name] = {}
+
+
+        for agent in self.stag_hare.state.agent_positions: # grab the before positions
+            new_dict[agent]["before_position"] = self.stag_hare.state.agent_positions[agent] # should be a tuple
+
+
         for client_id in new_positions:
             client_agent = "H" + str((self.client_id_list.index(client_id))+1) # once again, off by one error
             current_position = self.stag_hare.state.agent_positions[client_agent]
@@ -210,8 +237,27 @@ class gameInstance():
             self.hunters[self.client_id_list.index(client_id)].set_hare_hunting(client_intent[client_id])
 
         round_rewards = self.stag_hare.transition()
+
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
+
+        action_map = self.stag_hare.get_action_map()
+        for agent, attempted_position in action_map.items():
+            # new_row = attempted_position[0]
+            # new_col = attempted_position[1]
+            # old_row = new_dict[agent]["before_position"][0]
+            # old_col = new_dict[agent]["before_position"][1]
+            # row_to_return = int(new_row - old_row)
+            # col_to_return = int(new_col - old_col)
+            #[agent]["action"] = (row_to_return, col_to_return)
+            new_dict[agent]["action"] = [a - b for a,b in zip(attempted_position, new_dict[agent]["before_position"])]
+
+
+        for agent in self.stag_hare.state.agent_positions:
+            new_dict[agent]["after_position"] = self.stag_hare.state.agent_positions[agent]  # should be a tuple
+
+        self.big_dict[index] = new_dict
+
 
     def create_current_state(self):
         current_state = {}
@@ -360,6 +406,7 @@ class gameInstance():
                 small_dict = {
                     "stag": False,
                     "hare": False,
+                    "situation" : self.situation
                 }
                 # Directly assign the round as a key and small_dict as the value
                 current_entry[round] = small_dict

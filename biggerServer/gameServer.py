@@ -1,6 +1,8 @@
 #this is where the scheduling and holding all the big dicts / writing to disk takes place. also instantiates game instances given specific things.
 import os
 
+import numpy as np
+
 from littleServer import gameInstance
 from multiprocessing import Process
 import multiprocessing
@@ -30,6 +32,7 @@ class GameServer():
 
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
+        big_queue = multiprocessing.Queue()
         # TEST FOR SOMETHING -- DELETE LATER (needed to make sure that we could cycle through agent types as well. this is gonna be fun.
         # current_round = 1
         # situations = [[1, 1], [1, 1]] # what type each bot should be. We check to make sure there are always 3.
@@ -38,20 +41,20 @@ class GameServer():
         # self.run_games(games_list, q, current_round)
 
         # # **** ROUND 1 ***** # 6 players, each human in their own game (w/ hare first)
+
         current_round = 1
         situations = [["A"], ["D"]] # so having them all in the same situation does weird thigns to the dict, but other than that this SHOULD work.
         player_indices_round_2 = [[0], [1]]  # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations)
-        self.run_games(games_list, q, current_round)
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
         self.append_average_points(current_round)
         self.save_stuff()
-
 
         current_round = 2
         situations = [["C"]]
         player_indices_round_2 = [[0, 1]]  # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations)
-        self.run_games(games_list, q, current_round)
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
         self.append_average_points(current_round)
 
 
@@ -59,17 +62,18 @@ class GameServer():
         current_round = 1
         situations = [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]] # what type each bot should be. We check to make sure there are always 3.
         player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]] # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations)
-        self.run_games(games_list, q, current_round)
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
 
         # # **** ROUND 2 ***** # 6 players, each human in their own game (w/ stag greedy first)
         current_round = 2
-        situation = [[2, 2],[2, 2],[2, 2],[2, 2],[2, 2],[2, 2],[2, 2]]  # what type each bot should be. We check to make sure there are always 3.
+        situations = [[2, 2],[2, 2],[2, 2],[2, 2],[2, 2],[2, 2],[2, 2]]  # what type each bot should be. We check to make sure there are always 3.
         player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
-
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         # so based on my understanding, doing this SHOULD just overwrite the practice rounds, unless we want to keep them.
 
@@ -77,132 +81,153 @@ class GameServer():
         # # **** ROUND 3 ***** # 6 players, each human in their own game (w/ stag greedy first)
         current_round = 1
         player_indices_round_2 = [[0, 1, 5], [2], [3, 4], [6]]   # the players that will be in the same game
-        situation = [["B"], ["D"], ["C"], ["A"]]  # the number and type of bot we are expecting.
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["D"], ["C"], ["A"]]  # the number and type of bot we are expecting.
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 2
         player_indices_round_2 = [[0, 1, 5], [2, 4], [3], [6]]
-        situation = [["B"], ["C"], ["A"], ["D"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["C"], ["A"], ["D"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 3
         player_indices_round_2 = [[0, 3, 6], [1, 2], [4], [5]]
-        situation = [["B"], ["C"], ["A"], ["D"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["C"], ["A"], ["D"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 4
         player_indices_round_2 = [[0, 1, 2], [3], [4], [5,6]]
-        situation = [["B"], ["A"], ["D"], ["C"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["A"], ["D"], ["C"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 5
         player_indices_round_2 = [[0, 6], [1,2,5], [3], [4]]
-        situation = [["C"], ["B"], ["D"], ["A"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["C"], ["B"], ["D"], ["A"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 6
         player_indices_round_2 = [[0,2,3], [1,4], [5], [6]]
-        situation = [["B"], ["C"], ["D"], ["A"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["C"], ["D"], ["A"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 7
         player_indices_round_2 = [[0,6], [1], [2], [3,4,5]]
-        situation = [["C"], ["D"], ["A"], ["B"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["C"], ["D"], ["A"], ["B"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 8
         player_indices_round_2 = [[0, 5], [1,2,6], [3], [4]]
-        situation = [["C"], ["B"], ["A"], ["D"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["C"], ["B"], ["A"], ["D"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 9
         player_indices_round_2 = [[0, 2, 3], [1, 5], [4], [6]]
-        situation = [["B"], ["C"], ["D"], ["A"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["C"], ["D"], ["A"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 10
         player_indices_round_2 = [[0], [1, 4, 6], [2], [3,5]]
-        situation = [["A"], ["B"], ["D"], ["C"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["A"], ["B"], ["D"], ["C"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 11
         player_indices_round_2 = [[0], [1, 3], [2,4,6], [5]]
-        situation = [["D"], ["C"], ["B"], ["A"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["D"], ["C"], ["B"], ["A"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 12
         player_indices_round_2 = [[0,3], [1,4,6], [2], [5]]
-        situation = [["C"], ["B"], ["A"], ["D"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["C"], ["B"], ["A"], ["D"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 13
         player_indices_round_2 = [[0, 2, 6], [1], [3,4], [5]]
-        situation = [["B"], ["D"], ["C"], ["A"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["D"], ["C"], ["A"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 14
         player_indices_round_2 = [[0, 3, 4], [1], [2,5], [6]]
-        situation = [["B"], ["A"], ["C"], ["D"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["A"], ["C"], ["D"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 15
         player_indices_round_2 = [[0, 3, 6], [1,4], [2], [5]]
-        situation = [["B"], ["C"], ["D"], ["A"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["B"], ["C"], ["D"], ["A"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 16
         player_indices_round_2 = [[0], [1], [2, 6], [3, 4, 5]]
-        situation = [["A"], ["D"], ["C"], ["B"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["A"], ["D"], ["C"], ["B"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 17
         player_indices_round_2 = [[0, 4], [1,3,5], [2], [6]]
-        situation = [["C"], ["B"], ["A"], ["D"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["C"], ["B"], ["A"], ["D"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 18
         player_indices_round_2 = [[0, 2], [1], [3], [4,5,6]]
-        situation = [["C"], ["A"], ["D"], ["B"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["C"], ["A"], ["D"], ["B"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 19
         player_indices_round_2 = [[0], [1], [2,6], [3,4,5]]
-        situation = [["D"], ["A"], ["C"], ["B"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["D"], ["A"], ["C"], ["B"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 20
         player_indices_round_2 = [[0], [1,2,6], [3,5], [4]]
-        situation = [["D"], ["B"], ["C"], ["A"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["D"], ["B"], ["C"], ["A"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
 
         current_round = 21
         player_indices_round_2 = [[0], [1,6], [2,4,5], [6]]
-        situation = [["A"], ["C"], ["B"], ["D"]]
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situation)
-        self.run_games(games_list, q, current_round)
+        situations = [["A"], ["C"], ["B"], ["D"]]
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        self.run_games(games_list, q, current_round, big_queue)
+        self.append_average_points(current_round)
         self.save_stuff()
 
-    def create_game_processes(self, player_indices, current_round, new_clients, q, situations):
+    def create_game_processes(self, player_indices, current_round, new_clients, q, situations, big_queue):
         games_list = []
 
         # make a way to to check that everything sums up to 3 ig.
@@ -212,19 +237,25 @@ class GameServer():
             game_process = Process(target=self.game_thread,
                                    args=(
                                    self.create_player_dict_pairs(indices, new_clients), q, current_round,
-                                   situations[i]))
+                                   situations[i], big_queue))
             games_list.append(game_process)
 
         return games_list
 
 
-    def run_games(self, games_list, q, current_round):
+    def run_games(self, games_list, q, current_round, big_queue):
         print('attempitng to run games here')
-        situations_dict = self.start_and_join_games(games_list, q)
+        situations_dict, big_dict_list = self.start_and_join_games(games_list, q, big_queue)
         self.add_to_master_dict(situations_dict, current_round)
+        self.add_to_big_dict(big_dict_list, current_round)
         points_to_send, points_to_save = self.calc_avg_points(current_round)
         self.points_to_save = points_to_save
         self.send_leaderboard(points_to_send)  # sends out the updated leaderboard.
+
+    def add_to_big_dict(self, big_dict_list, current_round):
+        for big_dict in big_dict_list:
+            for situation, current_dict in big_dict.items():
+                self.high_level_dict[current_round][situation] = current_dict
 
     def add_to_master_dict(self, situations_dict, current_round):
         total_dict = {}
@@ -237,7 +268,7 @@ class GameServer():
         self.high_level_dict[current_round] = total_dict # that might brick as well. lets find out.
 
 
-    def start_and_join_games(self, games_list, q):
+    def start_and_join_games(self, games_list, q, big_queue):
         for game in games_list:
             game.start()
 
@@ -245,11 +276,16 @@ class GameServer():
             game.join()
 
         dicts_to_merge = []
+        all_big_dicts = []
         while not q.empty():
             item = q.get()
             dicts_to_merge.append(item)
 
-        return self.merge_dicts(dicts_to_merge)
+        while not big_queue.empty():
+            item = big_queue.get()
+            all_big_dicts.append(item)
+
+        return self.merge_dicts(dicts_to_merge), all_big_dicts
 
 
     def create_player_dict_pairs(self, new_players, new_clients): # new players is a list containing a bunch of indexes, and returns a dict of pairs.
@@ -261,11 +297,13 @@ class GameServer():
         return return_players
 
 
-    def game_thread(self, new_clients, q, current_round, situations):
+    def game_thread(self, new_clients, q, current_round, situations, big_queue):
         new_points_1 = gameInstance(new_clients, self.client_id_dict, situations, current_round)  # need to somehow include an agent type
         new_dict = {}
         new_dict[new_points_1.situation] = new_points_1.player_points
+        #new_dict["Big"] = new_points_1.big_dict
         q.put(new_dict)
+        big_queue.put(new_points_1.big_dict)
 
 
     def player_points_initialization(self):
@@ -364,13 +402,23 @@ class GameServer():
 
     def save_stuff(self):
         desktop_path = os.path.expanduser("~/Desktop")
-        filename = "stag_hare_top_level.json"
-        file_path = os.path.join(desktop_path, filename)
-        unique_file_path = self.get_unique_filename(file_path)
+        top_level_path = "stag_hare_top_level.json"
+        low_level_path = "stag_hare_low_level.json"
+        file_path_1 = os.path.join(desktop_path, top_level_path)
+        file_path_2 = os.path.join(desktop_path, low_level_path)
+        unique_file_path_1 = self.get_unique_filename(file_path_1)
+        unique_file_path_2 = self.get_unique_filename(file_path_2)
 
-        with open(unique_file_path, "w") as f:
+        with open(unique_file_path_1, "w") as f:
             json.dump(self.client_usernames, f, indent=4)
             json.dump(self.points, f, indent=4)
+
+        # Convert to JSON string
+        json_string = json.dumps(self.high_level_dict, indent=4, cls=NumpyEncoder)
+        json_string = json_string.replace(" [", "[").replace(", ", ",").replace(" ]", "]")
+
+        with open(unique_file_path_2, "w") as f:
+            f.write(json_string)
 
     def get_unique_filename(self, file_path):
         if not os.path.exists(file_path):
@@ -382,3 +430,10 @@ class GameServer():
                 counter += 1
             return f"{base}_{counter}{extension}"
 
+
+# Custom encoder to handle np.int64 conversion to Python int
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.int64):
+            return int(obj)  # Convert np.int64 to native Python int
+        return super(NumpyEncoder, self).default(obj)
