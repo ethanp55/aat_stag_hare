@@ -61,6 +61,7 @@ from pygame.locals import ( # gets us the four caridnal directions for movement 
     K_DOWN,
     K_LEFT,
     K_RIGHT,
+    K_SPACE,
 )
 
 hare_points = 1
@@ -144,15 +145,16 @@ def game_loop(client_socket):
     for event in events:
         if event.type == pygame.KEYDOWN:
             pressed_keys = pygame.key.get_pressed()
+            new_input = adjust_position(pressed_keys)
+            print("this is the input that we are sending ", new_input)
             message = {
-                "NEW_INPUT": adjust_position(pressed_keys),
+                "NEW_INPUT": new_input,
                 "CLIENT_ID": client_ID,
                 "INTENT" : active_button
             }
 
         if event.type == pygame.QUIT:
             pygame.quit()
-        break
 
     if buttons_active: # we need to do this here bc we need access to the events from pygame. really annoying to pass around.
         pygame_widgets.update(events)
@@ -232,6 +234,8 @@ def adjust_position(pressed_keys):
         curr_col -= 1  # move left
     if pressed_keys[K_RIGHT]:
         curr_col += 1  # move right
+    if pressed_keys[K_SPACE]:
+        pass
     return curr_row, curr_col
 
 def print_board(msg):

@@ -11,8 +11,8 @@ import time # tit for tat pausing?
 # from agents.rawo import RawO
 
 PAUSE_TIME = 5
-HEIGHT = 3
-WIDTH = 3
+HEIGHT = 15
+WIDTH = 15
 
 from agents.random_agent import *
 from agents.human import *
@@ -74,6 +74,7 @@ class gameInstance():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
                         new_time = time.time() - current_time
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
+                        print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
                         client_intent[self.client_id_dict[client]] = received_json["INTENT"]
                         client_time.append(new_time)
 

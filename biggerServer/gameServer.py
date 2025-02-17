@@ -43,8 +43,8 @@ class GameServer():
         # # **** ROUND 1 ***** # 6 players, each human in their own game (w/ hare first)
 
         current_round = 1
-        situations = [["A"], ["D"]] # so having them all in the same situation does weird thigns to the dict, but other than that this SHOULD work.
-        player_indices_round_2 = [[0], [1]]  # start them in the same game
+        situations = [["A"]] # so having them all in the same situation does weird thigns to the dict, but other than that this SHOULD work.
+        player_indices_round_2 = [[0]]  # start them in the same game
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
         self.run_games(games_list, q, current_round, big_queue)
         self.append_average_points(current_round)
@@ -310,24 +310,27 @@ class GameServer():
         player_points = {} # have it like this for now see if that changes anything.
         self.points = player_points  # just so its the right kind of object.
         hunters = ["H1","H2","H3","H4","H5","H6","H7"] # max 7 players. I SHOULD make this dynamic.
+        for i in range(len(self.connected_clients)):
+            new_name = "H" + str(i+1)
+            hunters.append(new_name)
 
         for hunter in hunters:
             if hunter not in player_points:
                 player_points[hunter] = {}  # Initialize an empty dictionary for each hunter (not a list)
 
-            for round in range(1, self.max_rounds + 1):
-                # Directly create the round entry with "stag" and "hare" for each hunter
-                current_entry = player_points[hunter]
-
-                small_dict = {
-                    "stag": False,
-                    "hare": False,
-                    "avg_points" : 0,
-                }
-                # Directly assign the round as a key and small_dict as the value
-                current_entry[round] = small_dict
-                if round not in player_points[hunter]:
-                    player_points[hunter] = current_entry
+            # for round in range(1, self.max_rounds + 1):
+            #     # Directly create the round entry with "stag" and "hare" for each hunter
+            #     current_entry = player_points[hunter]
+            #
+            #     small_dict = {
+            #         "stag": False,
+            #         "hare": False,
+            #         "avg_points" : 0,
+            #     }
+            #     # Directly assign the round as a key and small_dict as the value
+            #     current_entry[round] = small_dict
+            #     if round not in player_points[hunter]:
+            #         player_points[hunter] = current_entry
         return player_points
 
 
