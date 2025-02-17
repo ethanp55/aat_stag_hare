@@ -7,6 +7,11 @@ import copy
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
 
+from agents.random_agent import *
+from agents.human import *
+from environment.world import StagHare
+from server import enemy
+from gameServer import GameServer
 import gameServer
 
 # NOTE
@@ -17,8 +22,8 @@ PAUSE_TIME = 3
 connected_clients = {}
 client_input = {}
 client_usernames = {}
-HEIGHT = 15 # leave this hardcoded for now.
-WIDTH = 15
+HEIGHT = 3 # leave this hardcoded for now.
+WIDTH = 3
 client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
@@ -27,9 +32,11 @@ round = 1
 HARE_POINTS = 10
 STAG_POINTS = 20
 # these ones always stay the same
-
+stag = enemy.Enemy("stag", HEIGHT, WIDTH)
+hare = enemy.Enemy("hare", HEIGHT, WIDTH)
 # your workstation ip is '192.168.30.17', use local host while at home
 def start_server(host='127.0.0.1', port=12345):
+
     # Create a TCP socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
@@ -63,7 +70,7 @@ def start_server(host='127.0.0.1', port=12345):
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
             # passes down the new player list, calls that object (so we should now be cooking) and then clears out the stuff. Do I need to make threads?
             new_player_list = copy.copy(connected_clients)
-            gameServer.GameServer(new_player_list, client_id_dict, client_usernames)
+            GameServer(new_player_list, client_id_dict, client_usernames)
             connected_clients.clear()
             client_id_dict.clear()
             client_usernames.clear()

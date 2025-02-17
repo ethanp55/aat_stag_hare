@@ -29,7 +29,6 @@ class GameServer():
         self.high_level_dict = {}  # this stores the round and then situation break down.
         self.scheduler(new_clients)
 
-
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
         big_queue = multiprocessing.Queue()
