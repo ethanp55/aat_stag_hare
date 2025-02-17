@@ -105,6 +105,7 @@ class gameInstance():
         big_dict_finalized = {}
         big_dict_finalized[self.situation] = self.big_dict
         self.big_dict = big_dict_finalized
+        print("AIGHT THIS GAME HAS FINSIHED")
         return new_dict
 
     def send_state(self):
