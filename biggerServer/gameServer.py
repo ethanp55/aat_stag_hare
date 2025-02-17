@@ -42,43 +42,28 @@ class GameServer():
 
         # # **** ROUND 1 ***** # 6 players, each human in their own game (w/ hare first)
 
-        current_round = 1
-        situations = [["A"]] # so having them all in the same situation does weird thigns to the dict, but other than that this SHOULD work.
-        player_indices_round_2 = [[0]]  # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
-        self.run_games(games_list, q, current_round, big_queue)
-        self.append_average_points(current_round)
-        self.save_stuff()
+        # current_round = 1
+        # situations = [["A"], ["A"], ["A"], ["A"], ["A"], ["A"], ["A"]] # so having them all in the same situation does weird thigns to the dict, but other than that this SHOULD work.
+        # player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # start them in the same game
+        # games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        # self.run_games(games_list, q, current_round, big_queue)
+        # self.append_average_points(current_round)
+        #
+        #
+        # current_round = 2
+        # situations = [["A"],["D"]]
+        # player_indices_round_2 = [[0], [1]]  # start them in the same game
+        # games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
+        # self.run_games(games_list, q, current_round, big_queue)
+        # self.append_average_points(current_round)
+        # self.save_stuff()
 
-        current_round = 2
-        situations = [["C"]]
-        player_indices_round_2 = [[0, 1]]  # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
-        self.run_games(games_list, q, current_round, big_queue)
-        self.append_average_points(current_round)
-
-
-        # # **** ROUND 1 ***** # 6 players, each human in their own game (w/ hare first)
-        current_round = 1
-        situations = [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]] # what type each bot should be. We check to make sure there are always 3.
-        player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]] # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
-        self.run_games(games_list, q, current_round, big_queue)
-        self.append_average_points(current_round)
-
-
-        # # **** ROUND 2 ***** # 6 players, each human in their own game (w/ stag greedy first)
-        current_round = 2
-        situations = [[2, 2],[2, 2],[2, 2],[2, 2],[2, 2],[2, 2],[2, 2]]  # what type each bot should be. We check to make sure there are always 3.
-        player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # start them in the same game
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
-        self.run_games(games_list, q, current_round, big_queue)
-        self.append_average_points(current_round)
 
         # so based on my understanding, doing this SHOULD just overwrite the practice rounds, unless we want to keep them.
 
 
         # # **** ROUND 3 ***** # 6 players, each human in their own game (w/ stag greedy first)
+        print('attemping to start')
         current_round = 1
         player_indices_round_2 = [[0, 1, 5], [2], [3, 4], [6]]   # the players that will be in the same game
         situations = [["B"], ["D"], ["C"], ["A"]]  # the number and type of bot we are expecting.
@@ -92,6 +77,7 @@ class GameServer():
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, big_queue)
         self.run_games(games_list, q, current_round, big_queue)
         self.append_average_points(current_round)
+        self.save_stuff()
 
         current_round = 3
         player_indices_round_2 = [[0, 3, 6], [1, 2], [4], [5]]
@@ -246,6 +232,7 @@ class GameServer():
     def run_games(self, games_list, q, current_round, big_queue):
         print('attempitng to run games here')
         situations_dict, big_dict_list = self.start_and_join_games(games_list, q, big_queue)
+        print("DO WE GET THIS FAR PLEASE")
         self.add_to_master_dict(situations_dict, current_round)
         self.add_to_big_dict(big_dict_list, current_round)
         points_to_send, points_to_save = self.calc_avg_points(current_round)
@@ -272,8 +259,10 @@ class GameServer():
         for game in games_list:
             game.start()
 
+        print("This should be fine, we should get here")
         for game in games_list:
             game.join()
+        print("this is probably where we are bricking. maybe. ")
 
         dicts_to_merge = []
         all_big_dicts = []
@@ -285,6 +274,7 @@ class GameServer():
             item = big_queue.get()
             all_big_dicts.append(item)
 
+        print("All the games have finished!")
         return self.merge_dicts(dicts_to_merge), all_big_dicts
 
 
@@ -309,7 +299,7 @@ class GameServer():
     def player_points_initialization(self):
         player_points = {} # have it like this for now see if that changes anything.
         self.points = player_points  # just so its the right kind of object.
-        hunters = ["H1","H2","H3","H4","H5","H6","H7"] # max 7 players. I SHOULD make this dynamic.
+        hunters = []
         for i in range(len(self.connected_clients)):
             new_name = "H" + str(i+1)
             hunters.append(new_name)
@@ -342,9 +332,10 @@ class GameServer():
                     # Check if the key exists in the main_dict
                     if key in self.points:
                         # Now apply the updates to the main_dict for the current key (e.g., 'H1', 'H10')
-                        for index, update in updates.items():
-                            if index in self.points[key]:  # Ensure the index exists in the nested dictionary
-                                self.points[key][index].update(update)
+                        for index, update in updates.items(): # we actually need to check if this isn't empty.
+                            self.points[key][index] = update
+                            # if index in self.points[key]:  # Ensure the index exists in the nested dictionary
+                            #     self.points[key][index].update(update)
         situation_player_dict = {}
         for situation in dicts_to_merge:
             situation_list = []
@@ -400,20 +391,31 @@ class GameServer():
         # here's how we are going to do this
         for tuple in self.points_to_save:
             self.points[tuple[0]][current_round]["avg_points"] = tuple[1]
-        print(self.points_to_save, "thats the points we were supposed to save")
-        print(self.points, "\n and that is the overall points dict at the end")
+            new_points = 0
+            if self.points[tuple[0]][current_round]["stag"] == True:
+                new_points += STAG_POINTS
+            if self.points[tuple[0]][current_round]["hare"] != False:
+                new_points += HARE_POINTS / self.points[tuple[0]][current_round]["hare"]
+            self.points[tuple[0]][current_round]["new_points"] = new_points
 
     def save_stuff(self):
         desktop_path = os.path.expanduser("~/Desktop")
+        folder_path = os.path.join(desktop_path, "stag_hare_jsons")
         top_level_path = "stag_hare_top_level.json"
         low_level_path = "stag_hare_low_level.json"
-        file_path_1 = os.path.join(desktop_path, top_level_path)
-        file_path_2 = os.path.join(desktop_path, low_level_path)
+        file_path_1 = os.path.join(folder_path, top_level_path)
+        file_path_2 = os.path.join(folder_path, low_level_path)
         unique_file_path_1 = self.get_unique_filename(file_path_1)
         unique_file_path_2 = self.get_unique_filename(file_path_2)
 
+        # tells us which hunter has which name for the high level dict.
+        self.hunter_names = {}
+        for index, name in enumerate(self.client_usernames):
+            new_name = "H" + str(index + 1)
+            self.hunter_names[new_name] = self.client_usernames[name]
+
         with open(unique_file_path_1, "w") as f:
-            json.dump(self.client_usernames, f, indent=4)
+            json.dump(self.hunter_names, f, indent=4)
             json.dump(self.points, f, indent=4)
 
         # Convert to JSON string

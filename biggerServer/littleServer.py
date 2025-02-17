@@ -58,6 +58,10 @@ class gameInstance():
             agent_types = [2] # one stag greedy
         if situation == "D":
             agent_types = [2,2]
+        if situation == "PH": # Hare Greedy again
+            agent_types = [1,1]
+        if situation == "PS": # Stag Greedy again
+            agent_types = [2,2]
         return agent_types
 
     def main_game_loop(self):
@@ -74,15 +78,15 @@ class gameInstance():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
                         new_time = time.time() - current_time
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
-                        print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
+                        #print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
                         client_intent[self.client_id_dict[client]] = received_json["INTENT"]
                         client_time.append(new_time)
 
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
-                    print("here is the client_time as well. ", client_time)
+                    #print("here is the client_time as well. ", client_time)
                     pause_time = min(3.0, (sum(client_time) / len(client_time)))  # keeps the AI agents paused, but for no more than 3 seconds tops.
-                    print("WE HAVE FINISHED, here is the client wait time : ", pause_time)
+                    #print("WE HAVE FINISHED, here is the client wait time : ", pause_time)
                     # for i in range(3 - len(client_input)):  # confusing pausing timimg thingy.
                     #     time.sleep(pause_time) # put this back in later. fast for now.
 
