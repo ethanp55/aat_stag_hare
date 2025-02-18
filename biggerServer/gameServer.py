@@ -67,8 +67,6 @@ class GameServer():
                                                 big_queue)
         self.run_games(games_list, q, current_round, big_queue)
         self.append_average_points(current_round)
-        self.save_stuff()
-
 
         current_round = 2
         player_indices_round_2 = [[0, 1, 5], [2, 4], [3], [6]]
@@ -231,7 +229,6 @@ class GameServer():
         self.run_games(games_list, q, current_round, big_queue)
         self.append_average_points(current_round)
         self.save_stuff()
-
     def create_game_processes(self, player_indices, current_round, new_clients, q, situations, big_queue):
         games_list = []
 
@@ -251,21 +248,17 @@ class GameServer():
     def run_games(self, games_list, q, current_round, big_queue):
         print('attempitng to run games here')
         print("this is the size of the gameslist ", len(games_list))
-        situations_dict, big_dict_list = self.start_and_join_games(games_list, q, big_queue)
+        self.start_and_join_games(games_list, q, big_queue)
         print("DO WE GET THIS FAR PLEASE")
         print('we are just gonna add more print statements')
         print("just to see if that works. ")
         print("maybe there si a problem with situation C? Let me look into it more. ")
-        self.add_to_master_dict(situations_dict, current_round)
-       # self.add_to_big_dict(big_dict_list, current_round)
+        #self.add_to_master_dict(situations_dict, current_round)
+        # TODO: fix this line. it might be cuasing things to brick.
+        #self.add_to_big_dict(big_dict_list, current_round)
         points_to_send, points_to_save = self.calc_avg_points(current_round)
         self.points_to_save = points_to_save
         self.send_leaderboard(points_to_send)  # sends out the updated leaderboard.
-
-    def add_to_big_dict(self, big_dict_list, current_round):
-        for big_dict in big_dict_list:
-            for situation, current_dict in big_dict.items():
-                self.high_level_dict[current_round][situation] = current_dict
 
     def add_to_master_dict(self, situations_dict, current_round):
         total_dict = {}
@@ -314,10 +307,12 @@ class GameServer():
         print("ARE WE GETTING THIS FAR PLEASE  (we should expect to see this twice")
         new_dict = {}
         new_dict[new_points_1.situation] = new_points_1.player_points
-        #new_dict["Big"] = new_points_1.big_dict
+        # TODO: this line might influence at well
+        new_dict["Big"] = new_points_1.big_dict
         print("ARE WE GETTING THIS FAR")
         q.put(new_dict)
-        #big_queue.put(new_points_1.big_dict)
+        # TODO: This line was commented out as well.
+        self.save_stuff_big(new_points_1.big_dict, current_round)
         print("this is the size of the new points dict ", sys.getsizeof(new_points_1.big_dict), " is this too large?")
         #print("this is whawt we have on q ", q, " and this is what we have on big queue, ", big_queue)
         # is it possible that the size of big queue is breaking everything.
@@ -425,15 +420,13 @@ class GameServer():
                 new_points += HARE_POINTS / self.points[tuple[0]][current_round]["hare"]
             self.points[tuple[0]][current_round]["new_points"] = new_points
 
-    def save_stuff(self):
+    def save_stuff_small(self):
         desktop_path = os.path.expanduser("~/Desktop")
         folder_path = os.path.join(desktop_path, "stag_hare_jsons")
         top_level_path = "stag_hare_top_level.json"
-        low_level_path = "stag_hare_low_level.json"
+
         file_path_1 = os.path.join(folder_path, top_level_path)
-        file_path_2 = os.path.join(folder_path, low_level_path)
         unique_file_path_1 = self.get_unique_filename(file_path_1)
-        unique_file_path_2 = self.get_unique_filename(file_path_2)
 
         # tells us which hunter has which name for the high level dict.
         self.hunter_names = {}
@@ -449,9 +442,6 @@ class GameServer():
         json_string = json.dumps(self.high_level_dict, indent=4, cls=NumpyEncoder)
         json_string = json_string.replace(" [", "[").replace(", ", ",").replace(" ]", "]")
 
-        with open(unique_file_path_2, "w") as f:
-            f.write(json_string)
-
     def get_unique_filename(self, file_path):
         if not os.path.exists(file_path):
             return file_path
@@ -462,6 +452,26 @@ class GameServer():
                 counter += 1
             return f"{base}_{counter}{extension}"
 
+
+    def save_stuff_big(self, high_level_dict, current_round):
+        desktop_path = os.path.expanduser("~/Desktop")
+        folder_path = os.path.join(desktop_path, "stag_hare_jsons", "low_level_jsons")
+
+        situation = next(iter(high_level_dict))
+        low_level_path = "stag_hare_low_level" + str(current_round) + str(situation) + ".json"
+
+        # if not os.path.exists(folder_path): # folder should already be guranteed to exist. don't worry about it.
+        #     os.makedirs(folder_path)
+
+        file_path_2 = os.path.join(folder_path, low_level_path)
+        unique_file_path_2 = self.get_unique_filename(file_path_2)
+
+        # Convert to JSON string
+        json_string = json.dumps(high_level_dict, indent=4, cls=NumpyEncoder)
+        json_string = json_string.replace(" [", "[").replace(", ", ",").replace(" ]", "]")
+
+        with open(unique_file_path_2, "w") as f:
+            f.write(json_string)
 
 # Custom encoder to handle np.int64 conversion to Python int
 class NumpyEncoder(json.JSONEncoder):
