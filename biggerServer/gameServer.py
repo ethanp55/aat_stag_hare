@@ -1,6 +1,5 @@
 #this is where the scheduling and holding all the big dicts / writing to disk takes place. also instantiates game instances given specific things.
 import os
-import sys
 
 import numpy as np
 
@@ -213,8 +212,6 @@ class GameServer():
     def create_game_processes(self, player_indices, current_round, new_clients, q, situations):
         games_list = []
 
-        # make a way to to check that everything sums up to 3 ig.
-
         for i, indices in enumerate(player_indices): # should? now sort through the agent types and make sure it spits out the correct thing.
             # Create a new process for each list of indices
             game_process = Process(target=self.game_thread,
@@ -228,28 +225,15 @@ class GameServer():
 
     def run_games(self, games_list, q, current_round):
         self.start_and_join_games(games_list, q)
-        # TODO: fix this line. it might be cuasing things to brick.
-        #self.add_to_big_dict(big_dict_list, current_round)
         points_to_send, points_to_save = self.calc_avg_points(current_round)
         self.points_to_save = points_to_save
         self.send_leaderboard(points_to_send)  # sends out the updated leaderboard.
-
-    # def add_to_master_dict(self, situations_dict, current_round):
-    #     total_dict = {}
-    #     for situation, values in situations_dict.items():
-    #         new_dict = {}
-    #         for player in values:
-    #             selected_keys = ["hare", "stag"]
-    #             new_dict[player] = {key : self.points[player][current_round][key] for key in selected_keys}
-    #         total_dict[situation] = new_dict
-    #     self.high_level_dict[current_round] = total_dict # that might brick as well. lets find out.
 
 
     def start_and_join_games(self, games_list, q):
         for game in games_list:
             game.start()
 
-        print("This should be fine, we should get here")
         for game in games_list:
             game.join()
 
@@ -259,7 +243,6 @@ class GameServer():
             item = q.get()
             dicts_to_merge.append(item)
 
-        print("All the games have finished!")
         return self.merge_dicts(dicts_to_merge), all_big_dicts
 
 
@@ -276,16 +259,7 @@ class GameServer():
         new_points_1 = gameInstance(new_clients, self.client_id_dict, situations, current_round)  # need to somehow include an agent type
         new_dict = {}
         new_dict[new_points_1.situation] = new_points_1.player_points
-        # TODO: this line might influence at well
-        #new_dict["Big"] = new_points_1.big_dict
-        print("ARE WE GETTING THIS FAR")
         q.put(new_dict)
-        # TODO: This line was commented out as well.
-        #self.save_stuff_big(new_points_1.big_dict, current_round)
-        print("this is the size of the new points dict ", sys.getsizeof(new_points_1.big_dict), " is this too large?")
-        #print("this is whawt we have on q ", q, " and this is what we have on big queue, ")
-        # is it possible that the size of big queue is breaking everything.
-        print('are we getting to the end. if we are I have no idea whatss going on. ')
 
     def player_points_initialization(self):
         player_points = {} # have it like this for now see if that changes anything.
@@ -298,20 +272,6 @@ class GameServer():
         for hunter in hunters:
             if hunter not in player_points:
                 player_points[hunter] = {}  # Initialize an empty dictionary for each hunter (not a list)
-
-            # for round in range(1, self.max_rounds + 1):
-            #     # Directly create the round entry with "stag" and "hare" for each hunter
-            #     current_entry = player_points[hunter]
-            #
-            #     small_dict = {
-            #         "stag": False,
-            #         "hare": False,
-            #         "avg_points" : 0,
-            #     }
-            #     # Directly assign the round as a key and small_dict as the value
-            #     current_entry[round] = small_dict
-            #     if round not in player_points[hunter]:
-            #         player_points[hunter] = current_entry
         return player_points
 
 
@@ -325,8 +285,7 @@ class GameServer():
                         # Now apply the updates to the main_dict for the current key (e.g., 'H1', 'H10')
                         for index, update in updates.items(): # we actually need to check if this isn't empty.
                             self.points[key][index] = update
-                            # if index in self.points[key]:  # Ensure the index exists in the nested dictionary
-                            #     self.points[key][index].update(update)
+
         situation_player_dict = {}
         for situation in dicts_to_merge:
             situation_list = []
@@ -349,7 +308,7 @@ class GameServer():
                     if self.points[key][curr_round]['hare'] != False:
                         curr_points += HARE_POINTS / self.points[key][curr_round]['hare']
                 else:
-                    break # not sure if that will do what I want it to do.
+                    break
 
             if curr_points > 0:
                 curr_points = curr_points / target_round # just to get the average
@@ -378,8 +337,6 @@ class GameServer():
         time.sleep(2)  # lets everyone see the leaderboard
 
     def append_average_points(self, current_round):
-        # we need to modify self.points to include another feild - the average points
-        # here's how we are going to do this
         for tuple in self.points_to_save:
             self.points[tuple[0]][current_round]["avg_points"] = tuple[1]
             new_points = 0
@@ -407,9 +364,6 @@ class GameServer():
             json.dump(self.hunter_names, f, indent=4)
             json.dump(self.points, f, indent=4)
 
-        # Convert to JSON string
-        json_string = json.dumps(self.high_level_dict, indent=4, cls=NumpyEncoder)
-        json_string = json_string.replace(" [", "[").replace(", ", ",").replace(" ]", "]")
 
     def get_unique_filename(self, file_path):
         if not os.path.exists(file_path):
@@ -420,27 +374,6 @@ class GameServer():
             while os.path.exists(f"{base}_{counter}{extension}"):
                 counter += 1
             return f"{base}_{counter}{extension}"
-
-
-    def save_stuff_big(self, high_level_dict, current_round):
-        desktop_path = os.path.expanduser("~/Desktop")
-        folder_path = os.path.join(desktop_path, "stag_hare_jsons", "low_level_jsons")
-
-        situation = next(iter(high_level_dict))
-        low_level_path = "stag_hare_low_level" + str(current_round) + str(situation) + ".json"
-
-        # if not os.path.exists(folder_path): # folder should already be guranteed to exist. don't worry about it.
-        #     os.makedirs(folder_path)
-
-        file_path_2 = os.path.join(folder_path, low_level_path)
-        unique_file_path_2 = self.get_unique_filename(file_path_2)
-
-        # Convert to JSON string
-        json_string = json.dumps(high_level_dict, indent=4, cls=NumpyEncoder)
-        json_string = json_string.replace(" [", "[").replace(", ", ",").replace(" ]", "]")
-
-        with open(unique_file_path_2, "w") as f:
-            f.write(json_string)
 
 # Custom encoder to handle np.int64 conversion to Python int
 class NumpyEncoder(json.JSONEncoder):
