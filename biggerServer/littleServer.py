@@ -7,6 +7,9 @@ import json
 
 import time # tit for tat pausing?
 
+from agents.generator import GreedyHareGen
+from agents.greedy import Greedy
+
 # from agents.alegaatr import AlegAATr
 # from agents.dqn import DQNAgent
 # from agents.qalegaatr import QAlegAATr
@@ -24,7 +27,7 @@ from environment.world import StagHare
 import random
 
 class gameInstance():
-    def __init__(self, connected_clients, client_id_dict, situation, round=0):
+    def __init__(self, connected_clients, client_id_dict, situation, round=0, save=True):
         self.connected_clients = connected_clients
         self.client_id_dict = client_id_dict
         #self.agentType = situation
@@ -37,6 +40,7 @@ class gameInstance():
         self.max_rounds = round
         self.kills = None
         self.big_dict = {} # responsible for the second file upstream. Yeah its a lot.  # just have indexes instead of rounds as K.
+        self.save = save
         client_id_list = []
         for client in self.connected_clients:
             client_id_list.append(client+1)
@@ -109,7 +113,8 @@ class gameInstance():
         big_dict_finalized[self.situation] = self.big_dict
         self.big_dict = big_dict_finalized
         print("AIGHT THIS GAME HAS FINSIHED")
-        self.save_stuff_big(big_dict_finalized, self.round)
+        if self.save:
+            self.save_stuff_big(big_dict_finalized, self.round)
         return new_dict
 
     def send_state(self):
@@ -295,9 +300,10 @@ class gameInstance():
             agent_type = self.agentType[index]
             # different types of agents can go here, might be work making a different functioun
             if agent_type == 1:
-                new_hunters.append(Random(name=new_name))
+                new_hunters.append(GreedyHareGen(new_name))
             if agent_type == 2:
-                new_hunters.append(Random(name=new_name))
+                new_hunters.append(Greedy(new_name, "stag"))
+
             # if self.agentType == 2:
             #     new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
             # if self.agentType == 3:

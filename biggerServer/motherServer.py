@@ -14,6 +14,7 @@ from server import enemy
 from gameServer import GameServer
 import gameServer
 
+
 # NOTE
 HUMAN_PLAYERS = 7 # how many human players (clients) we are expecting (This should be 12 for the full study)
 
