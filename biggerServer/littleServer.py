@@ -1,4 +1,7 @@
 # this holds the actual instance of stag hunt, only runs 1 round based on scheduling. run this and then return the new dicts that we need to append to the large dicts up above.
+import os
+
+import numpy as np
 import select
 import json
 
@@ -106,6 +109,7 @@ class gameInstance():
         big_dict_finalized[self.situation] = self.big_dict
         self.big_dict = big_dict_finalized
         print("AIGHT THIS GAME HAS FINSIHED")
+        self.save_stuff_big(big_dict_finalized, self.round)
         return new_dict
 
     def send_state(self):
@@ -456,6 +460,43 @@ class gameInstance():
         return self.player_points
 
 
+    def get_unique_filename(self, file_path):
+        if not os.path.exists(file_path):
+            return file_path
+        else:
+            base, extension = os.path.splitext(file_path)
+            counter = 1
+            while os.path.exists(f"{base}_{counter}{extension}"):
+                counter += 1
+            return f"{base}_{counter}{extension}"
+
+
+    def save_stuff_big(self, high_level_dict, current_round):
+        desktop_path = os.path.expanduser("~/Desktop")
+        folder_path = os.path.join(desktop_path, "stag_hare_jsons", "low_level_jsons")
+
+        situation = next(iter(high_level_dict))
+        low_level_path = "stag_hare_low_level" + str(current_round) + str(situation) + ".json"
+
+        # if not os.path.exists(folder_path): # folder should already be guranteed to exist. don't worry about it.
+        #     os.makedirs(folder_path)
+
+        file_path_2 = os.path.join(folder_path, low_level_path)
+        unique_file_path_2 = self.get_unique_filename(file_path_2)
+
+        # Convert to JSON string
+        json_string = json.dumps(high_level_dict, indent=4, cls=NumpyEncoder)
+        json_string = json_string.replace(" [", "[").replace(", ", ",").replace(" ]", "]")
+
+        with open(unique_file_path_2, "w") as f:
+            f.write(json_string)
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.int64):
+            return int(obj)  # Convert np.int64 to native Python int
+        return super(NumpyEncoder, self).default(obj)
 
 
 
