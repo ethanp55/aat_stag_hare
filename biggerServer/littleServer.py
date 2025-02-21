@@ -271,6 +271,10 @@ class gameInstance():
         for agent in self.stag_hare.state.agent_positions:
             new_dict[agent]["after_position"] = self.stag_hare.state.agent_positions[agent]  # should be a tuple
 
+        for agent in self.hunters:
+            new_dict[agent.name]["intent"] = agent.is_hunting_hare()
+
+
         self.big_dict[index] = new_dict
 
 
@@ -290,8 +294,6 @@ class gameInstance():
         new_hunters = []
         for i in range(len(self.connected_clients)): # connected clients is only the clients who are supposed to be in the game
             new_name = "H" + str(i+1)
-
-
             new_hunters.append(humanAgent(name=new_name))
 
         for i in range(3 - len(self.connected_clients)): # bc they always need to add up to 3
