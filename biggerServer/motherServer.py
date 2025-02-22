@@ -16,7 +16,7 @@ import gameServer
 
 
 # NOTE
-HUMAN_PLAYERS = 1 # how many human players (clients) we are expecting (This should be 12 for the full study)
+HUMAN_PLAYERS = 2 # how many human players (clients) we are expecting (This should be 12 for the full study)
 
 PAUSE_TIME = 3
 

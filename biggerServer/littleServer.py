@@ -42,7 +42,7 @@ class gameInstance():
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
         self.max_rounds = round
         self.kills = None
-        self.client_time = None
+        self.client_time = 1 # start it off at 1 second.
         self.big_dict = {} # responsible for the second file upstream. Yeah its a lot.  # just have indexes instead of rounds as K.
         self.save = save
         client_id_list = []
@@ -77,13 +77,13 @@ class gameInstance():
 
     def main_game_loop(self):
         index = 0
-        q = multiprocessing.Queue() # intialize this here
         while True:
-
             client_input = {}
             client_intent = {}
-            client_time = []
+            client_wait_times = []
             current_time = time.time()
+            timer = Timer(self.client_time)
+            print("this is how long we are pausing ", self.client_time)
 
             while True:
                 self.send_state()  # sends out the current game state
@@ -94,44 +94,36 @@ class gameInstance():
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
                         # print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
                         client_intent[self.client_id_dict[client]] = received_json["INTENT"]
-                        client_time.append(new_time)
+                        client_wait_times.append(new_time)
+
+                for client in client_input:
+                    message = {
+                        "INPUT" : client_input[client],
+                        "HEIGHT": HEIGHT,
+                        "WIDTH": WIDTH,
+                    }
+                    self.connected_clients[client-1].send(json.dumps(message).encode()) # off by one error, no idea if its consistent.
 
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
-                    print("here is the client_time as well. ", client_time)
-                    # new_list = [client_input, client_intent, client_time]
-                    # q.put(new_list)  # yes we need all of those.
+                    print("here is the client_time as well. ", client_wait_times)
                     break  # gets us out of the input loop. hopefully.
 
-            # client_thread = Process(target=self.client_thread,
-            #                        args=(q,)
-            #                        )
-            # robot_thread = Process(target=self.robot_thread,
-            #                        args=(self.client_time,)
-            #                        )
-            # #current_threads = [client_thread, robot_thread]
-            # current_threads = [client_thread]
-            #
-            # for thread in current_threads:
-            #     thread.start()
-            #
-            # for thread in current_threads:
-            #     thread.join()
-            #
-            # print("ayo when do this pop off?")
-            # new_list = []
-            # while not q.empty():
-            #     item = q.get()
-            #     new_list.append(item)
 
+            if not timer.time_out():
+                #print("IS this going off? at all? here's how much time we are plugging in ", timer.time())
+                print("this is how long we are pausing ", float(self.client_time - timer.time()))
+                time.sleep(self.client_time - timer.time()) # gotta get how much time is left.
 
-            #self.client_time = new_list[0][2]
-            print("this is the current client time !", self.client_time)
-
-
+            # after sleeping, reset the timer based on the previous rounds input.
+            #self.client_time = min(sum(client_wait_times) / len(client_wait_times), 1) # never make em wait for more than a second.
+            # how can I make htis more convincing?
+            pause_time = 2 * sum(client_wait_times) / len(client_wait_times)
+            self.client_time = min(random.uniform(0, pause_time), 2)
+            print("this is the new self.client_time! ", self.client_time)
 
             #running = self.stag_hunt_game_loop(self.player_points, new_list[0][0], new_list[0][1], new_list[0][2], index)
-            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, client_time, index)
+            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, index)
 
             index += 1
             if running == False:
@@ -148,44 +140,6 @@ class gameInstance():
         if self.save:
             self.save_stuff_big(big_dict_finalized, self.round)
         return new_dict
-
-    def client_thread(self, q):
-        client_input = {}
-        client_intent = {}
-        client_time = []
-        current_time = time.time()
-
-        while True:
-            self.send_state()  # sends out the current game state
-            data = self.get_client_data()
-            for client, received_json in data.items():
-                if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
-                    new_time = time.time() - current_time
-                    client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
-                    # print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
-                    client_intent[self.client_id_dict[client]] = received_json["INTENT"]
-                    client_time.append(new_time)
-
-            # Check if all clients have provided input
-            if len(client_input) == len(self.connected_clients):
-                print("here is the client_time as well. ", client_time)
-                new_list = [client_input, client_intent, client_time]
-                q.put(new_list) # yes we need all of those.
-                break  # gets us out of the input loop. hopefully.
-
-
-    def robot_thread(self, client_time):
-        wait_time = 0.5 # assume half a second if there is no input.
-        if client_time is not None:
-            wait_time = sum(client_time) / len(client_time)
-        wait_time = random.uniform(0, wait_time) # gives me some randomness, but still mostly leans towrads stuff.
-        wait_time = min(wait_time, 1) # never more than a second per agent.
-        print("This here is teh wait time ", wait_time)
-        asyncio.run(self.robot_wait(wait_time))
-        # should wait roughly as long as the client now. maybe a little less. give it a whirl.
-
-    async def robot_wait(self, wait_time):
-        await asyncio.sleep(wait_time)
 
 
     def send_state(self):
@@ -229,11 +183,11 @@ class gameInstance():
                 pass
         return data
 
-    def stag_hunt_game_loop(self, player_points, player_input, client_intent, client_time, index):
+    def stag_hunt_game_loop(self, player_points, player_input, client_intent, index):
 
         rewards = [0] * (len(self.hunters) + 2)
 
-        self.next_round(rewards, player_input, client_intent, client_time, index)
+        self.next_round(rewards, player_input, client_intent, index)
 
         self.send_state()
 
@@ -294,7 +248,7 @@ class gameInstance():
                 self.round += 1
                 self.reset_stag_hare()
 
-    def next_round(self, rewards, new_positions, client_intent, client_time, index):
+    def next_round(self, rewards, new_positions, client_intent, index):
         new_dict = {}
         new_dict["stag"] = {}
         new_dict["hare"] = {}
@@ -584,8 +538,11 @@ class NumpyEncoder(json.JSONEncoder):
 # tried having this in a separate file and it just kept bricking, pulled it out and we are good to go.
 class Timer:
     def __init__(self, time_limit: float = 60):
-        self.start = time.time()
         self.time_limit = time_limit
+        self.reset()
+
+    def reset(self):
+        self.start = time.time()
 
     def time(self) -> float:
         return time.time() - self.start

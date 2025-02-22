@@ -135,6 +135,8 @@ def game_loop(client_socket):
             buttons_active = True
             if "message" in server_response:
                 client_ID = server_response["CLIENT_ID"]
+            if "INPUT" in server_response:
+                add_input(server_response)
             if "HUMAN_AGENTS" in server_response:
                 initalize(server_response)
             print_board(server_response)
@@ -169,6 +171,12 @@ def game_loop(client_socket):
 
     pygame.display.update()
     client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
+
+
+def add_input(msg):
+    for agent in agents:
+        agent.add_input()
+
 
 
 def draw_leaderboard(new_leaderboard):
@@ -403,6 +411,7 @@ def change_hare(new_value):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, name, height, width, my_player=False):
         super(Enemy, self).__init__()
+        self.my_player = my_player
         self.row_to_return, self.col_to_return = None, None # for ethans code
         self.square_height = SCREEN_HEIGHT / height
         self.square_width = SCREEN_WIDTH / width
@@ -412,7 +421,9 @@ class Enemy(pygame.sprite.Sprite):
         self.square_height = self.height
         self.square_width = self.width
         self.points = 0
+        self.new_position = None
         self.new_surf = None
+        self.screen = None
 
         if name == "stag":
             self.original_surf = stag_sprite
@@ -441,7 +452,9 @@ class Enemy(pygame.sprite.Sprite):
 
     def update(self, screen, array_position, dead=False):
         # here
+        self.screen = screen
         new_position = calculate_position(self, array_position)
+        self.new_position = new_position
         if dead:
             red_surf = self.surf.copy()  # Copy the original surface
             red_surf.fill((200, 60, 20))  # Fill the copy with red
@@ -465,6 +478,12 @@ class Enemy(pygame.sprite.Sprite):
 
         # create the new font here make sure all the changes work so far tho.
 
+    def add_input(self):
+        if self.my_player:
+            print("WE SHOULD BE DRAWIGN A CIRCLE CHEFI")
+            circle_radius = self.square_width // 2 + 5 # for a little padding action
+            circle_center = self.rect.center
+            pygame.draw.circle(self.screen, (255, 0,0), circle_center, circle_radius, 3)
 
 
 
