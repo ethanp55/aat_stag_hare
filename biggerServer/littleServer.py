@@ -80,32 +80,59 @@ class gameInstance():
         q = multiprocessing.Queue() # intialize this here
         while True:
 
-            client_thread = Process(target=self.client_thread,
-                                   args=(q,)
-                                   )
-            robot_thread = Process(target=self.robot_thread,
-                                   args=(self.client_time,)
-                                   )
-            #current_threads = [client_thread, robot_thread]
-            current_threads = [client_thread]
+            client_input = {}
+            client_intent = {}
+            client_time = []
+            current_time = time.time()
 
-            for thread in current_threads:
-                thread.start()
+            while True:
+                self.send_state()  # sends out the current game state
+                data = self.get_client_data()
+                for client, received_json in data.items():
+                    if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
+                        new_time = time.time() - current_time
+                        client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
+                        # print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
+                        client_intent[self.client_id_dict[client]] = received_json["INTENT"]
+                        client_time.append(new_time)
 
-            for thread in current_threads:
-                thread.join()
+                # Check if all clients have provided input
+                if len(client_input) == len(self.connected_clients):
+                    print("here is the client_time as well. ", client_time)
+                    # new_list = [client_input, client_intent, client_time]
+                    # q.put(new_list)  # yes we need all of those.
+                    break  # gets us out of the input loop. hopefully.
 
-            print("ayo when do this pop off?")
-            new_list = []
-            while not q.empty():
-                item = q.get()
-                new_list.append(item)
+            # client_thread = Process(target=self.client_thread,
+            #                        args=(q,)
+            #                        )
+            # robot_thread = Process(target=self.robot_thread,
+            #                        args=(self.client_time,)
+            #                        )
+            # #current_threads = [client_thread, robot_thread]
+            # current_threads = [client_thread]
+            #
+            # for thread in current_threads:
+            #     thread.start()
+            #
+            # for thread in current_threads:
+            #     thread.join()
+            #
+            # print("ayo when do this pop off?")
+            # new_list = []
+            # while not q.empty():
+            #     item = q.get()
+            #     new_list.append(item)
 
 
-            self.client_time = new_list[0][2]
+            #self.client_time = new_list[0][2]
             print("this is the current client time !", self.client_time)
 
-            running = self.stag_hunt_game_loop(self.player_points, new_list[0][0], new_list[0][1], new_list[0][2], index)
+
+
+            #running = self.stag_hunt_game_loop(self.player_points, new_list[0][0], new_list[0][1], new_list[0][2], index)
+            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, client_time, index)
+
             index += 1
             if running == False:
                 break
