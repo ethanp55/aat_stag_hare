@@ -1,12 +1,13 @@
 # this holds the actual instance of stag hunt, only runs 1 round based on scheduling. run this and then return the new dicts that we need to append to the large dicts up above.
 import multiprocessing
 import os
+import socket
 from multiprocessing import Process
 
 import numpy as np
 import select
 import json
-
+import asyncio
 import time # tit for tat pausing?
 
 from agents.generator import GreedyHareGen
@@ -85,7 +86,8 @@ class gameInstance():
             robot_thread = Process(target=self.robot_thread,
                                    args=(self.client_time,)
                                    )
-            current_threads = [client_thread, robot_thread]
+            #current_threads = [client_thread, robot_thread]
+            current_threads = [client_thread]
 
             for thread in current_threads:
                 thread.start()
@@ -99,13 +101,11 @@ class gameInstance():
                 item = q.get()
                 new_list.append(item)
 
-            best_list = []
-            for key in new_list:
-                best_list = new_list[key]
 
-            self.client_time = best_list[2]
+            self.client_time = new_list[0][2]
+            print("this is the current client time !", self.client_time)
 
-            running = self.stag_hunt_game_loop(self.player_points, best_list[0], best_list[1], best_list[2], index)
+            running = self.stag_hunt_game_loop(self.player_points, new_list[0][0], new_list[0][1], new_list[0][2], index)
             index += 1
             if running == False:
                 break
@@ -129,7 +129,6 @@ class gameInstance():
         current_time = time.time()
 
         while True:
-            print("ATTEMPTIGN LETS JUST SEE WHAT HAPPENS")
             self.send_state()  # sends out the current game state
             data = self.get_client_data()
             for client, received_json in data.items():
@@ -152,13 +151,14 @@ class gameInstance():
         wait_time = 0.5 # assume half a second if there is no input.
         if client_time is not None:
             wait_time = sum(client_time) / len(client_time)
-        wait_time = random.uniform(0, 2*wait_time) # gives me some randomness, but still mostly leans towrads stuff.
+        wait_time = random.uniform(0, wait_time) # gives me some randomness, but still mostly leans towrads stuff.
+        wait_time = min(wait_time, 1) # never more than a second per agent.
+        print("This here is teh wait time ", wait_time)
+        asyncio.run(self.robot_wait(wait_time))
+        # should wait roughly as long as the client now. maybe a little less. give it a whirl.
 
-        for agent in self.hunters:
-            if agent.name.startswith("R"):
-                time.sleep(wait_time)
-
-        return
+    async def robot_wait(self, wait_time):
+        await asyncio.sleep(wait_time)
 
 
     def send_state(self):
@@ -196,6 +196,8 @@ class gameInstance():
                         break
                 if msg:
                     data[client] = json.loads(msg)
+            except socket.timeout:
+                print("here's the problem - socket time out :(")
             except Exception as e:
                 pass
         return data
