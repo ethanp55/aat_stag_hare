@@ -31,6 +31,13 @@ class GameServer():
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
 
+        current_round = 1
+        player_indices_round_2 = [[0]]  # the players that will be in the same game
+        situations = [["A"]]  # the number and type of bot we are expecting.
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
+        self.run_games(games_list, q, current_round)
+        self.append_average_points(current_round)
+
         # PRACTICE ROUNDS 1 AND 2.
         current_round = 1
         player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game

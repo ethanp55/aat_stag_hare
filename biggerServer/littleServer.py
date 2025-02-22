@@ -1,5 +1,7 @@
 # this holds the actual instance of stag hunt, only runs 1 round based on scheduling. run this and then return the new dicts that we need to append to the large dicts up above.
+import multiprocessing
 import os
+from multiprocessing import Process
 
 import numpy as np
 import select
@@ -39,6 +41,7 @@ class gameInstance():
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
         self.max_rounds = round
         self.kills = None
+        self.client_time = None
         self.big_dict = {} # responsible for the second file upstream. Yeah its a lot.  # just have indexes instead of rounds as K.
         self.save = save
         client_id_list = []
@@ -73,37 +76,39 @@ class gameInstance():
 
     def main_game_loop(self):
         index = 0
+        q = multiprocessing.Queue() # intialize this here
         while True:
-            client_input = {}
-            client_intent = {}
-            client_time = []
-            current_time = time.time()
-            while True:
-                self.send_state()  # sends out the current game state
-                data = self.get_client_data()
-                for client, received_json in data.items():
-                    if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
-                        new_time = time.time() - current_time
-                        client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
-                        #print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
-                        client_intent[self.client_id_dict[client]] = received_json["INTENT"]
-                        client_time.append(new_time)
 
-                # Check if all clients have provided input
-                if len(client_input) == len(self.connected_clients):
-                    #print("here is the client_time as well. ", client_time)
-                    pause_time = min(3.0, (sum(client_time) / len(client_time)))  # keeps the AI agents paused, but for no more than 3 seconds tops.
-                    #print("WE HAVE FINISHED, here is the client wait time : ", pause_time)
-                    # for i in range(3 - len(client_input)):  # confusing pausing timimg thingy.
-                    #     time.sleep(pause_time) # put this back in later. fast for now.
+            client_thread = Process(target=self.client_thread,
+                                   args=(q,)
+                                   )
+            robot_thread = Process(target=self.robot_thread,
+                                   args=(self.client_time,)
+                                   )
+            current_threads = [client_thread, robot_thread]
 
-                    break # gets us out of the input loop. hopefully.
+            for thread in current_threads:
+                thread.start()
 
-            running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, client_time, index)
+            for thread in current_threads:
+                thread.join()
+
+            print("ayo when do this pop off?")
+            new_list = []
+            while not q.empty():
+                item = q.get()
+                new_list.append(item)
+
+            best_list = []
+            for key in new_list:
+                best_list = new_list[key]
+
+            self.client_time = best_list[2]
+
+            running = self.stag_hunt_game_loop(self.player_points, best_list[0], best_list[1], best_list[2], index)
             index += 1
             if running == False:
                 break
-            client_input.clear()
 
 
         new_points = self.adjust_points()
@@ -116,6 +121,45 @@ class gameInstance():
         if self.save:
             self.save_stuff_big(big_dict_finalized, self.round)
         return new_dict
+
+    def client_thread(self, q):
+        client_input = {}
+        client_intent = {}
+        client_time = []
+        current_time = time.time()
+
+        while True:
+            print("ATTEMPTIGN LETS JUST SEE WHAT HAPPENS")
+            self.send_state()  # sends out the current game state
+            data = self.get_client_data()
+            for client, received_json in data.items():
+                if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
+                    new_time = time.time() - current_time
+                    client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
+                    # print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
+                    client_intent[self.client_id_dict[client]] = received_json["INTENT"]
+                    client_time.append(new_time)
+
+            # Check if all clients have provided input
+            if len(client_input) == len(self.connected_clients):
+                print("here is the client_time as well. ", client_time)
+                new_list = [client_input, client_intent, client_time]
+                q.put(new_list) # yes we need all of those.
+                break  # gets us out of the input loop. hopefully.
+
+
+    def robot_thread(self, client_time):
+        wait_time = 0.5 # assume half a second if there is no input.
+        if client_time is not None:
+            wait_time = sum(client_time) / len(client_time)
+        wait_time = random.uniform(0, 2*wait_time) # gives me some randomness, but still mostly leans towrads stuff.
+
+        for agent in self.hunters:
+            if agent.name.startswith("R"):
+                time.sleep(wait_time)
+
+        return
+
 
     def send_state(self):
         current_state = self.create_current_state()
