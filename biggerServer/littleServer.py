@@ -86,7 +86,7 @@ class gameInstance():
             print("this is how long we are pausing ", self.client_time)
 
             while True:
-                self.send_state(client_input)  # sends out the current game state
+                #self.send_state(client_input)  # sends out the current game state
                 data = self.get_client_data()
                 for client, received_json in data.items():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
@@ -104,6 +104,7 @@ class gameInstance():
                 #     }
                 #     self.connected_clients[client-1].send(json.dumps(message).encode()) # off by one error, no idea if its consistent.
 
+                self.send_state(client_input) # will this fix it?
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
                     print("here is the client_time as well. ", client_wait_times)
@@ -188,7 +189,7 @@ class gameInstance():
         rewards = [0] * (len(self.hunters) + 2)
 
         self.next_round(rewards, player_input, client_intent, index)
-
+        player_input.clear()
         self.send_state(player_input)
 
         if self.stag_hare.is_over():
