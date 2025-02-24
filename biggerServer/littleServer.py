@@ -158,7 +158,7 @@ class gameInstance():
                 "HEIGHT": HEIGHT,
                 "WIDTH": WIDTH,
             }
-            if (client+1) in client_input:
+            if (client+1) in client_input: # off by one error don't worry about it.
                 response["INPUT"] = True
             new_message = json.dumps(response).encode()
             self.connected_clients[client].send(new_message)

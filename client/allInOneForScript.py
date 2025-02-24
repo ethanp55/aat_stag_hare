@@ -473,8 +473,10 @@ class Enemy(pygame.sprite.Sprite):
 
         if highlight and self.my_player:
             print("we have become highlighted chefi. I think")
-            circle_radius = self.square_width // 2 + 5  # for a little padding action
-            pygame.draw.circle(self.screen, (255, 0, 0), new_position, circle_radius, 3)
+            circle_radius = self.square_width * 1.75  # for a little padding action
+            position_to_plug_in = new_position[0] + (1.75 * self.square_height), new_position[1] + (1.75 * self.square_height)
+
+            pygame.draw.circle(self.screen, (255, 0, 0), position_to_plug_in, circle_radius, 3)
 
     def update_alive(self):
         self.surf = self.original_surf
