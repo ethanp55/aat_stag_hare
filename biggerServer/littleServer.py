@@ -86,7 +86,7 @@ class gameInstance():
             print("this is how long we are pausing ", self.client_time)
 
             while True:
-                self.send_state()  # sends out the current game state
+                self.send_state(client_input)  # sends out the current game state
                 data = self.get_client_data()
                 for client, received_json in data.items():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
@@ -96,13 +96,13 @@ class gameInstance():
                         client_intent[self.client_id_dict[client]] = received_json["INTENT"]
                         client_wait_times.append(new_time)
 
-                for client in client_input:
-                    message = {
-                        "INPUT" : client_input[client],
-                        "HEIGHT": HEIGHT,
-                        "WIDTH": WIDTH,
-                    }
-                    self.connected_clients[client-1].send(json.dumps(message).encode()) # off by one error, no idea if its consistent.
+                # for client in client_input:
+                #     message = {
+                #         "INPUT" : client_input[client],
+                #         "HEIGHT": HEIGHT,
+                #         "WIDTH": WIDTH,
+                #     }
+                #     self.connected_clients[client-1].send(json.dumps(message).encode()) # off by one error, no idea if its consistent.
 
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
@@ -142,24 +142,24 @@ class gameInstance():
         return new_dict
 
 
-    def send_state(self):
+    def send_state(self, client_input):
         current_state = self.create_current_state()
         send_player_points = self.player_points.copy()
         # lets make a list of all of the connected_clients_ids and use those to generate players
-        response = {}
-        response = { # KEEP THIS OUTSIDE THE LOOP PLEASE
-            "HUMAN_AGENTS": len(self.connected_clients),
-            "AI_AGENTS": 3 - len(self.connected_clients),
-            "CLIENT_ID_LIST": self.client_id_list,
-            "AGENT_POSITIONS": current_state,
-            "POINTS": send_player_points,
-            "CURR_ROUND": self.round,
-            "HEIGHT": HEIGHT,
-            "WIDTH": WIDTH,
-        }
-
-
         for client in self.connected_clients:
+            response = {}
+            response = {  # KEEP THIS OUTSIDE THE LOOP PLEASE
+                "HUMAN_AGENTS": len(self.connected_clients),
+                "AI_AGENTS": 3 - len(self.connected_clients),
+                "CLIENT_ID_LIST": self.client_id_list,
+                "AGENT_POSITIONS": current_state,
+                "POINTS": send_player_points,
+                "CURR_ROUND": self.round,
+                "HEIGHT": HEIGHT,
+                "WIDTH": WIDTH,
+            }
+            if (client+1) in client_input:
+                response["INPUT"] = True
             new_message = json.dumps(response).encode()
             self.connected_clients[client].send(new_message)
         time.sleep(0.1) # makes sure not to overwhelm the client.
@@ -189,7 +189,7 @@ class gameInstance():
 
         self.next_round(rewards, player_input, client_intent, index)
 
-        self.send_state()
+        self.send_state(player_input)
 
         if self.stag_hare.is_over():
 

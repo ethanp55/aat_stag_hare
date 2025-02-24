@@ -131,12 +131,13 @@ def game_loop(client_socket):
             buttons_active = False
             draw_leaderboard(server_response["LEADERBOARD"])
 
+        elif" INPUT" in server_response:
+            add_input(server_response)
+
         else:
             buttons_active = True
             if "message" in server_response:
                 client_ID = server_response["CLIENT_ID"]
-            if "INPUT" in server_response:
-                add_input(server_response)
             if "HUMAN_AGENTS" in server_response:
                 initalize(server_response)
             print_board(server_response)
@@ -264,18 +265,22 @@ def print_board(msg):
     #print("this is the stag dead and hare_dead variables ", stag_dead, " ", hare_dead)
 
     if "AGENT_POSITIONS" in msg:
+        highlight = False
         agents_positions = msg["AGENT_POSITIONS"]
+        if "INPUT" in msg:
+            highlight = True
+
         #calculate_points(msg["POINTS"], agents)
         for agent in agents:
             row = agents_positions[agent.name]["Y_COORD"]
             col = agents_positions[agent.name]["X_COORD"]
             new_tuple = row, col
             if agent.name == "stag":
-                agent.update(SCREEN, new_tuple, stag_dead)
+                agent.update(SCREEN, new_tuple, dead=stag_dead)
             if agent.name == "hare":
-                agent.update(SCREEN, new_tuple, hare_dead)
+                agent.update(SCREEN, new_tuple, dead=hare_dead)
             else:
-                agent.update(SCREEN, new_tuple)
+                agent.update(SCREEN, new_tuple, highlight=highlight)
             #agent.update_points(SCREEN, new_tuple)
         draw_round(msg["CURR_ROUND"])
 
@@ -421,6 +426,8 @@ class Enemy(pygame.sprite.Sprite):
         self.square_height = self.height
         self.square_width = self.width
         self.points = 0
+        self.my_player = False
+        self.highlighted = False
         self.new_position = None
         self.new_surf = None
         self.screen = None
@@ -436,6 +443,7 @@ class Enemy(pygame.sprite.Sprite):
 
         if name[0] == "H":
             if my_player:
+                self.my_player = True
                 self.original_surf = my_hunter
             else:
                 self.original_surf = other_hunter
@@ -450,7 +458,7 @@ class Enemy(pygame.sprite.Sprite):
         self.points = 0
 
 
-    def update(self, screen, array_position, dead=False):
+    def update(self, screen, array_position, highlight=False, dead=False):
         # here
         self.screen = screen
         new_position = calculate_position(self, array_position)
@@ -463,10 +471,13 @@ class Enemy(pygame.sprite.Sprite):
             self.surf = self.original_surf.copy()
             screen.blit(self.surf, new_position) # so this one works.
 
+        if highlight and self.my_player:
+            print("we have become highlighted chefi. I think")
+            circle_radius = self.square_width // 2 + 5  # for a little padding action
+            pygame.draw.circle(self.screen, (255, 0, 0), new_position, circle_radius, 3)
+
     def update_alive(self):
         self.surf = self.original_surf
-
-
 
     def update_points(self, screen, array_position):
         if not self.name[0] == "H" and not self.name[0] == "R":  # should filter out all non agents.
@@ -480,10 +491,9 @@ class Enemy(pygame.sprite.Sprite):
 
     def add_input(self):
         if self.my_player:
-            print("WE SHOULD BE DRAWIGN A CIRCLE CHEFI")
-            circle_radius = self.square_width // 2 + 5 # for a little padding action
-            circle_center = self.rect.center
-            pygame.draw.circle(self.screen, (255, 0,0), circle_center, circle_radius, 3)
+            print("WE SHOULD BE HIGHLIGHTED HERE OR SOMETHING")
+            self.highlighted = True
+
 
 
 
