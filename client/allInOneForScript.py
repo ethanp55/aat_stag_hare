@@ -237,13 +237,13 @@ def adjust_position(pressed_keys):
     curr_col = 0
     if pressed_keys[K_UP]:
         curr_row -= 1
-    if pressed_keys[K_DOWN]:
+    elif pressed_keys[K_DOWN]:
         curr_row += 1  # move down
-    if pressed_keys[K_LEFT]:
+    elif pressed_keys[K_LEFT]:
         curr_col -= 1  # move left
-    if pressed_keys[K_RIGHT]:
+    elif pressed_keys[K_RIGHT]:
         curr_col += 1  # move right
-    if pressed_keys[K_SPACE]:
+    elif pressed_keys[K_SPACE]:
         pass
     return curr_row, curr_col
 
