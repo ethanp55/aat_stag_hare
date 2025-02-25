@@ -86,7 +86,7 @@ def start_client():
 
     global client_ID
     #host = '192.168.30.17'  # The server's IP address
-    host = '127.0.0.1'  # your local host address cause you're working from home.
+    host = '10.55.10.103'  # your local host address cause you're working from home.
     port = 12345         # The port number to connect to
 
     # Create a TCP socket
@@ -141,20 +141,26 @@ def game_loop(client_socket):
             if "HUMAN_AGENTS" in server_response:
                 initalize(server_response)
             print_board(server_response)
+
     message = {
         "NEW_INPUT": None,
     }
+
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.KEYDOWN:
             pressed_keys = pygame.key.get_pressed()
-            new_input = adjust_position(pressed_keys)
-            print("this is the input that we are sending ", new_input)
-            message = {
-                "NEW_INPUT": new_input,
-                "CLIENT_ID": client_ID,
-                "INTENT" : active_button
-            }
+            if pressed_keys[K_UP] or pressed_keys[K_DOWN] or pressed_keys[K_LEFT] or pressed_keys[K_RIGHT] or pressed_keys[K_SPACE]:
+                new_input = adjust_position(pressed_keys)
+                print("this is the input that we are sending ", new_input)
+                message = {
+                    "NEW_INPUT": new_input,
+                    "CLIENT_ID": client_ID,
+                    "INTENT" : active_button
+                }
+                time.sleep(0.1) # make it sleep just a little bit to prevent mashing or something IG>
+            else:
+                print("you tried to input somethign that WASN't a valid key. try again")
 
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -233,18 +239,20 @@ def initalize(server_response):
 
 
 def adjust_position(pressed_keys):
+
     curr_row = 0
     curr_col = 0
     if pressed_keys[K_UP]:
         curr_row -= 1
-    if pressed_keys[K_DOWN]:
+    elif pressed_keys[K_DOWN]:
         curr_row += 1  # move down
-    if pressed_keys[K_LEFT]:
+    elif pressed_keys[K_LEFT]:
         curr_col -= 1  # move left
-    if pressed_keys[K_RIGHT]:
+    elif pressed_keys[K_RIGHT]:
         curr_col += 1  # move right
-    if pressed_keys[K_SPACE]:
+    elif pressed_keys[K_SPACE]:
         pass
+
     return curr_row, curr_col
 
 def print_board(msg):

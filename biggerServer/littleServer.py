@@ -90,6 +90,7 @@ class gameInstance():
                 data = self.get_client_data()
                 for client, received_json in data.items():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
+                        print("WE HAVE RECEIVED A NERW INPUT CHEFI")
                         new_time = time.time() - current_time
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
                         # print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
@@ -107,23 +108,18 @@ class gameInstance():
                 self.send_state(client_input) # will this fix it?
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
-                    print("here is the client_time as well. ", client_wait_times)
                     break  # gets us out of the input loop. hopefully.
 
 
             if not timer.time_out():
                 #print("IS this going off? at all? here's how much time we are plugging in ", timer.time())
-                print("this is how long we are pausing ", float(self.client_time - timer.time()))
                 time.sleep(self.client_time - timer.time()) # gotta get how much time is left.
 
-            # after sleeping, reset the timer based on the previous rounds input.
-            #self.client_time = min(sum(client_wait_times) / len(client_wait_times), 1) # never make em wait for more than a second.
-            # how can I make htis more convincing?
+
             pause_time = 2 * sum(client_wait_times) / len(client_wait_times)
             self.client_time = min(random.uniform(0, pause_time), 2)
             print("this is the new self.client_time! ", self.client_time)
 
-            #running = self.stag_hunt_game_loop(self.player_points, new_list[0][0], new_list[0][1], new_list[0][2], index)
             running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, index)
 
             index += 1
@@ -187,6 +183,8 @@ class gameInstance():
     def stag_hunt_game_loop(self, player_points, player_input, client_intent, index):
 
         rewards = [0] * (len(self.hunters) + 2)
+
+        print("This is the player input ", player_input)
 
         self.next_round(rewards, player_input, client_intent, index)
         player_input.clear()
@@ -269,7 +267,7 @@ class gameInstance():
         for agent in self.stag_hare.state.agent_positions: # grab the before positions
             new_dict[agent]["before_position"] = self.stag_hare.state.agent_positions[agent] # should be a tuple
 
-
+        print("this si the size of new positiosn ", len(new_positions))
         for client_id in new_positions:
             client_agent = "H" + str((self.client_id_list.index(client_id))+1) # once again, off by one error
             current_position = self.stag_hare.state.agent_positions[client_agent]
