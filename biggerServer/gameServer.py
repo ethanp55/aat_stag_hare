@@ -31,7 +31,7 @@ class GameServer():
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
 
-        for i in range(1, 4): ## code for testing smaller edge cases. Just leave it here incase something breaks and we need to test.
+        for i in range(1, 40): ## code for testing smaller edge cases. Just leave it here incase something breaks and we need to test.
             current_round = i
             player_indices_round_2 = [[0]]  # the players that will be in the same game
             situations = [["A"]]  # the number and type of bot we are expecting.

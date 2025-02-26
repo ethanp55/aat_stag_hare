@@ -30,13 +30,15 @@ hunters = []
 MAX_ROUNDS = 2
 round = 1
 
+
+
 HARE_POINTS = 10
 STAG_POINTS = 20
 # these ones always stay the same
 stag = enemy.Enemy("stag", HEIGHT, WIDTH)
 hare = enemy.Enemy("hare", HEIGHT, WIDTH)
 # your workstation ip is '192.168.30.17', use local host while at home
-def start_server(host='127.0.0.1', port=12345):
+def start_server(host='10.55.10.103', port=12345):
 
     # Create a TCP socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
