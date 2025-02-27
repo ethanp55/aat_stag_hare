@@ -31,33 +31,29 @@ class GameServer():
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
 
-
-
         # for i in range(1, 40): ## code for testing smaller edge cases. Just leave it here incase something breaks and we need to test.
         #     current_round = i
-        #     player_indices_round_2 = [[0, 1]]  # the players that will be in the same game
-        #     situations = [["C"]]  # the number and type of bot we are expecting.
-        #     games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
+        #     player_indices_round_2 = [[0]]  # the players that will be in the same game
+        #     situations = [["A"]]  # the number and type of bot we are expecting.
+        #     games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, True)
         #     self.run_games(games_list, q, current_round)
         #     self.append_average_points(current_round)
-
-
-
+        #     self.save_stuff_small()
 
         # PRACTICE ROUNDS 1 AND 2.
-        current_round = 1
-        player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
-        situations = [["A"], ["A"], ["A"], ["A"], ["A"], ["A"], ["A"]]  # the number and type of bot we are expecting.
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
-        self.run_games(games_list, q, current_round)
-        self.append_average_points(current_round)
-
-        current_round = 2
-        player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
-        situations = [["D"], ["D"], ["D"], ["D"], ["D"], ["D"], ["D"]]  # the number and type of bot we are expecting.
-        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
-        self.run_games(games_list, q, current_round)
-        self.append_average_points(current_round)
+        # current_round = 1
+        # player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
+        # situations = [["A"], ["A"], ["A"], ["A"], ["A"], ["A"], ["A"]]  # the number and type of bot we are expecting.
+        # games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
+        # self.run_games(games_list, q, current_round)
+        # self.append_average_points(current_round)
+        #
+        # current_round = 2
+        # player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
+        # situations = [["D"], ["D"], ["D"], ["D"], ["D"], ["D"], ["D"]]  # the number and type of bot we are expecting.
+        # games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
+        # self.run_games(games_list, q, current_round)
+        # self.append_average_points(current_round)
 
         self.points = self.player_points_initialization() #  # reset the points. Clear the dict and start all over.
 

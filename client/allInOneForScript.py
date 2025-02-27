@@ -150,9 +150,6 @@ def game_loop(client_socket):
             pressed_keys = pygame.key.get_pressed()
             if pressed_keys[K_UP] or pressed_keys[K_DOWN] or pressed_keys[K_LEFT] or pressed_keys[K_RIGHT] or pressed_keys[K_SPACE]:
                 new_input = adjust_position(pressed_keys)
-                print("this is the input that we are sending ", new_input)
-                if new_input == (0,0):
-                    print("AAAAHAHAHAHA")
                 message = {
                     "NEW_INPUT": new_input,
                     "CLIENT_ID": client_ID,
@@ -248,8 +245,7 @@ def adjust_position(pressed_keys):
         curr_col += 1  # move right
     elif pressed_keys[K_SPACE]:
         pass
-    if (curr_row, curr_col) == (0, 0) and not pressed_keys[K_SPACE]:
-        print("SOMETHING BLEW UP")
+
     return curr_row, curr_col
 
 def print_board(msg):
@@ -267,7 +263,6 @@ def print_board(msg):
             stag_dead = msg["GAME_OVER"]["STAG_DEAD"]
         if "HARE_DEAD" in msg["GAME_OVER"] and msg["GAME_OVER"]["HARE_DEAD"]:
             hare_dead = msg["GAME_OVER"]["HARE_DEAD"]
-    #print("this is the stag dead and hare_dead variables ", stag_dead, " ", hare_dead)
 
     if "AGENT_POSITIONS" in msg:
         highlight = False
@@ -472,12 +467,12 @@ class Enemy(pygame.sprite.Sprite):
             red_surf = self.surf.copy()  # Copy the original surface
             red_surf.fill((200, 60, 20))  # Fill the copy with red
             screen.blit(red_surf, new_position)  # Blit the red surface
+            screen.blit(self.surf, new_position) # draw us over the fetcher.
         else:
             self.surf = self.original_surf.copy()
             screen.blit(self.surf, new_position) # so this one works.
 
         if highlight and self.my_player:
-            print("we have become highlighted chefi. I think")
             circle_radius = self.square_width * 1.75  # for a little padding action
             position_to_plug_in = new_position[0] + (1.75 * self.square_height), new_position[1] + (1.75 * self.square_height)
 
@@ -498,7 +493,6 @@ class Enemy(pygame.sprite.Sprite):
 
     def add_input(self):
         if self.my_player:
-            print("WE SHOULD BE HIGHLIGHTED HERE OR SOMETHING")
             self.highlighted = True
 
 

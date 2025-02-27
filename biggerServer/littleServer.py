@@ -83,47 +83,28 @@ class gameInstance():
             client_wait_times = []
             current_time = time.time()
             timer = Timer(self.client_time)
-            print("this is how long we are pausing ", self.client_time)
 
             while True:
-                #self.send_state(client_input)  # sends out the current game state
                 data = self.get_client_data()
                 for client, received_json in data.items():
                     if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
                         new_time = time.time() - current_time
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
-                        # print("This is the new client input we have recieved ", client_input[self.client_id_dict[client]])
                         client_intent[self.client_id_dict[client]] = received_json["INTENT"]
                         client_wait_times.append(new_time)
-
-                # for client in client_input:
-                #     message = {
-                #         "INPUT" : client_input[client],
-                #         "HEIGHT": HEIGHT,
-                #         "WIDTH": WIDTH,
-                #     }
-                #     self.connected_clients[client-1].send(json.dumps(message).encode()) # off by one error, no idea if its consistent.
 
                 self.send_state(client_input) # will this fix it?
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
-                    print("here is the client_time as well. ", client_wait_times)
                     break  # gets us out of the input loop. hopefully.
 
 
-            if not timer.time_out():
-                #print("IS this going off? at all? here's how much time we are plugging in ", timer.time())
-                print("this is how long we are pausing ", float(self.client_time - timer.time()))
+            if not timer.time_out(): # egg timer for bot input
                 time.sleep(self.client_time - timer.time()) # gotta get how much time is left.
 
             # after sleeping, reset the timer based on the previous rounds input.
-            #self.client_time = min(sum(client_wait_times) / len(client_wait_times), 1) # never make em wait for more than a second.
-            # how can I make htis more convincing?
             pause_time = 2 * sum(client_wait_times) / len(client_wait_times)
             self.client_time = min(random.uniform(0, pause_time), 2)
-            print("this is the new self.client_time! ", self.client_time)
-
-            #running = self.stag_hunt_game_loop(self.player_points, new_list[0][0], new_list[0][1], new_list[0][2], index)
             running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, index)
 
             index += 1
@@ -137,7 +118,7 @@ class gameInstance():
         big_dict_finalized = {}
         big_dict_finalized[self.situation] = self.big_dict
         self.big_dict = big_dict_finalized
-        print("AIGHT THIS GAME HAS FINSIHED")
+
         if self.save:
             self.save_stuff_big(big_dict_finalized, self.round)
         return new_dict
@@ -179,7 +160,7 @@ class gameInstance():
                 if msg:
                     data[client] = json.loads(msg)
             except socket.timeout:
-                print("here's the problem - socket time out :(")
+                pass
             except Exception as e:
                 pass
         return data
