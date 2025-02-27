@@ -32,16 +32,16 @@ class GameServer():
         q = multiprocessing.Queue()
 
 
-        #
+
         # for i in range(1, 40): ## code for testing smaller edge cases. Just leave it here incase something breaks and we need to test.
         #     current_round = i
-        #     player_indices_round_2 = [[0]]  # the players that will be in the same game
-        #     situations = [["A"]]  # the number and type of bot we are expecting.
+        #     player_indices_round_2 = [[0, 1]]  # the players that will be in the same game
+        #     situations = [["C"]]  # the number and type of bot we are expecting.
         #     games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
         #     self.run_games(games_list, q, current_round)
         #     self.append_average_points(current_round)
-        #
-        #
+
+
 
 
         # PRACTICE ROUNDS 1 AND 2.
