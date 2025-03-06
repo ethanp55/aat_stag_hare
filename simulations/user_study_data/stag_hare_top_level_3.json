@@ -1,0 +1,1045 @@
+{
+    "H1": {
+        "1": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 10.0
+        },
+        "2": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 10.0
+        },
+        "3": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 6.67,
+            "new_points": 0
+        },
+        "4": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 7.5,
+            "new_points": 10.0
+        },
+        "5": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 8.0,
+            "new_points": 10.0
+        },
+        "6": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 20
+        },
+        "7": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 10.0,
+            "new_points": 10.0
+        },
+        "8": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 8.75,
+            "new_points": 0
+        },
+        "9": {
+            "stag": false,
+            "hare": 2,
+            "situation": "B",
+            "avg_points": 8.33,
+            "new_points": 5.0
+        },
+        "10": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 7.5,
+            "new_points": 0
+        },
+        "11": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 7.73,
+            "new_points": 10.0
+        },
+        "12": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 7.08,
+            "new_points": 0
+        },
+        "13": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 7.31,
+            "new_points": 10.0
+        },
+        "14": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 7.5,
+            "new_points": 10.0
+        },
+        "15": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.33,
+            "new_points": 20
+        },
+        "16": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 7.81,
+            "new_points": 0
+        },
+        "17": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 7.35,
+            "new_points": 0
+        },
+        "18": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 8.06,
+            "new_points": 20
+        },
+        "19": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 8.16,
+            "new_points": 10.0
+        },
+        "20": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 8.25,
+            "new_points": 10.0
+        },
+        "21": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 7.86,
+            "new_points": 0
+        }
+    },
+    "H2": {
+        "1": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 0,
+            "new_points": 0
+        },
+        "2": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 0,
+            "new_points": 0
+        },
+        "3": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 6.67,
+            "new_points": 20
+        },
+        "4": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 5.0,
+            "new_points": 0
+        },
+        "5": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 4.0,
+            "new_points": 0
+        },
+        "6": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 6.67,
+            "new_points": 20
+        },
+        "7": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 8.57,
+            "new_points": 20
+        },
+        "8": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 7.5,
+            "new_points": 0
+        },
+        "9": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 6.67,
+            "new_points": 0
+        },
+        "10": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.0,
+            "new_points": 20
+        },
+        "11": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 9.09,
+            "new_points": 20
+        },
+        "12": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 20
+        },
+        "13": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 10.77,
+            "new_points": 20
+        },
+        "14": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 10.0,
+            "new_points": 0
+        },
+        "15": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 10.67,
+            "new_points": 20
+        },
+        "16": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 11.25,
+            "new_points": 20
+        },
+        "17": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 11.76,
+            "new_points": 20
+        },
+        "18": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 11.11,
+            "new_points": 0
+        },
+        "19": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 10.53,
+            "new_points": 0
+        },
+        "20": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 11.0,
+            "new_points": 20
+        },
+        "21": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 11.43,
+            "new_points": 20
+        }
+    },
+    "H3": {
+        "1": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 10.0,
+            "new_points": 10.0
+        },
+        "2": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 10.0,
+            "new_points": 10.0
+        },
+        "3": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 13.33,
+            "new_points": 20
+        },
+        "4": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 0
+        },
+        "5": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 10.0
+        },
+        "6": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 11.67,
+            "new_points": 20
+        },
+        "7": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 10.0,
+            "new_points": 0
+        },
+        "8": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 10.0
+        },
+        "9": {
+            "stag": false,
+            "hare": 2,
+            "situation": "B",
+            "avg_points": 9.44,
+            "new_points": 5.0
+        },
+        "10": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 9.5,
+            "new_points": 10.0
+        },
+        "11": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.64,
+            "new_points": 0
+        },
+        "12": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 7.92,
+            "new_points": 0
+        },
+        "13": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 7.31,
+            "new_points": 0
+        },
+        "14": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 8.21,
+            "new_points": 20
+        },
+        "15": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 8.33,
+            "new_points": 10.0
+        },
+        "16": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 8.44,
+            "new_points": 10.0
+        },
+        "17": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 7.94,
+            "new_points": 0
+        },
+        "18": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 8.61,
+            "new_points": 20
+        },
+        "19": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 8.68,
+            "new_points": 10.0
+        },
+        "20": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 9.25,
+            "new_points": 20
+        },
+        "21": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.81,
+            "new_points": 0
+        }
+    },
+    "H4": {
+        "1": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 10.0,
+            "new_points": 10.0
+        },
+        "2": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 5.0,
+            "new_points": 0
+        },
+        "3": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 6.67,
+            "new_points": 10.0
+        },
+        "4": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 5.0,
+            "new_points": 0
+        },
+        "5": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 6.0,
+            "new_points": 10.0
+        },
+        "6": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.33,
+            "new_points": 20
+        },
+        "7": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 8.57,
+            "new_points": 10.0
+        },
+        "8": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 7.5,
+            "new_points": 0
+        },
+        "9": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 6.67,
+            "new_points": 0
+        },
+        "10": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 8.0,
+            "new_points": 20
+        },
+        "11": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 9.09,
+            "new_points": 20
+        },
+        "12": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 9.17,
+            "new_points": 10.0
+        },
+        "13": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 10.0,
+            "new_points": 20
+        },
+        "14": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 9.29,
+            "new_points": 0
+        },
+        "15": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 20
+        },
+        "16": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 10.62,
+            "new_points": 20
+        },
+        "17": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 11.18,
+            "new_points": 20
+        },
+        "18": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 11.67,
+            "new_points": 20
+        },
+        "19": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 11.05,
+            "new_points": 0
+        },
+        "20": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 10.5,
+            "new_points": 0
+        },
+        "21": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 10.95,
+            "new_points": 20
+        }
+    },
+    "H5": {
+        "1": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 0,
+            "new_points": 0
+        },
+        "2": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 0,
+            "new_points": 0
+        },
+        "3": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 0,
+            "new_points": 0
+        },
+        "4": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 5.0,
+            "new_points": 20
+        },
+        "5": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 4.0,
+            "new_points": 0
+        },
+        "6": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 6.67,
+            "new_points": 20
+        },
+        "7": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 5.71,
+            "new_points": 0
+        },
+        "8": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 6.25,
+            "new_points": 10.0
+        },
+        "9": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 7.78,
+            "new_points": 20
+        },
+        "10": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 9.0,
+            "new_points": 20
+        },
+        "11": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.18,
+            "new_points": 0
+        },
+        "12": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 9.17,
+            "new_points": 20
+        },
+        "13": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 10.0,
+            "new_points": 20
+        },
+        "14": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 9.29,
+            "new_points": 0
+        },
+        "15": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 10.0,
+            "new_points": 20
+        },
+        "16": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 10.62,
+            "new_points": 20
+        },
+        "17": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 10.59,
+            "new_points": 10.0
+        },
+        "18": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 10.0,
+            "new_points": 0
+        },
+        "19": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 9.47,
+            "new_points": 0
+        },
+        "20": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 9.0,
+            "new_points": 0
+        },
+        "21": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.57,
+            "new_points": 0
+        }
+    },
+    "H6": {
+        "1": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 0,
+            "new_points": 0
+        },
+        "2": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 0,
+            "new_points": 0
+        },
+        "3": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 3.33,
+            "new_points": 10.0
+        },
+        "4": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 2.5,
+            "new_points": 0
+        },
+        "5": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 2.0,
+            "new_points": 0
+        },
+        "6": {
+            "stag": false,
+            "hare": 1,
+            "situation": "D",
+            "avg_points": 3.33,
+            "new_points": 10.0
+        },
+        "7": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 2.86,
+            "new_points": 0
+        },
+        "8": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 3.75,
+            "new_points": 10.0
+        },
+        "9": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 4.44,
+            "new_points": 10.0
+        },
+        "10": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 6.0,
+            "new_points": 20
+        },
+        "11": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 5.45,
+            "new_points": 0
+        },
+        "12": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 6.67,
+            "new_points": 20
+        },
+        "13": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 6.15,
+            "new_points": 0
+        },
+        "14": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 7.14,
+            "new_points": 20
+        },
+        "15": {
+            "stag": false,
+            "hare": 1,
+            "situation": "A",
+            "avg_points": 7.33,
+            "new_points": 10.0
+        },
+        "16": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.12,
+            "new_points": 20
+        },
+        "17": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.82,
+            "new_points": 20
+        },
+        "18": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.33,
+            "new_points": 0
+        },
+        "19": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 8.42,
+            "new_points": 10.0
+        },
+        "20": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 8.5,
+            "new_points": 10.0
+        },
+        "21": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 8.57,
+            "new_points": 10.0
+        }
+    },
+    "H7": {
+        "1": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 0,
+            "new_points": 0
+        },
+        "2": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 10.0,
+            "new_points": 20
+        },
+        "3": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 6.67,
+            "new_points": 0
+        },
+        "4": {
+            "stag": false,
+            "hare": 1,
+            "situation": "C",
+            "avg_points": 7.5,
+            "new_points": 10.0
+        },
+        "5": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 6.0,
+            "new_points": 0
+        },
+        "6": {
+            "stag": false,
+            "hare": 1,
+            "situation": "A",
+            "avg_points": 6.67,
+            "new_points": 10.0
+        },
+        "7": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 5.71,
+            "new_points": 0
+        },
+        "8": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 5.0,
+            "new_points": 0
+        },
+        "9": {
+            "stag": false,
+            "hare": false,
+            "situation": "A",
+            "avg_points": 4.44,
+            "new_points": 0
+        },
+        "10": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 6.0,
+            "new_points": 20
+        },
+        "11": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 6.36,
+            "new_points": 10.0
+        },
+        "12": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 7.5,
+            "new_points": 20
+        },
+        "13": {
+            "stag": false,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 6.92,
+            "new_points": 0
+        },
+        "14": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 7.86,
+            "new_points": 20
+        },
+        "15": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 8.67,
+            "new_points": 20
+        },
+        "16": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 8.12,
+            "new_points": 0
+        },
+        "17": {
+            "stag": true,
+            "hare": false,
+            "situation": "D",
+            "avg_points": 8.82,
+            "new_points": 20
+        },
+        "18": {
+            "stag": false,
+            "hare": 1,
+            "situation": "B",
+            "avg_points": 8.89,
+            "new_points": 10.0
+        },
+        "19": {
+            "stag": false,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 8.42,
+            "new_points": 0
+        },
+        "20": {
+            "stag": true,
+            "hare": false,
+            "situation": "B",
+            "avg_points": 9.0,
+            "new_points": 20
+        },
+        "21": {
+            "stag": true,
+            "hare": false,
+            "situation": "C",
+            "avg_points": 9.52,
+            "new_points": 20
+        }
+    }
+}

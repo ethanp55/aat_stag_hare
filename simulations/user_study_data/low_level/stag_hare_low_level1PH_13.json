@@ -1,0 +1,79 @@
+{
+    "PH": {
+        "0": {
+            "stag": {
+                "before_position":[
+                    9,
+                    2
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    8,
+                    2
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    13,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    14,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    0,
+                    13
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    14,
+                    13
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    9,
+                    7
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    9,
+                    8
+               ],
+                "intent": true
+            },
+            "R2": {
+                "before_position":[
+                    4,
+                    9
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    3,
+                    9
+               ],
+                "intent": true
+            }
+        }
+    }
+}

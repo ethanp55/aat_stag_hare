@@ -1,0 +1,1654 @@
+{
+    "D": {
+        "0": {
+            "stag": {
+                "before_position":[
+                    10,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    13
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    3,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    11,
+                    5
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    11,
+                    6
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    1
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    11,
+                    0
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    4,
+                    1
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    5,
+                    1
+               ],
+                "intent": false
+            }
+        },
+        "1": {
+            "stag": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    11,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    3,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    11,
+                    6
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    11,
+                    7
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    0
+               ],
+                "action":[
+                    0,
+                    14
+               ],
+                "after_position":[
+                    11,
+                    14
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    5,
+                    1
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    6,
+                    1
+               ],
+                "intent": false
+            }
+        },
+        "2": {
+            "stag": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    3,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    11,
+                    7
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    11,
+                    8
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    14
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    11,
+                    13
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    6,
+                    1
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    6,
+                    0
+               ],
+                "intent": false
+            }
+        },
+        "3": {
+            "stag": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    3,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    11,
+                    8
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    8
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    13
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    6,
+                    0
+               ],
+                "action":[
+                    0,
+                    14
+               ],
+                "after_position":[
+                    6,
+                    14
+               ],
+                "intent": false
+            }
+        },
+        "4": {
+            "stag": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    12
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    3,
+                    13
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    10,
+                    8
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    9,
+                    8
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    6,
+                    14
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    7,
+                    14
+               ],
+                "intent": false
+            }
+        },
+        "5": {
+            "stag": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    4,
+                    13
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    9,
+                    8
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    8,
+                    8
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    7,
+                    14
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    7,
+                    13
+               ],
+                "intent": false
+            }
+        },
+        "6": {
+            "stag": {
+                "before_position":[
+                    10,
+                    11
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    4,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    5,
+                    13
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    8,
+                    8
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    7,
+                    8
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    7,
+                    13
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    7,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "7": {
+            "stag": {
+                "before_position":[
+                    10,
+                    11
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    5,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    6,
+                    13
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    7,
+                    8
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    7,
+                    9
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    7,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    8,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "8": {
+            "stag": {
+                "before_position":[
+                    10,
+                    11
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    6,
+                    13
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    6,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    7,
+                    9
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    7,
+                    10
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    8,
+                    12
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    8,
+                    11
+               ],
+                "intent": false
+            }
+        },
+        "9": {
+            "stag": {
+                "before_position":[
+                    10,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    6,
+                    12
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    5,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    7,
+                    10
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    7,
+                    11
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    8,
+                    11
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    9,
+                    11
+               ],
+                "intent": false
+            }
+        },
+        "10": {
+            "stag": {
+                "before_position":[
+                    10,
+                    11
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    11
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    5,
+                    12
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    4,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    7,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    6,
+                    11
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    9,
+                    11
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    9,
+                    11
+               ],
+                "intent": false
+            }
+        },
+        "11": {
+            "stag": {
+                "before_position":[
+                    10,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    10,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    4,
+                    12
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    3,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    6,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    5,
+                    11
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    9,
+                    11
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    11
+               ],
+                "intent": false
+            }
+        },
+        "12": {
+            "stag": {
+                "before_position":[
+                    10,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    3,
+                    12
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    5,
+                    11
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    6,
+                    11
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    10,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    10,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "13": {
+            "stag": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    12
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    3,
+                    13
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    6,
+                    11
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    7,
+                    11
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    10,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "14": {
+            "stag": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    13
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    3,
+                    13
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    7,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    7,
+                    12
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    10,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "15": {
+            "stag": {
+                "before_position":[
+                    12,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    3,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    4,
+                    13
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    7,
+                    12
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    7,
+                    13
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "16": {
+            "stag": {
+                "before_position":[
+                    12,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    4,
+                    13
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    4,
+                    14
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    7,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    8,
+                    13
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    12,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    12,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "17": {
+            "stag": {
+                "before_position":[
+                    12,
+                    12
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    4,
+                    14
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    4,
+                    14
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    8,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    9,
+                    13
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    12,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    12,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "18": {
+            "stag": {
+                "before_position":[
+                    12,
+                    12
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    4,
+                    14
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    4,
+                    14
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    9,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    13
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    12,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    12,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "19": {
+            "stag": {
+                "before_position":[
+                    12,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    4,
+                    14
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    4,
+                    14
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    10,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    13
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    12,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    12,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "20": {
+            "stag": {
+                "before_position":[
+                    12,
+                    12
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    4,
+                    14
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    4,
+                    14
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    11,
+                    13
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    13
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    12,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    12,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            }
+        },
+        "21": {
+            "stag": {
+                "before_position":[
+                    12,
+                    12
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    12
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    4,
+                    14
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    4,
+                    0
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    12,
+                    13
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    13
+               ],
+                "intent": false
+            },
+            "R1": {
+                "before_position":[
+                    12,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    12,
+                    11
+               ],
+                "intent": false
+            },
+            "R2": {
+                "before_position":[
+                    11,
+                    12
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": false
+            }
+        }
+    }
+}

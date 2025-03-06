@@ -1,0 +1,79 @@
+{
+    "A": {
+        "0": {
+            "stag": {
+                "before_position":[
+                    9,
+                    7
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    8,
+                    7
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    13,
+                    7
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    13,
+                    7
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    11,
+                    4
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    11,
+                    5
+               ],
+                "intent": false
+            },
+            "R1": {
+                "before_position":[
+                    14,
+                    8
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    14,
+                    7
+               ],
+                "intent": true
+            },
+            "R2": {
+                "before_position":[
+                    3,
+                    3
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    3,
+                    4
+               ],
+                "intent": true
+            }
+        }
+    }
+}

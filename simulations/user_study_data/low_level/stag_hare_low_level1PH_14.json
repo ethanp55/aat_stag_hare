@@ -1,0 +1,304 @@
+{
+    "PH": {
+        "0": {
+            "stag": {
+                "before_position":[
+                    14,
+                    3
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    13,
+                    3
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    1,
+                    1
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    1,
+                    1
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    9,
+                    10
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    10,
+                    10
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    13,
+                    13
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    13,
+                    14
+               ],
+                "intent": true
+            },
+            "R2": {
+                "before_position":[
+                    0,
+                    13
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    0,
+                    14
+               ],
+                "intent": true
+            }
+        },
+        "1": {
+            "stag": {
+                "before_position":[
+                    13,
+                    3
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    13,
+                    3
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    1,
+                    1
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    1,
+                    1
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    10,
+                    10
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    10,
+                    11
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    13,
+                    14
+               ],
+                "action":[
+                    0,
+                    -14
+               ],
+                "after_position":[
+                    13,
+                    0
+               ],
+                "intent": true
+            },
+            "R2": {
+                "before_position":[
+                    0,
+                    14
+               ],
+                "action":[
+                    0,
+                    -14
+               ],
+                "after_position":[
+                    0,
+                    0
+               ],
+                "intent": true
+            }
+        },
+        "2": {
+            "stag": {
+                "before_position":[
+                    13,
+                    3
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    12,
+                    3
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    1,
+                    1
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    1,
+                    0
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    10,
+                    11
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    11
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    13,
+                    0
+               ],
+                "action":[
+                    1,
+                    0
+               ],
+                "after_position":[
+                    14,
+                    0
+               ],
+                "intent": true
+            },
+            "R2": {
+                "before_position":[
+                    0,
+                    0
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    0,
+                    1
+               ],
+                "intent": true
+            }
+        },
+        "3": {
+            "stag": {
+                "before_position":[
+                    12,
+                    3
+               ],
+                "action":[
+                    -1,
+                    0
+               ],
+                "after_position":[
+                    11,
+                    3
+               ]
+            },
+            "hare": {
+                "before_position":[
+                    1,
+                    0
+               ],
+                "action":[
+                    0,
+                    0
+               ],
+                "after_position":[
+                    1,
+                    0
+               ]
+            },
+            "H1": {
+                "before_position":[
+                    11,
+                    11
+               ],
+                "action":[
+                    0,
+                    1
+               ],
+                "after_position":[
+                    11,
+                    12
+               ],
+                "intent": true
+            },
+            "R1": {
+                "before_position":[
+                    14,
+                    0
+               ],
+                "action":[
+                    -14,
+                    0
+               ],
+                "after_position":[
+                    14,
+                    0
+               ],
+                "intent": true
+            },
+            "R2": {
+                "before_position":[
+                    0,
+                    1
+               ],
+                "action":[
+                    0,
+                    -1
+               ],
+                "after_position":[
+                    0,
+                    0
+               ],
+                "intent": true
+            }
+        }
+    }
+}

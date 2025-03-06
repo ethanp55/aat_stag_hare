@@ -121,7 +121,7 @@ for run_num in range(N_TRAIN_TEST_RUNS):
 alg_names = ['DQN', 'RawO', 'RAlegAATr', 'RAAT', 'AleqgAATr', 'QAlegAATr', 'AlegAATr']
 alg_plot_names = ['EG-Raw', 'REGAE-Raw', 'EG-AAT', 'REGAE-AAT', 'EG-RawAAT', 'REGAE-RawAAT', 'AlegAATr']
 colors = ['#ef8a62', '#67a9cf', '#ef8a62', '#67a9cf', '#ef8a62', '#67a9cf', '#999999']
-a_scores, learning_algs, features = [], [], []
+scores, score_types, learning_algs, features, domain = [], [], [], [], []
 for cond in ['d', 'c', 'a']:
     avgs, ses = [], []
     for alg in alg_names:
@@ -129,13 +129,15 @@ for cond in ['d', 'c', 'a']:
         avgs.append(np.mean(alg_data))
         ses.append(np.std(alg_data, ddof=1) / np.sqrt(len(alg_data)))
 
-        if cond == 'a' and alg != 'AlegAATr':
-            a_scores.extend(alg_data)
-            name = alg_plot_names[alg_names.index(alg)]
-            learning_alg = name.split('-')[0]
-            feature_set = name.split('-')[1]
-            learning_algs.extend([learning_alg] * len(alg_data))
-            features.extend([feature_set] * len(alg_data))
+        n_samples = len(alg_data)
+        scores.extend(alg_data)
+        score_types.extend([cond] * n_samples)
+        name = alg_plot_names[alg_names.index(alg)]
+        learning_alg = name.split('-')[0] if alg != 'AlegAATr' else 'REGAEKNN'
+        feature_set = name.split('-')[1] if alg != 'AlegAATr' else 'AATKNN'
+        learning_algs.extend([learning_alg] * n_samples)
+        features.extend([feature_set] * n_samples)
+        domain.extend(['pursuit'] * n_samples)
 
     plt.figure(figsize=(10, 3))
     plt.grid()
@@ -146,8 +148,10 @@ for cond in ['d', 'c', 'a']:
     plt.clf()
 
 df = pd.DataFrame({
-    'adaptability': a_scores,
+    'score': scores,
+    'score_type': score_types,
     'learning_alg': learning_algs,
-    'feature_set': features
+    'feature_set': features,
+    'domain': domain
 })
 df.to_csv('./pursuit_adaptability_results.csv', index=False)
