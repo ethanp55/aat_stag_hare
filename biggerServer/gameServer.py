@@ -35,25 +35,24 @@ class GameServer():
         #     current_round = i
         #     player_indices_round_2 = [[0]]  # the players that will be in the same game
         #     situations = [["A"]]  # the number and type of bot we are expecting.
-        #     games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, True)
+        #     games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations)
         #     self.run_games(games_list, q, current_round)
         #     self.append_average_points(current_round)
-        #     self.save_stuff_small()
 
-        # PRACTICE ROUNDS 1 AND 2.
-        # current_round = 1
-        # player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
-        # situations = [["A"], ["A"], ["A"], ["A"], ["A"], ["A"], ["A"]]  # the number and type of bot we are expecting.
-        # games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
-        # self.run_games(games_list, q, current_round)
-        # self.append_average_points(current_round)
-        #
-        # current_round = 2
-        # player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
-        # situations = [["D"], ["D"], ["D"], ["D"], ["D"], ["D"], ["D"]]  # the number and type of bot we are expecting.
-        # games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, False)
-        # self.run_games(games_list, q, current_round)
-        # self.append_average_points(current_round)
+        # # PRACTICE ROUNDS 1 AND 2.
+        current_round = 1
+        player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
+        situations = [["PH"], ["PH"], ["PH"], ["PH"], ["PH"], ["PH"], ["PH"]]  # the number and type of bot we are expecting.
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations)
+        self.run_games(games_list, q, current_round)
+        self.append_average_points(current_round)
+
+        current_round = 2
+        player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
+        situations = [["PS"], ["PS"], ["PS"], ["PS"], ["PS"], ["PS"], ["PS"]]  # the number and type of bot we are expecting.
+        games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations)
+        self.run_games(games_list, q, current_round)
+        self.append_average_points(current_round)
 
         self.points = self.player_points_initialization() #  # reset the points. Clear the dict and start all over.
 
@@ -99,6 +98,7 @@ class GameServer():
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, )
         self.run_games(games_list, q, current_round)
         self.append_average_points(current_round)
+        self.save_stuff_small()
 
         current_round = 7
         player_indices_round_2 = [[0, 6], [1], [2], [3, 4, 5]]
@@ -141,6 +141,7 @@ class GameServer():
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, )
         self.run_games(games_list, q, current_round)
         self.append_average_points(current_round)
+        self.save_stuff_small()
 
         current_round = 13
         player_indices_round_2 = [[0, 2, 6], [1], [3, 4], [5]]
@@ -198,8 +199,9 @@ class GameServer():
         self.run_games(games_list, q, current_round)
         self.append_average_points(current_round)
 
+
         current_round = 21
-        player_indices_round_2 = [[0], [1, 6], [2, 4, 5], [6]]
+        player_indices_round_2 = [[0], [1, 6], [2, 4, 5], [3]]
         situations = [["A"], ["C"], ["B"], ["D"]]
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, )
         self.run_games(games_list, q, current_round)
