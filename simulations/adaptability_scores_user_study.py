@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-baselines = {'greedyhare': 3.3769999999999993, 'selfplay': 13.760833333333334, 'coop': 13.760833333333334}
+baselines = {'greedyhare': 3.3769999999999993, 'selfplay': 20, 'coop': 20}
 results, folder = {}, '../simulations/adaptability_results/'
 minimax_val, lowest_reward = 3.3769999999999993, 0
 with open('./user_study_data/stag_hare_top_level_3.json', 'r') as file:
