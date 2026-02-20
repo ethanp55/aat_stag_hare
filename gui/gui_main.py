@@ -124,6 +124,8 @@ def main():
                     #this_player.update(SCREEN, current_position)
                     this_player.update(SCREEN, state.agent_positions[agent])
 
+                pygame.display.update()
+
 
 
             if event.type == pygame.KEYDOWN:
@@ -144,6 +146,7 @@ def main():
             pygame.display.update()
             time.sleep(PAUSE_TIME)
             running = False
+        pygame.display.update()
 
 
 
