@@ -41,6 +41,14 @@ class GameServer():
         #     self.run_games(games_list, q, current_round)
         #     self.append_average_points(current_round)
 
+        for i in range(5):
+            current_round = i
+            players_indicies_round_1 = [[0]]
+            situations = [["PH"]]
+            games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations)
+            self.run_games(games_list, q, current_round)
+            self.append_average_points(current_round)
+
         # # PRACTICE ROUNDS 1 AND 2. One with pure hare, one with pure stag.
         current_round = 1
         player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game

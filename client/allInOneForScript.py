@@ -90,7 +90,8 @@ def start_client():
 
     global client_ID
     #host = '192.168.30.17'  # The server's IP address
-    host = '10.55.10.103'  # your local host address cause you're working from home.
+    # host = '10.55.10.103'  # your local host address cause you're working from home.
+    host = "127.0.0.1"
     port = 12345         # The port number to connect to
 
     # Create a TCP socket
@@ -523,6 +524,6 @@ class Enemy(pygame.sprite.Sprite):
 
 
 
-# and this is where it all starts. 
+# and this is where it all starts.
 if __name__ == "__main__":
     start_client()
