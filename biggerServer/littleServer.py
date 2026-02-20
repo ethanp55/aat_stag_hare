@@ -1,29 +1,20 @@
 # this holds the actual instance of stag hunt, only runs 1 round based on scheduling. run this and then return the new dicts that we need to append to the large dicts up above.
-import multiprocessing
 import os
 import socket
-from multiprocessing import Process
 
 import numpy as np
 import select
 import json
-import asyncio
 import time # tit for tat pausing?
 
 from agents.generator import GreedyHareGen
 from agents.greedy import Greedy
 
-# from agents.alegaatr import AlegAATr
-# from agents.dqn import DQNAgent
-# from agents.qalegaatr import QAlegAATr
-# from agents.smalegaatr import SMAlegAATr
-# from agents.rawo import RawO
 
 PAUSE_TIME = 5
 HEIGHT = 15
 WIDTH = 15
 
-from agents.random_agent import *
 from agents.human import *
 from environment.world import StagHare
 
@@ -49,6 +40,7 @@ class gameInstance():
         for client in self.connected_clients:
             client_id_list.append(client+1)
         self.client_id_list = client_id_list
+        # set up the stagHare game.
         while True:  # set up stag hunt and avoid weird edgecase
             stag_hare = StagHare(HEIGHT, WIDTH, self.hunters)
             if not stag_hare.is_over():
@@ -57,6 +49,7 @@ class gameInstance():
         self.stag_hare = stag_hare  # just to have that down.
         self.main_game_loop()
 
+    # yeah this one is kind of a mess. We could probably have done this better as well.
     def set_situation(self, situation):
         situation = situation[0]
         self.situation = situation
@@ -75,6 +68,7 @@ class gameInstance():
             agent_types = [2,2]
         return agent_types
 
+    # where da magic happens.
     def main_game_loop(self):
         index = 0
         while True:
@@ -91,45 +85,43 @@ class gameInstance():
                         new_time = time.time() - current_time
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
                         client_intent[self.client_id_dict[client]] = received_json["INTENT"]
-                        client_wait_times.append(new_time)
+                        client_wait_times.append(new_time) # tit for tat pausing. Great SCOTT that sucked.
 
-                self.send_state(client_input) # will this fix it?
+                self.send_state(client_input)
                 # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
-                    break  # gets us out of the input loop. hopefully.
-
+                    break  # gets us out of the input loop.
 
             if not timer.time_out(): # egg timer for bot input
                 time.sleep(self.client_time - timer.time()) # gotta get how much time is left.
 
             # after sleeping, reset the timer based on the previous rounds input.
-            pause_time = 2 * sum(client_wait_times) / len(client_wait_times)
-            self.client_time = min(random.uniform(0, pause_time), 2)
+            pause_time = 2 * sum(client_wait_times) / len(client_wait_times) # average wait time
+            self.client_time = min(random.uniform(0, pause_time), 2) # just pick a time somewhere in there.
             running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, index)
 
             index += 1
-            if running == False:
+            if running == False: # just check to see if the round has terminated or not yet.
                 break
 
-
+        # once the game is over, return our kill dict and save our movements and whatnot locally.
         new_points = self.adjust_points()
         new_dict = {}
         new_dict[self.situation] = new_points
         big_dict_finalized = {}
         big_dict_finalized[self.situation] = self.big_dict
         self.big_dict = big_dict_finalized
-
+        # if of course, we actually want to save the stuff. 
         if self.save:
             self.save_stuff_big(big_dict_finalized, self.round)
         return new_dict
 
-
+        
     def send_state(self, client_input):
-        current_state = self.create_current_state()
-        send_player_points = self.player_points.copy()
+        current_state = self.create_current_state() # send out all the current positions.
+        send_player_points = self.player_points.copy() # points is misleading, its more of a kill dictionary.
         # lets make a list of all of the connected_clients_ids and use those to generate players
         for client in self.connected_clients:
-            response = {}
             response = {  # KEEP THIS OUTSIDE THE LOOP PLEASE
                 "HUMAN_AGENTS": len(self.connected_clients),
                 "AI_AGENTS": 3 - len(self.connected_clients),
@@ -146,6 +138,7 @@ class gameInstance():
             self.connected_clients[client].send(new_message)
         time.sleep(0.1) # makes sure not to overwhelm the client.
 
+    # protected function to read in the input from the client which actually loading the json and allowing for simultaneous listens.
     def get_client_data(self):
         ready_to_read, _, _ = select.select(list(self.connected_clients.values()), [], [], 0.1)
         data = {}
@@ -165,15 +158,17 @@ class gameInstance():
                 pass
         return data
 
+    # this is where the actual "game logic" happens.
     def stag_hunt_game_loop(self, player_points, player_input, client_intent, index):
 
-        rewards = [0] * (len(self.hunters) + 2)
+        rewards = [0] * (len(self.hunters) + 2) # for the agents.
 
+        # plays through a round of the stag hare problem and updates the appropriate variables.
         self.next_round(rewards, player_input, client_intent, index)
-        player_input.clear()
+        player_input.clear() #
         self.send_state(player_input)
 
-        if self.stag_hare.is_over():
+        if self.stag_hare.is_over(): # if its over, go ahead and reformat the kill dict appropriately.
 
             # formualtes the server response to client.
             hare_dead = False
@@ -192,7 +187,7 @@ class gameInstance():
 
             points_to_send = dict(player_points)
             current_state = self.create_current_state()
-            response = {}
+            # send this back over to let them now that the game is over and to light things up appropraitely.
             response = {
                 "AGENT_POSITIONS": current_state,
                 "POINTS": dict(points_to_send),
@@ -202,34 +197,35 @@ class gameInstance():
                 "WIDTH": WIDTH,
             }
 
-            for i in range(4):
+            for i in range(4): # do this a couple of times, to make sure they get the packet, but not too many times. Once was not enough.
                 for client in self.connected_clients:  # does this update the points correctly?
                     new_message = json.dumps(response).encode()
                     self.connected_clients[client].send(new_message)
                 time.sleep(0.1) # slow down packet transmission.
 
 
-            if self.round == self.max_rounds: #
-                response = {} # clear the response I guess.
+            if self.round == self.max_rounds: # this doesn't really matter as every instance only does a single "round" so to speak.
+
                 response = { # KEEP THIS OUTSIDE TEH LOOP
                     "AGENT_POSITIONS": current_state,
                     "POINTS": dict(points_to_send),
                     "CURR_ROUND": self.round,
                     "GAME_OVER": small_dict,
-                    "GAME_ENDED": True,
+                    "GAME_ENDED": True, # this lets us to know to go ahead and prep the leaderboard.
                     "HEIGHT": HEIGHT,
                     "WIDTH": WIDTH,
                 }
-                for client in self.connected_clients:  # does this update the points correctly?
+                for client in self.connected_clients: # send the response packet back out.
                     new_message = json.dumps(response).encode()
                     self.connected_clients[client].send(new_message)
                 time.sleep(2) # when game ends, give them a second to realize that it has, in fact, ended.
                 return False
 
-            else:
+            else: # otherwise, iterate the round and play again.
                 self.round += 1
                 self.reset_stag_hare()
 
+    # goes through the motions of playing the next round.
     def next_round(self, rewards, new_positions, client_intent, index):
         new_dict = {}
         new_dict["stag"] = {}
@@ -250,7 +246,7 @@ class gameInstance():
         for agent in self.stag_hare.state.agent_positions: # grab the before positions
             new_dict[agent]["before_position"] = self.stag_hare.state.agent_positions[agent] # should be a tuple
 
-
+        # grabs the after positions and sets up the next actions for the server.
         for client_id in new_positions:
             client_agent = "H" + str((self.client_id_list.index(client_id))+1) # once again, off by one error
             current_position = self.stag_hare.state.agent_positions[client_agent]
@@ -260,22 +256,16 @@ class gameInstance():
             self.hunters[self.client_id_list.index(client_id)].set_next_action(new_tuple_row, new_tuple_col) # change that up
             self.hunters[self.client_id_list.index(client_id)].set_hare_hunting(client_intent[client_id])
 
-        round_rewards = self.stag_hare.transition()
+        round_rewards = self.stag_hare.transition() # this is where I no longer understand what's going on. Iterates the simulator.
+        # actually thats not entirely true, I understand whats happening back here for agents and normal bots but not for generators.
 
-        for i, reward in enumerate(round_rewards):
+        for i, reward in enumerate(round_rewards): # increase the rewards for generator bots.
             rewards[i] += reward
 
-        action_map = self.stag_hare.get_action_map()
+        action_map = self.stag_hare.get_action_map() # get our action map that we created from the hunters and prey moving.
+        # save where everyone WANTED to move, as where as they ACTUALLY moved, and then what they were hunting.
         for agent, attempted_position in action_map.items():
-            # new_row = attempted_position[0]
-            # new_col = attempted_position[1]
-            # old_row = new_dict[agent]["before_position"][0]
-            # old_col = new_dict[agent]["before_position"][1]
-            # row_to_return = int(new_row - old_row)
-            # col_to_return = int(new_col - old_col)
-            #[agent]["action"] = (row_to_return, col_to_return)
             new_dict[agent]["action"] = [a - b for a,b in zip(attempted_position, new_dict[agent]["before_position"])]
-
 
         for agent in self.stag_hare.state.agent_positions:
             new_dict[agent]["after_position"] = self.stag_hare.state.agent_positions[agent]  # should be a tuple
@@ -283,14 +273,15 @@ class gameInstance():
         for agent in self.hunters:
             new_dict[agent.name]["intent"] = agent.is_hunting_hare()
 
-
+        # prepare the big dict for saving.
+        # YES we could have named this better.
         self.big_dict[index] = new_dict
 
-
+    # grabs all the positions of the players to send them out to the client.
     def create_current_state(self):
         current_state = {}
 
-        # Prepare current state to send to clients
+        # prepare current state to send to clients
         for agent in self.stag_hare.state.agent_positions:
             hidden_second_dict = {}
             hidden_second_dict["X_COORD"] = int(self.stag_hare.state.agent_positions[agent][1])
@@ -298,7 +289,7 @@ class gameInstance():
             current_state[agent] = hidden_second_dict
         return current_state
 
-
+    # generate all the other peeps we need to roudn out the game size.
     def create_hunters(self):
         new_hunters = []
         for i in range(len(self.connected_clients)): # connected clients is only the clients who are supposed to be in the game
@@ -329,6 +320,7 @@ class gameInstance():
 
         self.hunters = new_hunters
 
+    # find hte hunters that killed the hare. very annoying.
     def find_hunter_hare(self):
         global HARE_POINTS
 
@@ -347,7 +339,6 @@ class gameInstance():
             agent = next(agent for agent in self.stag_hare.agents if agent.name == str(hunter))
             if not (agent.is_hunting_hare()): # if we aren't hunting the hare, then don't consider us.
                 continue
-
 
 
             if abs(positionX - hare_positionX) == 1 and positionY == hare_positionY or \
@@ -374,7 +365,7 @@ class gameInstance():
 
                 self.worker2(hunter, self.round, small_dict)
 
-    # given that we already know that the stag is dead, all players receive points. Much easier than hare.f
+    # given that we already know that the stag is dead, all players receive points. Much easier than hare
     def find_hunter_stag(self):
 
         for hunter in self.stag_hare.state.agent_positions:
@@ -384,14 +375,15 @@ class gameInstance():
             small_dict = {}
             small_dict["stag"] = True
 
+            # made to work with race conditions (small_dict is a shared resource)
             self.worker2(hunter, self.round, small_dict)
 
     def worker2(self, hunter_name, round, updated_states_dict):
-        # Ensure player_points is a Manager dictionary
+        # see if the fetcher is empty.
         if hunter_name not in self.player_points:
             # If the hunter doesn't exist in the dictionary, create an entry for them
             self.player_points[hunter_name] = {}
-
+        # create a new entry.
         current_entry = self.player_points[hunter_name]
 
         # If the round doesn't exist, create a new entry for that round
@@ -405,11 +397,11 @@ class gameInstance():
         if "stag" in updated_states_dict:
             current_entry[round]["stag"] = updated_states_dict["stag"]
 
-        # Using `update()` to ensure changes are reflected in the Manager dict
+        # set the new entry into the thing.
         self.player_points[hunter_name] = current_entry
 
 
-
+    # clear everything out and recreate the sim.
     def reset_stag_hare(self):
         self.hunters.clear()
         self.create_hunters()
@@ -420,6 +412,7 @@ class gameInstance():
                 break
         self.stag_hare = stag_hare
 
+    # create the player points dict when we start the game.
     def player_points_initialization(self):
         player_points = {}
         for hunter in self.hunters:
@@ -441,6 +434,7 @@ class gameInstance():
                     player_points[hunter.name] = current_entry
         self.player_points = player_points
 
+     # idk why some of these are in C++ naming convention. Who knows?
     def adjust_points(self):
         for currRound in range(self.start_round, self.max_rounds + 1):  # if we ever don't have a player this will blow up
             hareKillers = 0
@@ -477,17 +471,18 @@ class gameInstance():
         return self.player_points
 
 
+    # creates the filename fo for the stuff we want to save.
     def get_unique_filename(self, file_path):
         if not os.path.exists(file_path):
             return file_path
         else:
             base, extension = os.path.splitext(file_path)
-            counter = 1
+            counter = 1 # just to make sure we don't overwrite anything. better duplicates than erasing.
             while os.path.exists(f"{base}_{counter}{extension}"):
                 counter += 1
             return f"{base}_{counter}{extension}"
 
-
+    # saves everything on this level just to make sure.
     def save_stuff_big(self, high_level_dict, current_round):
         desktop_path = os.path.expanduser("~/Desktop")
         folder_path = os.path.join(desktop_path, "stag_hare_jsons", "low_level_jsons")

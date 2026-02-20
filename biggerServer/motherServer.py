@@ -4,20 +4,12 @@ import json
 import socket
 import copy
 
-BLACKCOLOR = (0, 0, 0)
-WHITECOLOR = (255, 255, 255)
-
-from agents.random_agent import *
-from agents.human import *
-from environment.world import StagHare
 from server import enemy
 from gameServer import GameServer
-import gameServer
 
 
-# NOTE
-HUMAN_PLAYERS = 7 # how many human players (clients) we are expecting (This should be 12 for the full study)
 
+HUMAN_PLAYERS = 7 # how many human players (clients) we are expecting
 PAUSE_TIME = 3
 
 connected_clients = {}
@@ -31,7 +23,7 @@ MAX_ROUNDS = 2
 round = 1
 
 
-
+# calculate that this server side, not client side.
 HARE_POINTS = 10
 STAG_POINTS = 20
 # these ones always stay the same
@@ -53,19 +45,18 @@ def start_server(host='10.55.10.103', port=12345):
         data = client_socket.recv(1024)
 
         try:
-            # Deserialize the JSON data
+            # deserialize the data
             received_json = json.loads(data.decode())
             client_usernames[len(connected_clients)] = received_json["USERNAME"]
 
-
-            # Create a response
+            # formulate a response
             response = {
                 "message": "Hello from the server!",
                 "HEIGHT": HEIGHT,
                 "WIDTH": WIDTH,
                 "CLIENT_ID" : client_id_dict[client_socket],
             }
-            # Serialize and send the response as JSON
+            # serialize and send the response as JSON
             client_socket.send(json.dumps(response).encode())
         except json.JSONDecodeError:
             pass # don't do anything but still handle the exception

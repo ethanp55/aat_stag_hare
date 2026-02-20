@@ -25,9 +25,11 @@ class GameServer():
         self.client_usernames = client_usernames
         self.points = self.player_points_initialization()
         self.current_round = 0
+        # this takes the stuff at a high level.
         self.high_level_dict = {}  # this stores the round and then situation break down.
         self.scheduler(new_clients)
 
+    # this is where the meat of the function happens.
     def scheduler(self, new_clients):
         q = multiprocessing.Queue()
 
@@ -39,7 +41,7 @@ class GameServer():
         #     self.run_games(games_list, q, current_round)
         #     self.append_average_points(current_round)
 
-        # # PRACTICE ROUNDS 1 AND 2.
+        # # PRACTICE ROUNDS 1 AND 2. One with pure hare, one with pure stag.
         current_round = 1
         player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
         situations = [["PH"], ["PH"], ["PH"], ["PH"], ["PH"], ["PH"], ["PH"]]  # the number and type of bot we are expecting.
@@ -47,6 +49,7 @@ class GameServer():
         self.run_games(games_list, q, current_round)
         self.append_average_points(current_round)
 
+        # this was in an attempt to not try and really
         current_round = 2
         player_indices_round_2 = [[0], [1], [2], [3], [4], [5], [6]]  # the players that will be in the same game
         situations = [["PS"], ["PS"], ["PS"], ["PS"], ["PS"], ["PS"], ["PS"]]  # the number and type of bot we are expecting.
@@ -54,9 +57,12 @@ class GameServer():
         self.run_games(games_list, q, current_round)
         self.append_average_points(current_round)
 
+        # recreate the points so the previous rounds don't count against the players.
         self.points = self.player_points_initialization() #  # reset the points. Clear the dict and start all over.
 
         # START OF THE ACTUAL GAME.
+        # were there ways to better optimize the situations list? definitely.
+        # that is definitely something I would fix on a refactor.
         current_round = 1
         player_indices_round_2 = [[0, 1, 5], [2], [3, 4], [6]]   # the players that will be in the same game
         situations = [["B"], ["D"], ["C"], ["A"]]  # the number and type of bot we are expecting.
@@ -98,7 +104,7 @@ class GameServer():
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, )
         self.run_games(games_list, q, current_round)
         self.append_average_points(current_round)
-        self.save_stuff_small()
+        self.save_stuff_small() # no real reason to do it here, was done for debugging purposes.
 
         current_round = 7
         player_indices_round_2 = [[0, 6], [1], [2], [3, 4, 5]]
@@ -206,13 +212,15 @@ class GameServer():
         games_list = self.create_game_processes(player_indices_round_2, current_round, new_clients, q, situations, )
         self.run_games(games_list, q, current_round)
         self.append_average_points(current_round)
-        self.save_stuff_small()
+        self.save_stuff_small() # this is the only place where it really matters, filesize might have been an issue a time or two.
 
+    # this thing is a DOOZY
     def create_game_processes(self, player_indices, current_round, new_clients, q, situations, save=True):
-        games_list = []
+        games_list = [] # a lit of all the games we want to run (as delta functions)
 
-        for i, indices in enumerate(player_indices): # should? now sort through the agent types and make sure it spits out the correct thing.
+        for i, indices in enumerate(player_indices): # every list in the list of lists of players that we need to treat separate.
             # Create a new process for each list of indices
+            # we also need to create the player dict pairs, pass in the queue, the current round, the expected situation, and if we want to write it to json
             game_process = Process(target=self.game_thread,
                                    args=(
                                    self.create_player_dict_pairs(indices, new_clients), q, current_round,
@@ -223,6 +231,7 @@ class GameServer():
 
 
     def run_games(self, games_list, q, current_round):
+        # modifies self.points more than anything else after the games conclude.
         self.start_and_join_games(games_list, q)
         points_to_send, points_to_save = self.calc_avg_points(current_round)
         self.points_to_save = points_to_save
@@ -230,18 +239,23 @@ class GameServer():
 
 
     def start_and_join_games(self, games_list, q):
+        # start the threads
         for game in games_list:
             game.start()
-
+        # monitor the threads
         for game in games_list:
             game.join()
 
+        # create the smaller dicts and the big dicts prepared
         dicts_to_merge = []
         all_big_dicts = []
+        # pop all the return values off the queue and add it to the list
         while not q.empty():
             item = q.get()
             dicts_to_merge.append(item)
 
+        # combine all possible instances and throw it in the big one.
+        # also modifies self.points, which is where the real magic happens.
         return self.merge_dicts(dicts_to_merge), all_big_dicts
 
 
@@ -285,6 +299,7 @@ class GameServer():
                         for index, update in updates.items(): # we actually need to check if this isn't empty.
                             self.points[key][index] = update
 
+        # I guess I don't use this anymore?
         situation_player_dict = {}
         for situation in dicts_to_merge:
             situation_list = []
@@ -297,7 +312,7 @@ class GameServer():
 
     def calc_avg_points(self, target_round):
         new_list_to_send = [] # list of tuples, holds the clientID and then the number of points that they have accrued
-        new_list_to_save = []
+        new_list_to_save = [] # this holds the serverSide playerID and then the number of points they ahve accrued.
         for key in self.points:
             curr_points = 0
             for curr_round in self.points[key]:
@@ -324,7 +339,7 @@ class GameServer():
         sorted_save_tuples = sorted(new_list_to_save, key=lambda x: x[1], reverse=True)
         return sorted_points, sorted_save_tuples
 
-
+    # fairly straightforward. Takes in hte new points and sends them out.
     def send_leaderboard(self, new_points_dict):
         time.sleep(2)  # lets everyone see the leaderboard
         message = {
@@ -374,7 +389,7 @@ class GameServer():
                 counter += 1
             return f"{base}_{counter}{extension}"
 
-# Custom encoder to handle np.int64 conversion to Python int
+# I bet this was useful at some point and I neatly side stepped it.
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.int64):
